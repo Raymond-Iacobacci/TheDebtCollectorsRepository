@@ -1,1 +1,0 @@
-# Changelog for Frontend Modifications
