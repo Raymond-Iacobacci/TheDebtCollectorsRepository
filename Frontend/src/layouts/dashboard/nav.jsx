@@ -17,7 +17,7 @@ import { useResponsive } from 'src/hooks/use-responsive';
 
 import { account } from 'src/_mock/account';
 
-import Logo from 'src/components/logo';
+// import Logo from 'src/components/logo';
 import Scrollbar from 'src/components/scrollbar';
 
 import { NAV } from './config-layout';
@@ -70,6 +70,26 @@ export default function Nav({ openNav, onCloseNav }) {
     </Stack>
   );
 
+  const renderLogo = (
+    <Box
+      sx={{
+        my: 3,
+        mx: 2.5,
+        py: 2,
+        px: 2.5,
+        display: 'flex',
+        borderRadius: 1.5,
+        alignItems: 'center',
+        bgcolor: (theme) => alpha(theme.palette.grey[500], 0.12),
+      }}
+    >
+
+      <Box sx={{ ml: 2 }}>
+        <Typography align="justify" variant="h6">Property Management Suite</Typography>
+      </Box>
+    </Box>
+  );
+
   const renderContent = (
     <Scrollbar
       sx={{
@@ -81,7 +101,9 @@ export default function Nav({ openNav, onCloseNav }) {
         },
       }}
     >
-      <Logo sx={{ mt: 3, ml: 4 }} />
+      
+      {/* <Logo sx={{ mt: 3, ml: 4 }} /> */}
+      {renderLogo}
 
       {renderAccount}
 
