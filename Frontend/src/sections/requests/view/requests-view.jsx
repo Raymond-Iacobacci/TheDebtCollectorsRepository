@@ -109,9 +109,9 @@ export default function RequestPage() {
           <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
             <Typography variant="h4">Requests</Typography>
 
-            <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
+            {/* <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
               New Request
-            </Button>
+            </Button> */}
           </Stack>
           
           <Card>
@@ -188,7 +188,7 @@ export default function RequestPage() {
             <Grid xs={12} md={6} lg={8}>
               <RequestDescription
                 title={currentRequest.type}
-                subheader={currentRequest.address}
+                subheader={`${currentRequest.name} @ ${currentRequest.address}`}
                 description={currentRequest.description}
                 list={[...Array(1)].map((_, index) => ({
                   id: faker.string.uuid(),
@@ -198,6 +198,12 @@ export default function RequestPage() {
                   postedAt: faker.date.recent(),
                 }))}
                 request={currentRequest}
+                commentList={[...Array(1)].map((_i, i_x) => ({
+                  id: faker.string.uuid(),
+                  user: "Manager",
+                  text: "Some comment here denoting an update for the specific request. This can be utilized for both the tenant and manager to communicate.",
+                  postedAt: faker.date.recent(),
+                }))}
               />
             </Grid>
             <Grid xs={12} md={6} lg={4}>
