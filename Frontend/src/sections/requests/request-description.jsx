@@ -47,7 +47,7 @@ export default function RequestDescription({ title, subheader, description, list
           </Typography>
           <Stack spacing={3} sx={{ pt: 2, pr: 0 }}>
             {list.map((news) => (
-              <NewsItem key={news.id} news={news} />
+              <AttachmentItem key={news.id} news={news} />
             ))}
           </Stack>
         </Stack>
@@ -80,16 +80,6 @@ export default function RequestDescription({ title, subheader, description, list
           </Stack>
         </Stack>
       </Scrollbar>
-
-      {/* <Box sx={{ p: 2, textAlign: 'right' }}>
-        <Button
-          size="small"
-          color="inherit"
-          endIcon={<Iconify icon="eva:arrow-ios-forward-fill" />}
-        >
-          View all
-        </Button>
-      </Box> */}
     </Card>
   );
 }
@@ -105,7 +95,7 @@ RequestDescription.propTypes = {
 
 // ----------------------------------------------------------------------
 
-function NewsItem({ news }) {
+function AttachmentItem({ news }) {
   const { image, title, description, postedAt } = news;
 
   return (
@@ -134,7 +124,7 @@ function NewsItem({ news }) {
   );
 }
 
-NewsItem.propTypes = {
+AttachmentItem.propTypes = {
   news: PropTypes.shape({
     image: PropTypes.string,
     title: PropTypes.string,

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 // import PropTypes from 'prop-types';
-import { faker } from '@faker-js/faker';
+// import { faker } from '@faker-js/faker';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -35,18 +35,6 @@ export default function RequestPage() {
 
   const [currentRequest, setCurrentRequest] = useState(null);
 
-  const handleOpenPopup = () => {
-    setPopup(true);
-  }
-  
-  const handleClosePopup = () => {
-    setPopup(null);
-  }
-
-  const handleSelectRequest = (id) => {
-    setCurrentRequest(requests.find(req => req.id === id))
-  }
-
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -64,15 +52,6 @@ export default function RequestPage() {
       setOrderBy(id);
     }
   };
-
-  // const handleSelectAllClick = (event) => {
-  //   if (event.target.checked) {
-  //     const newSelecteds = requests.map((n) => n.name);
-  //     setSelected(newSelecteds);
-  //     return;
-  //   }
-  //   setSelected([]);
-  // };
 
   const handleExpand = (event, name) => {
     handleSelectRequest(name);
@@ -92,6 +71,18 @@ export default function RequestPage() {
     setPage(0);
     setFilterName(event.target.value);
   };
+
+  const handleOpenPopup = () => {
+    setPopup(true);
+  }
+  
+  const handleClosePopup = () => {
+    setPopup(null);
+  }
+
+  const handleSelectRequest = (id) => {
+    setCurrentRequest(requests.find(req => req.id === id))
+  }
 
   const dataFiltered = applyFilter({
     inputData: requests,
@@ -116,7 +107,6 @@ export default function RequestPage() {
           
           <Card>
             <UserTableToolbar
-              // numSelected={selected.length}
               filterName={filterName}
               onFilterName={handleFilterByName}
             />
@@ -128,7 +118,6 @@ export default function RequestPage() {
                     order={order}
                     orderBy={orderBy}
                     rowCount={requests.length}
-                    // numSelected={selected.length}
                     onRequestSort={handleSort}
                     headLabel={[
                       { id: 'name', label: 'Name' },
@@ -190,43 +179,15 @@ export default function RequestPage() {
                 title={currentRequest.type}
                 subheader={`${currentRequest.name} @ ${currentRequest.address}`}
                 description={currentRequest.description}
-                list={[...Array(1)].map((_, index) => ({
-                  id: faker.string.uuid(),
-                  title: "Photo of Damages",
-                  description: "Shown here is a photo of the damages that need repaired... etc. This description can be used for various attachment details.",
-                  image: `/assets/images/covers/cover_${index + 1}.jpg`,
-                  postedAt: faker.date.recent(),
-                }))}
+                list={currentRequest.attachments}
                 request={currentRequest}
-                commentList={[...Array(1)].map((_i, i_x) => ({
-                  id: faker.string.uuid(),
-                  user: "Manager",
-                  text: "Some comment here denoting an update for the specific request. This can be utilized for both the tenant and manager to communicate.",
-                  postedAt: faker.date.recent(),
-                }))}
+                commentList={currentRequest.comments}
               />
             </Grid>
             <Grid xs={12} md={6} lg={4}>
               <RequestLogTimeline
                 title="Recent Updates"
-                list={[...Array(5)].map((_, index) => ({
-                  id: faker.string.uuid(),
-                  title: [
-                    'Request submitted by tenant',
-                    'Manager contacted maintenance people',
-                    'Status changed to In Progress',
-                    'Maintenance people visited tenant',
-                    'Status changed to Completed',
-                  ][index],
-                  type: [
-                    'info',
-                    'info',
-                    'ongoing',
-                    'info',
-                    'completed',
-                  ][index],
-                  time: faker.date.past(),
-                }))}
+                list={currentRequest.logs}
               />
             </Grid>
           </Grid>

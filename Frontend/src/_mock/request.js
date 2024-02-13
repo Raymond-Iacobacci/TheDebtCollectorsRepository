@@ -24,5 +24,36 @@ export const requests = [...Array(24)].map((_, index) => ({
     'Plumbing',
     'Emergency Maintenance',
   ]),
-  description: "The HVAC system is acting up, causing discomfort with inconsistent heating. It's urgent to assess and fix this issue. Additionally, my refrigerator is making unusual noises, affecting food preservation and convenience. I kindly request a prompt inspection and necessary repairs to restore optimal functionality. Your swift attention to these matters is crucial for my satisfaction and to prevent further escalation. Thank you for prioritizing these concerns, enhancing my living conditions in a timely manner.",
+  description: faker.lorem.paragraph(8),
+  logs: [...Array(5)].map((_l, l_i) => ({
+    id: faker.string.uuid(),
+    title: [
+      'Request submitted by tenant',
+      'Manager contacted maintenance people',
+      'Status changed to In Progress',
+      'Maintenance people visited tenant',
+      'Status changed to Completed',
+    ][l_i],
+    type: [
+      'info',
+      'info',
+      'ongoing',
+      'info',
+      'completed',
+    ][l_i],
+    time: faker.date.past(),
+  })),
+  attachments: [...Array(1)].map((_a, a_i) => ({
+    id: faker.string.uuid(),
+    title: "Photo of Damages",
+    description: faker.lorem.paragraph(2),
+    image: `/assets/images/covers/cover_${a_i + 1}.jpg`,
+    postedAt: faker.date.recent(),
+  })),
+  comments: [...Array(2)].map((_c, c_i) => ({
+    id: faker.string.uuid(),
+    user: sample(["Manager", "Tenant"]),
+    text: faker.lorem.paragraph(3),
+    postedAt: faker.date.recent(),
+  }))
 }));
