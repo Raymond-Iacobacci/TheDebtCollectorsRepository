@@ -96,16 +96,16 @@ export default function AppView() {
             list={[
               { id: '1', name: 'Fix sink at unit 102.' },
               { id: '2', name: 'Refund safety deposits.' },
-              { id: '3', name: 'Add client A as a tenant to unit 103' },
-              { id: '4', name: 'Email tenant B regarding Request C'  },
-              { id: '5', name: 'Email tenant C regarding Request D'  },
+              { id: '3', name: 'Add client A as a tenant to unit 103.' },
+              { id: '4', name: 'Email tenant B regarding Request C.'  },
+              { id: '5', name: 'Email tenant C regarding Request D.'  },
             ]}
           />
 
         </Grid>
         <Grid xs={12} md={6} lg={4}>
           <AppOrderTimeline
-            title="Order Timeline"
+            title="Payment Timeline"
             list={[...Array(5)].map((_, index) => ({
               id: faker.string.uuid(),
               title: [
