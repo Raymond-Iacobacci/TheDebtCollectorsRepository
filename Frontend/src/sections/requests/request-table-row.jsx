@@ -2,10 +2,11 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import Stack from '@mui/material/Stack';
+// import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
 import Popover from '@mui/material/Popover';
 import TableRow from '@mui/material/TableRow';
-import Checkbox from '@mui/material/Checkbox';
+// import Checkbox from '@mui/material/Checkbox';
 import MenuItem from '@mui/material/MenuItem';
 import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
@@ -38,8 +39,10 @@ export default function UserTableRow({
   return (
     <>
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
-        <TableCell padding="checkbox">
-          <Checkbox disableRipple checked={selected} onChange={handleClick} />
+        <TableCell align="center" padding="checkbox">
+          <IconButton onClick={handleClick}>
+            <Iconify icon="eva:expand-fill" />
+          </IconButton>
         </TableCell>
 
         <TableCell component="th" scope="row" padding="none">

@@ -1,12 +1,16 @@
 // import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { faker } from '@faker-js/faker';
 
-import Card from '@mui/material/Card';
+// import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Unstable_Grid2';
+// import Typography from '@mui/material/Typography';
 
 import Iconify from 'src/components/iconify';
+
+import RequestLogTimeline from './request-log-timeline';
 
 export default function RequestPopup({
   handleClosePopup
@@ -14,18 +18,34 @@ export default function RequestPopup({
   return (
     <>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h4">Request Specifics</Typography>
+        <Button onClick={handleClosePopup} variant="contained" color="inherit" startIcon={<Iconify icon="eva:corner-down-left-fill" />}>
+          Back
+        </Button>
 
-          <Button onClick={handleClosePopup} variant="contained" color="inherit" startIcon={<Iconify icon="eva:edit-fill" />}>
-            Temporary Close Popup
-          </Button>
+        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:edit-fill" />}>
+          Edit
+        </Button>
       </Stack>
-      <Card>
-      <Stack direction="row" alignItems="center" spacing={2}>
-        <Typography variant="h4">Name</Typography>
-        <Typography variant="h4">Date</Typography>
-      </Stack>
-      </Card>
+      
+      <Grid container spacing={3}>
+        <Grid xs={12} md={6} lg={4}>
+          <RequestLogTimeline
+            title="Payment Timeline"
+            list={[...Array(5)].map((_, index) => ({
+              id: faker.string.uuid(),
+              title: [
+                '1983, orders, $4220',
+                '12 Invoices have been paid',
+                'Order #37745 from September',
+                'New order placed #XF-2356',
+                'New order placed #XF-2346',
+              ][index],
+              type: `order${index + 1}`,
+              time: faker.date.past(),
+            }))}
+          />
+        </Grid>
+      </Grid>
     </>
   );
 }
