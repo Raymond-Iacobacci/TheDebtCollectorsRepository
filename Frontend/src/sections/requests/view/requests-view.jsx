@@ -180,40 +180,45 @@ export default function RequestPage() {
             <Button onClick={handleClosePopup} variant="contained" color="inherit" startIcon={<Iconify icon="eva:corner-down-left-fill" />}>
               Back
             </Button>
-    
             <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:edit-fill" />}>
               Edit
             </Button>
           </Stack>
-          <h1>{currentRequest.type}</h1>
-          <h2>{currentRequest.id}</h2>
           <Grid container spacing={3}>
             <Grid xs={12} md={6} lg={8}>
               <RequestDescription
-                title="Request Details"
-                subheader="Water Leak"
-                list={[...Array(5)].map((_, index) => ({
+                title={currentRequest.type}
+                subheader={currentRequest.address}
+                description={currentRequest.description}
+                list={[...Array(1)].map((_, index) => ({
                   id: faker.string.uuid(),
-                  title: faker.person.jobTitle(),
-                  description: faker.commerce.productDescription(),
+                  title: "Photo of Damages",
+                  description: "Shown here is a photo of the damages that need repaired... etc. This description can be used for various attachment details.",
                   image: `/assets/images/covers/cover_${index + 1}.jpg`,
                   postedAt: faker.date.recent(),
                 }))}
+                request={currentRequest}
               />
             </Grid>
             <Grid xs={12} md={6} lg={4}>
               <RequestLogTimeline
-                title="Payment Timeline"
+                title="Recent Updates"
                 list={[...Array(5)].map((_, index) => ({
                   id: faker.string.uuid(),
                   title: [
-                    '1983, orders, $4220',
-                    '12 Invoices have been paid',
-                    'Order #37745 from September',
-                    'New order placed #XF-2356',
-                    'New order placed #XF-2346',
+                    'Request submitted by tenant',
+                    'Manager contacted maintenance people',
+                    'Status changed to In Progress',
+                    'Maintenance people visited tenant',
+                    'Status changed to Completed',
                   ][index],
-                  type: `order${index + 1}`,
+                  type: [
+                    'info',
+                    'info',
+                    'ongoing',
+                    'info',
+                    'completed',
+                  ][index],
                   time: faker.date.past(),
                 }))}
               />
