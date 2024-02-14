@@ -25,7 +25,7 @@ export const requests = [...Array(24)].map((_, index) => ({
     'Emergency Maintenance',
   ]),
   description: faker.lorem.paragraph(8),
-  logs: [...Array(5)].map((_l, l_i) => ({
+  logs: [...Array(Math.floor(Math.random() *4) +1)].map((_l, l_i) => ({
     id: faker.string.uuid(),
     title: [
       'Request submitted by tenant',
