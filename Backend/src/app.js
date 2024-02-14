@@ -1,10 +1,11 @@
 const express = require('express');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth2').Strategy;
 const session = require('express-session');
-require('dotenv').config({ path: '../.env' });
+const GoogleStrategy = require('passport-google-oauth2').Strategy;
+const passport = require('passport');
 const mysql = require('mysql');
 const sendEmail = require('./sendEmail');
+const crypto = require('crypto')
+require('dotenv').config({ path: '../.env' });
 
 const app = express();
 const PORT = 8080;
@@ -16,50 +17,42 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://localhost:8080/google/callback",
-    passReqToCallback: true
-  },
-  function(request, accessToken, refreshToken, profile, done) {
-    // You can implement logic to store user profile information in the database
-    return done(null, profile);
-  }
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: "http://localhost:8080/google/callback",
+  passReqToCallback: true
+},
+function(request, accessToken, refreshToken, profile, done) {
+  return done(null, profile);
+}
 ));
 
 passport.serializeUser(function(user, done) {
-    done(null, user);
+  done(null, user);
 });
 
 passport.deserializeUser(function(obj, done) {
-    done(null, obj);
+  done(null, obj);
 });
 
-function generateUniqueLink() {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-}
-
-// Define a route for generating a unique link
-app.get('/generate-link', (req, res) => {
-    const uniqueLink = generateUniqueLink();
-    res.send(`Unique link generated: <a href="/${uniqueLink}">${uniqueLink}</a>`);
+// Route for sending OAuth email
+app.get('/send-email', (req, res) => {
+  const emailToken = crypto.randomBytes(20).toString('hex');
+  const oauthLink = `http://localhost:8080/auth/google?oauth_token=${emailToken}`;
+  res.send(`Unique link generated: <a href="${oauthLink}">${oauthLink}</a>`);
 });
 
-// Define a route for handling the unique link and using Passport to authenticate with Google OAuth 2.0
-app.get('/:uniqueLink', passport.authenticate('google', { scope: ['profile', 'email'] }));
+// Route for initiating OAuth authentication
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// Define a route for Google OAuth 2.0 callback
-app.get('/google/callback', 
-  passport.authenticate('google', 
-  { successRedirect: '/success',
-    failureRedirect: '/failure' }));
-
-app.get('/success', (req, res) => {
-  res.send("Success");
+// OAuth callback route
+app.get('/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
+    // Successful authentication, redirect user to appropriate page
+    res.redirect('/success');
 });
 
-app.get('/failure', (req, res) => {
-  res.send("failure");
+app.get("/success", (req, res) => {
+  res.send("success");
 });
 
 const pool = mysql.createPool({
