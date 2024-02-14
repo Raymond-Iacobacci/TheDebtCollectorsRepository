@@ -1,10 +1,7 @@
 const express = require('express');
-const session = require('express-session');
-const GoogleStrategy = require('passport-google-oauth2').Strategy;
-const passport = require('passport');
 const mysql = require('mysql');
 const sendEmail = require('./sendEmail');
-const crypto = require('crypto')
+const authRouter = require('./auth');
 require('dotenv').config({ path: '../.env' });
 
 const app = express();
@@ -12,48 +9,7 @@ const PORT = 8080;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(session({ secret: 'your_secret_key', resave: false, saveUninitialized: false }));
-app.use(passport.initialize());
-app.use(passport.session());
-
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://localhost:8080/google/callback",
-  passReqToCallback: true
-},
-function(request, accessToken, refreshToken, profile, done) {
-  return done(null, profile);
-}
-));
-
-passport.serializeUser(function(user, done) {
-  done(null, user);
-});
-
-passport.deserializeUser(function(obj, done) {
-  done(null, obj);
-});
-
-// Route for sending OAuth email
-app.get('/send-email', (req, res) => {
-  const emailToken = crypto.randomBytes(20).toString('hex');
-  const oauthLink = `http://localhost:8080/auth/google?oauth_token=${emailToken}`;
-  res.send(`Unique link generated: <a href="${oauthLink}">${oauthLink}</a>`);
-});
-
-// Route for initiating OAuth authentication
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-// OAuth callback route
-app.get('/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
-    // Successful authentication, redirect user to appropriate page
-    res.redirect('/success');
-});
-
-app.get("/success", (req, res) => {
-  res.send("success");
-});
+app.use('/auth', authRouter);
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
