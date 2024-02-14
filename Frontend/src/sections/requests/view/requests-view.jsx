@@ -178,7 +178,7 @@ export default function RequestPage() {
             <Grid xs={12} md={7} lg={8}>
               <RequestDescription
                 title={currentRequest.type}
-                subheader={`${currentRequest.name} @ ${currentRequest.address}`}
+                subheader={`${currentRequest.name}  @  ${currentRequest.address}`}
                 description={currentRequest.description}
                 list={currentRequest.attachments}
                 request={currentRequest}
