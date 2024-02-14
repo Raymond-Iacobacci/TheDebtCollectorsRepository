@@ -1,12 +1,66 @@
 const express = require('express');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth2').Strategy;
+const session = require('express-session');
+require('dotenv').config({ path: '../.env' });
 const mysql = require('mysql');
 const sendEmail = require('./sendEmail');
-require('dotenv').config({ path: '../.env' });
 
 const app = express();
 const PORT = 8080;
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(session({ secret: 'your_secret_key', resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "https://localhost:8080/google/callback",
+    passReqToCallback: true
+  },
+  function(request, accessToken, refreshToken, profile, done) {
+    // You can implement logic to store user profile information in the database
+    return done(null, profile);
+  }
+));
+
+passport.serializeUser(function(user, done) {
+    done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+    done(null, obj);
+});
+
+function generateUniqueLink() {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+
+// Define a route for generating a unique link
+app.get('/generate-link', (req, res) => {
+    const uniqueLink = generateUniqueLink();
+    res.send(`Unique link generated: <a href="/${uniqueLink}">${uniqueLink}</a>`);
+});
+
+// Define a route for handling the unique link and using Passport to authenticate with Google OAuth 2.0
+app.get('/:uniqueLink', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+// Define a route for Google OAuth 2.0 callback
+app.get('/google/callback', 
+  passport.authenticate('google', 
+  { successRedirect: '/success',
+    failureRedirect: '/failure' }));
+
+app.get('/success', (req, res) => {
+  res.send("Success");
+});
+
+app.get('/failure', (req, res) => {
+  res.send("failure");
+});
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
