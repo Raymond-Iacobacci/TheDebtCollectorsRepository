@@ -1,6 +1,4 @@
 import { useState } from 'react';
-// import PropTypes from 'prop-types';
-// import { faker } from '@faker-js/faker';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -174,7 +172,7 @@ export default function RequestPage() {
             </Button>
           </Stack>
           <Grid container spacing={3}>
-            <Grid xs={12} md={6} lg={8}>
+            <Grid xs={12} md={7} lg={8}>
               <RequestDescription
                 title={currentRequest.type}
                 subheader={`${currentRequest.name} @ ${currentRequest.address}`}
@@ -184,7 +182,7 @@ export default function RequestPage() {
                 commentList={currentRequest.comments}
               />
             </Grid>
-            <Grid xs={12} md={6} lg={4}>
+            <Grid xs={12} md={5} lg={4}>
               <RequestLogTimeline
                 title="Recent Updates"
                 list={currentRequest.logs}

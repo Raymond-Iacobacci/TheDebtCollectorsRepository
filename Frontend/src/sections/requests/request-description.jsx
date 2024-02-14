@@ -1,4 +1,7 @@
+import { sample } from 'lodash';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { faker } from '@faker-js/faker';
 
 import Box from '@mui/material/Box';
 // import Link from '@mui/material/Link';
@@ -20,6 +23,22 @@ import Scrollbar from 'src/components/scrollbar';
 // ----------------------------------------------------------------------
 
 export default function RequestDescription({ title, subheader, description, list, commentList, request, ...other }) {
+
+  const [comments, setComments] = useState(commentList);
+
+  const [commentField, setCommentField] = useState("");
+
+  const handleAddComment = (event) => {
+    const newCommentArr = [...comments, {
+      id: faker.string.uuid(),
+      user: sample(["Manager", "Tenant"]),
+      text: commentField,
+      postedAt: new Date(),
+    }]
+    setComments(newCommentArr);
+    setCommentField("");
+  }
+
   return (
     <Card {...other}>
       <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={3} sx={{ p: 0, pr: 3 }}>
@@ -61,12 +80,12 @@ export default function RequestDescription({ title, subheader, description, list
             Comments
           </Typography>
           <Stack spacing={3} sx={{ pt: 2, pr: 0 }}>
-            {commentList.map((comment) => (
+            {comments.map((comment) => (
               <CommentItem key={comment.id} comment={comment} />
             ))}
           </Stack>
           <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={3} sx={{ pt: 2, pr: 3 }}>
-            <IconButton >
+            <IconButton onClick={handleAddComment} size="large" >
               <Iconify icon="eva:plus-circle-outline" />
             </IconButton>
             <TextField
@@ -76,6 +95,8 @@ export default function RequestDescription({ title, subheader, description, list
               fullWidth
               variant="filled"
               size="small"
+              value={commentField}
+              onChange={(event) => {setCommentField(event.target.value)}}
             />
           </Stack>
         </Stack>
