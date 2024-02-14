@@ -50,7 +50,7 @@ export const requests = [...Array(24)].map((_, index) => ({
     image: `/assets/images/covers/cover_${a_i + 1}.jpg`,
     postedAt: faker.date.recent(),
   })),
-  comments: [...Array(Math.floor(Math.random() *3) +1)].map((_c, c_i) => ({
+  comments: [...Array(Math.floor(Math.random()*4))].map((_c, c_i) => ({
     id: faker.string.uuid(),
     user: sample(["Manager", "Tenant"]),
     text: faker.lorem.paragraph(3),
