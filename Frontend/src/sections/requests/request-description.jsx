@@ -33,7 +33,7 @@ export default function RequestDescription({ title, subheader, description, list
   const [status, setStatus] = useState(request.status);
   const [statusPopover, setStatusPopover] = useState(null);
 
-  const [errorStr, setErrorStr] = useState("");
+  const [commentLabel, setCommentLabel] = useState("New Comment");
   const [validate, setValidate] = useState(true);
 
   const handleAddComment = (event) => {
@@ -46,12 +46,12 @@ export default function RequestDescription({ title, subheader, description, list
       }]
       setComments(newCommentArr);
       setCommentField("");
-      setErrorStr("");
+      setCommentLabel("");
       setValidate(true);
     }
     else {
       setValidate(false);
-      setErrorStr("Comment cannot be empty")
+      setCommentLabel("Comment cannot be empty")
     }
   }
 
@@ -149,7 +149,7 @@ export default function RequestDescription({ title, subheader, description, list
             <TextField
               id="filled-multiline"
               error={!validate}
-              label={errorStr}
+              label={commentLabel}
               multiline
               fullWidth
               variant="filled"

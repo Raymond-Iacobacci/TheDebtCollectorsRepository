@@ -1,4 +1,6 @@
+// import { useState } from 'react';
 import PropTypes from 'prop-types';
+// import { faker } from '@faker-js/faker';
 
 import Card from '@mui/material/Card';
 import Timeline from '@mui/lab/Timeline';
@@ -14,11 +16,23 @@ import { fDateTime } from 'src/utils/format-time';
 
 // ----------------------------------------------------------------------
 
-export default function RequestLogTimeline({ title, subheader, list, ...other }) {
+export default function RequestLogTimeline({ title, subheader, logList, ...other }) {
+
+  // const [logs, setLogs] = useState(logList);
+
+  // const handleAddLog = (event) => {
+  //   const newLogArr = [...logs, {
+  //     id: faker.string.uuid(),
+  //     title: "TBD",
+  //     type: "TBD",
+  //     time: new Date(),
+  //   }]
+  //   setLogs(newLogArr);
+  // }
+
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
-
       <Timeline
         sx={{
           m: 0,
@@ -29,8 +43,8 @@ export default function RequestLogTimeline({ title, subheader, list, ...other })
           },
         }}
       >
-        {list.map((item, index) => (
-          <OrderItem key={item.id} item={item} lastTimeline={index === list.length - 1} />
+        {logList.map((item, index) => (
+          <OrderItem key={item.id} item={item} lastTimeline={index === logList.length - 1} />
         ))}
       </Timeline>
     </Card>
@@ -38,7 +52,7 @@ export default function RequestLogTimeline({ title, subheader, list, ...other })
 }
 
 RequestLogTimeline.propTypes = {
-  list: PropTypes.array,
+  logList: PropTypes.array,
   subheader: PropTypes.string,
   title: PropTypes.string,
 };

@@ -31,9 +31,12 @@ export default function RequestSpecificView({ id }) {
   return (
     <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-            <Button onClick={handleGoBack} variant="contained" color="inherit" startIcon={<Iconify icon="eva:corner-down-left-fill" />}>
-                Back
-            </Button>
+            <Button 
+              onClick={handleGoBack} 
+              variant="contained" 
+              color="inherit" 
+              startIcon={<Iconify icon="eva:corner-down-left-fill" />}
+            > Back </Button>
             </Stack>
             <Grid container spacing={3}>
             <Grid xs={12} md={7} lg={8}>
@@ -49,7 +52,7 @@ export default function RequestSpecificView({ id }) {
             <Grid xs={12} md={5} lg={4}>
                 <RequestLogTimeline
                 title="Recent Updates"
-                list={currentRequest.logs}
+                logList={currentRequest.logs}
                 />
             </Grid>
         </Grid>
