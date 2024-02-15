@@ -4,6 +4,7 @@ const GoogleStrategy = require('passport-google-oauth2').Strategy;
 const passport = require('passport');
 const crypto = require('crypto');
 const {pool} = require('./pool')
+const sendEmail = require('./sendEmail')
 require('dotenv').config({ path: '../.env' });
 
 const authRouter = express.Router();
@@ -72,7 +73,9 @@ passport.deserializeUser(function(obj, done) {
 authRouter.get('/send-email', (req, res) => {
   const emailToken = crypto.randomBytes(20).toString('hex');
   const oauthLink = `http://localhost:8080/auth/google?oauth_token=${emailToken}`;
-  res.send(`Unique link generated: <a href="${oauthLink}">${oauthLink}</a>`);
+  const subject = 'Create a DebtCollectors Account';
+  const text = "Your manager has invited you to create a DebtCollectors Account:\n\n" + "Link: " + oauthLink;
+  sendEmail('ajay.talanki@gmail.com', subject, text);
 });
 
 authRouter.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
