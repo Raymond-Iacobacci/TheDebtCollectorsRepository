@@ -4,6 +4,7 @@ const GoogleStrategy = require('passport-google-oauth2').Strategy;
 const passport = require('passport');
 const crypto = require('crypto');
 require('dotenv').config({ path: '../.env' });
+const mysql = require('mysql');
 
 const authRouter = express.Router();
 
@@ -13,6 +14,15 @@ authRouter.use(session({ secret: 'your_secret_key', resave: false, saveUninitial
 authRouter.use(passport.initialize());
 authRouter.use(passport.session());
 
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  port: process.env.DB_PORT,
+  connectionLimit : 1000
+});
+
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -20,9 +30,48 @@ passport.use(new GoogleStrategy({
   passReqToCallback: true
 },
 function(request, accessToken, refreshToken, profile, done) {
-  return done(null, profile);
-}
-));
+  pool.getConnection(function(err, connection) {
+    if (err) {
+      console.error('Error getting database connection:', err);
+      return done(err);
+    }
+  
+    connection.query('SELECT * FROM tenants WHERE googleID = ?', [profile.id], function(queryErr, results) {
+      
+      if (queryErr) {
+        console.error('Error executing SELECT query:', queryErr);
+        connection.release();
+        return done(queryErr);
+      }
+  
+      if (results.length > 0) {
+        console.log(results);
+        console.log("USER WAS FOUND IN THE DATABASE!");
+        connection.release();
+        return done(null, results[0]);
+      }
+  
+      connection.query('INSERT INTO tenants VALUES (?, ?)', [profile.id, profile.email], function(queryErr, results) {
+        connection.release();
+        if (queryErr) {
+          console.error('Error executing INSERT query:', queryErr);
+          return done(queryErr);
+        }
+
+        const newUser = {
+          id: profile.id,
+          email: profile.email
+        };
+        
+        newUser.id = results.insertId; 
+        console.log(user);
+        console.log("USER WAS ADDED TO THE DATABASE!");
+        return done(null, newUser);
+      });
+    });
+  });
+})
+); 
 
 passport.serializeUser(function(user, done) {
   done(null, user);
