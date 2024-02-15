@@ -146,9 +146,6 @@ export default function RequestDescription({ title, subheader, description, list
             ))}
           </Stack>
           <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={3} sx={{ pt: 2, pr: 3 }}>
-            <IconButton onClick={handleAddComment} size="large" >
-              <Iconify icon="eva:plus-circle-outline" />
-            </IconButton>
             <TextField
               id="filled-multiline"
               error={!validate}
@@ -160,6 +157,9 @@ export default function RequestDescription({ title, subheader, description, list
               value={commentField}
               onChange={(event) => {setCommentField(event.target.value)}}
             />
+            <IconButton onClick={handleAddComment} size="large" >
+              <Iconify icon="eva:plus-circle-outline" />
+            </IconButton>
           </Stack>
         </Stack>
       </Scrollbar>
@@ -181,9 +181,20 @@ RequestDescription.propTypes = {
 function AttachmentItem({ attachment }) {
   const { image, title, description, postedAt } = attachment;
 
+  const [popover, setPopover] = useState(null);
+
+  const handleOpen = (event) => {
+    setPopover(event.currentTarget);
+  };
+
+  const handleClose = (event) => {
+    setPopover(null);
+  }
+
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
       <Box
+        onClick={handleOpen}
         component="img"
         alt={title}
         src={image}
@@ -197,6 +208,27 @@ function AttachmentItem({ attachment }) {
           },
         }}
       />
+      <Popover
+        open={!!popover}
+        anchorEl={popover}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'center', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'center', horizontal: 'left' }}
+        style={{
+          display: 'flex',
+          padding: '30px',
+          position: 'absolute',
+          maxWidth: '65%',
+          maxHeight: 'auto'
+      }}
+      >
+        <Box
+        onClick={handleClose}
+        component="img"
+        alt={title}
+        src={image}
+        />
+      </Popover>
 
       <Box sx={{ minWidth: 240, flexGrow: 1 }}>
         <Typography color="inherit" variant="subtitle2" underline="hover" noWrap>
