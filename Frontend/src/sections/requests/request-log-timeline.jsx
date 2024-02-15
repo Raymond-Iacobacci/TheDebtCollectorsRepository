@@ -52,9 +52,9 @@ function OrderItem({ item, lastTimeline }) {
       <TimelineSeparator>
         <TimelineDot
           color={
-            (type === 'info' && 'primary') ||
+            (type === 'start' && 'error') ||
             (type === 'completed' && 'success') ||
-            (type === 'info' && 'info') ||
+            (type === 'info' && 'primary') ||
             (type === 'ongoing' && 'warning') ||
             'error'
           }

@@ -1,17 +1,17 @@
 import { Helmet } from 'react-helmet-async';
 
-import { RequestView } from 'src/sections/requests/view';
+import { RequestsView } from 'src/sections/requests/view';
 
 // ----------------------------------------------------------------------
 
-export default function UserPage() {
+export default function RequestPage() {
   return (
     <>
       <Helmet>
-        <title> User | Property Management Suite </title>
+        <title> Requests | Property Management Suite </title>
       </Helmet>
 
-      <RequestView />
+      <RequestsView/>
     </>
   );
 }

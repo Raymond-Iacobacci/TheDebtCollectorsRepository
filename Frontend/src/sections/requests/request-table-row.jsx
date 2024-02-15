@@ -2,15 +2,15 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import Stack from '@mui/material/Stack';
-// import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
 import Popover from '@mui/material/Popover';
 import TableRow from '@mui/material/TableRow';
-// import Checkbox from '@mui/material/Checkbox';
 import MenuItem from '@mui/material/MenuItem';
 import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+
+import { usePathname } from 'src/routes/hooks';
 
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
@@ -18,7 +18,7 @@ import Iconify from 'src/components/iconify';
 // ----------------------------------------------------------------------
 
 export default function UserTableRow({
-  selected,
+  id,
   name,
   avatarUrl,
   address,
@@ -26,6 +26,9 @@ export default function UserTableRow({
   status,
   handleClick,
 }) {
+
+  const pathname = usePathname();
+
   const [open, setOpen] = useState(null);
 
   const handleOpenMenu = (event) => {
@@ -38,9 +41,11 @@ export default function UserTableRow({
 
   return (
     <>
-      <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
+      <TableRow hover tabIndex={-1} role="checkbox">
         <TableCell align="center" padding="checkbox">
-          <IconButton onClick={handleClick}>
+          <IconButton 
+            href={`${pathname}/${id}`}
+            onClick={handleClick}>
             <Iconify icon="eva:expand-fill" />
           </IconButton>
         </TableCell>
@@ -92,11 +97,11 @@ export default function UserTableRow({
 }
 
 UserTableRow.propTypes = {
+  id: PropTypes.any,
   avatarUrl: PropTypes.any,
   handleClick: PropTypes.func,
   name: PropTypes.any,
   address: PropTypes.any,
   type: PropTypes.any,
   status: PropTypes.any,
-  selected: PropTypes.any,
 };

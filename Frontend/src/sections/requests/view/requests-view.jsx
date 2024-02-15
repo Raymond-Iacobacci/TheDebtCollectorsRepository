@@ -3,38 +3,30 @@ import { useState } from 'react';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Unstable_Grid2';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
+import { usePathname } from 'src/routes/hooks';
+
 import { requests } from 'src/_mock/request';
 
-import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
-
-// import { usePathname } from 'src/routes/hooks';
-// import { RouterLink } from 'src/routes/components';
 
 import TableNoData from '../table-no-data';
 import UserTableHead from '../user-table-head';
 import UserTableRow from '../request-table-row';
 import TableEmptyRows from '../table-empty-rows';
 import UserTableToolbar from '../user-table-toolbar';
-import RequestDescription from '../request-description';
-import RequestLogTimeline from '../request-log-timeline';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 
 // ----------------------------------------------------------------------
 
-export default function RequestPage() {
+export default function RequestsView() {
 
-  const [popup, setPopup] = useState(null);
-
-  const [currentRequest, setCurrentRequest] = useState(null);
+  const pathname = usePathname();
 
   const [page, setPage] = useState(0);
 
@@ -55,8 +47,7 @@ export default function RequestPage() {
   };
 
   const handleExpand = (event, name) => {
-    handleSelectRequest(name);
-    handleOpenPopup();
+    console.log(`${pathname}/${name}`);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -73,18 +64,6 @@ export default function RequestPage() {
     setFilterName(event.target.value);
   };
 
-  const handleOpenPopup = () => {
-    setPopup(true);
-  }
-  
-  const handleClosePopup = () => {
-    setPopup(null);
-  }
-
-  const handleSelectRequest = (id) => {
-    setCurrentRequest(requests.find(req => req.id === id))
-  }
-
   const dataFiltered = applyFilter({
     inputData: requests,
     comparator: getComparator(order, orderBy),
@@ -95,105 +74,73 @@ export default function RequestPage() {
 
   return (
     <Container>
-      {
-        !popup ? 
-        <>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-            <Typography variant="h4">Requests</Typography>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+        <Typography variant="h4">Requests</Typography>
 
-            {/* <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
-              New Request
-            </Button> */}
-          </Stack>
-          
-          <Card>
-            <UserTableToolbar
-              filterName={filterName}
-              onFilterName={handleFilterByName}
-            />
+        {/* <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
+          New Request
+        </Button> */}
+      </Stack>
+      
+      <Card>
+        <UserTableToolbar
+          filterName={filterName}
+          onFilterName={handleFilterByName}
+        />
 
-            <Scrollbar>
-              <TableContainer sx={{ overflow: 'unset' }}>
-                <Table sx={{ minWidth: 800 }}>
-                  <UserTableHead
-                    order={order}
-                    orderBy={orderBy}
-                    rowCount={requests.length}
-                    onRequestSort={handleSort}
-                    headLabel={[
-                      { id: 'name', label: 'Name' },
-                      { id: 'address', label: 'Address' },
-                      { id: 'type', label: 'Type' },
-                      { id: 'status', label: 'Status'},
-                      { id: '' },
-                    ]}
-                  />
-                  <TableBody>
-                    {dataFiltered
-                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row) => (
-                        <UserTableRow
-                          key={row.id}
-                          avatarUrl={row.avatarUrl}
-                          name={row.name}
-                          address={row.address}
-                          type={row.type}
-                          status={row.status}
-                          handleClick={(event) => handleExpand(event, row.id)}
-                        />
-                      ))}
-
-                    <TableEmptyRows
-                      height={77}
-                      emptyRows={emptyRows(page, rowsPerPage, requests.length)}
+        <Scrollbar>
+          <TableContainer sx={{ overflow: 'unset' }}>
+            <Table sx={{ minWidth: 800 }}>
+              <UserTableHead
+                order={order}
+                orderBy={orderBy}
+                rowCount={requests.length}
+                onRequestSort={handleSort}
+                headLabel={[
+                  { id: 'name', label: 'Name' },
+                  { id: 'address', label: 'Address' },
+                  { id: 'type', label: 'Type' },
+                  { id: 'status', label: 'Status'},
+                  { id: '' },
+                ]}
+              />
+              <TableBody>
+                {dataFiltered
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row) => (
+                    <UserTableRow
+                      key={row.id}
+                      id={row.id}
+                      avatarUrl={row.avatarUrl}
+                      name={row.name}
+                      address={row.address}
+                      type={row.type}
+                      status={row.status}
+                      handleClick={(event) => handleExpand(event, row.id)}
                     />
+                  ))}
 
-                    {notFound && <TableNoData query={filterName} />}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Scrollbar>
+                <TableEmptyRows
+                  height={77}
+                  emptyRows={emptyRows(page, rowsPerPage, requests.length)}
+                />
 
-            <TablePagination
-              page={page}
-              component="div"
-              count={requests.length}
-              rowsPerPage={rowsPerPage}
-              onPageChange={handleChangePage}
-              rowsPerPageOptions={[5, 10, 25]}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </Card>
-        </> : 
-        <>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-            <Button onClick={handleClosePopup} variant="contained" color="inherit" startIcon={<Iconify icon="eva:corner-down-left-fill" />}>
-              Back
-            </Button>
-            <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:edit-fill" />}>
-              Edit
-            </Button>
-          </Stack>
-          <Grid container spacing={3}>
-            <Grid xs={12} md={7} lg={8}>
-              <RequestDescription
-                title={currentRequest.type}
-                subheader={`${currentRequest.name}  @  ${currentRequest.address}`}
-                description={currentRequest.description}
-                list={currentRequest.attachments}
-                request={currentRequest}
-                commentList={currentRequest.comments}
-              />
-            </Grid>
-            <Grid xs={12} md={5} lg={4}>
-              <RequestLogTimeline
-                title="Recent Updates"
-                list={currentRequest.logs}
-              />
-            </Grid>
-          </Grid>
-        </>
-      }
+                {notFound && <TableNoData query={filterName} />}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Scrollbar>
+
+        <TablePagination
+          page={page}
+          component="div"
+          count={requests.length}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handleChangePage}
+          rowsPerPageOptions={[5, 10, 25]}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Card>
     </Container>
   );
 }
