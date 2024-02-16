@@ -29,7 +29,6 @@ function(request, accessToken, refreshToken, profile, done) {
     }
   
     connection.query('SELECT * FROM tenants WHERE googleID = ?', [profile.id], function(queryErr, results) {
-      
       if (queryErr) {
         console.error('Error executing SELECT query:', queryErr);
         connection.release();
@@ -78,14 +77,51 @@ authRouter.get('/send-email', (req, res) => {
   sendEmail('ajay.talanki@gmail.com', subject, text);
 });
 
-authRouter.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+authRouter.get('/login', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 authRouter.get("/success", (req, res) => {
-    res.send("success");
+    res.send("Authentication Succesful!");
 });
 
 authRouter.get('/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
-    res.redirect('http://localhost:8080/auth/success');
+    res.redirect(req.baseUrl + '/success');
 });
+
+authRouter.get('/logout', (req, res) => {
+  req.logout(() => {
+      res.redirect(req.baseUrl + '/loggedout');
+  });
+});
+
+authRouter.get("/loggedout", (req, res) => {
+  res.send("You have succesfully logged out!");
+});
+
+authRouter.get('/check', (req, res) => {
+  if (req.isAuthenticated()) {
+      res.send('Welcome, ' + req.user.username);
+  } else {
+      res.redirect(req.baseUrl + '/login');
+  }
+});
+// TEST TO SEE IF CONTAINER CAN CONNECT TO DATABASE
+// authRouter.get('/show-queries', (req, res) => {
+//   pool.getConnection(function(err, connection) {
+//     if (err) {
+//       res.status(401).send("CONNECTION ERROR");
+//       return done(err);
+//     }
+  
+//     connection.query('SELECT * FROM tenants', function(queryErr, results) {
+//       connection.release(); // Release the connection back to the pool
+  
+//       if (queryErr) {
+//         res.status(401).send("QUERY ERROR");
+//         return;
+//       }
+//       res.send(results);
+//     });
+//   })
+// });
 
 module.exports = authRouter;

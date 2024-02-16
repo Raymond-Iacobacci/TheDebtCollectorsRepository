@@ -9,6 +9,8 @@ RUN npm install
 
 COPY src/ ./src/
 
+COPY .env .
+
 EXPOSE 8080
 
 CMD ["node", "src/app.js"]
