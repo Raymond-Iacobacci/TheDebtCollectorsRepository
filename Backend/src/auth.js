@@ -71,13 +71,26 @@ passport.deserializeUser(function(obj, done) {
 
 authRouter.get('/send-email', (req, res) => {
   const emailToken = crypto.randomBytes(20).toString('hex');
-  const oauthLink = `http://localhost:8080/auth/google?oauth_token=${emailToken}`;
+  const oauthLink = `http://localhost:8080/auth/login?oauth_token=${emailToken}`;
   const subject = 'Create a DebtCollectors Account';
   const text = "Your manager has invited you to create a DebtCollectors Account:\n\n" + "Link: " + oauthLink;
-  sendEmail('ajay.talanki@gmail.com', subject, text);
+
+  sendEmail('ajay.talanki@gmail.com', subject, text, (err) => {
+      if (err) {
+          res.status(500).json({ message: 'Failed to send email' });
+      } else {
+          res.json({ message: 'Email sent successfully' });
+      }
+  });
 });
 
 authRouter.get('/login', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+authRouter.get('/logout', (req, res) => {
+  req.logout(() => {
+      res.redirect(req.baseUrl + '/loggedout');
+  });
+});
 
 authRouter.get("/success", (req, res) => {
     res.send("Authentication Succesful!");
@@ -87,23 +100,26 @@ authRouter.get('/google/callback', passport.authenticate('google', { failureRedi
     res.redirect(req.baseUrl + '/success');
 });
 
-authRouter.get('/logout', (req, res) => {
-  req.logout(() => {
-      res.redirect(req.baseUrl + '/loggedout');
-  });
-});
-
 authRouter.get("/loggedout", (req, res) => {
-  res.send("You have succesfully logged out!");
+    res.send("You have succesfully logged out!");
 });
 
-authRouter.get('/check', (req, res) => {
-  if (req.isAuthenticated()) {
-      res.send('Welcome, ' + req.user.username);
-  } else {
-      res.redirect(req.baseUrl + '/login');
-  }
+authRouter.get("/failure", (req, res) => {
+  res.send("You are not authenticated.");
 });
+
+function checkAuthentication(req, res, next) {
+  if (req.isAuthenticated()) {
+      res.send("Welcome");
+  } else {
+      res.redirect(req.baseUrl + '/failure');
+  }
+}
+
+authRouter.get('/protected', checkAuthentication, (req, res) => {
+  res.send('This is a protected route');
+});
+
 // TEST TO SEE IF CONTAINER CAN CONNECT TO DATABASE
 // authRouter.get('/show-queries', (req, res) => {
 //   pool.getConnection(function(err, connection) {

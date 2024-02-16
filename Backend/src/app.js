@@ -87,14 +87,6 @@ app.post('/make-request', (req, res) =>{
   addEntries('requests', req, res);
 });
 
-app.post('/login-tenant', (req, res) => {
-   login('tenants', req, res);
-});
-
-app.post('/login-manager', (req, res) => {
-   login('managers', req, res);
-});
-
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
 });
