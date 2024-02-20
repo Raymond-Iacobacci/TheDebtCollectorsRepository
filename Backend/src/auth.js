@@ -121,23 +121,23 @@ authRouter.get('/protected', checkAuthentication, (req, res) => {
 });
 
 // TEST TO SEE IF CONTAINER CAN CONNECT TO DATABASE
-// authRouter.get('/show-queries', (req, res) => {
-//   pool.getConnection(function(err, connection) {
-//     if (err) {
-//       res.status(401).send("CONNECTION ERROR");
-//       return done(err);
-//     }
+authRouter.get('/show-queries', (req, res) => {
+  pool.getConnection(function(err, connection) {
+    if (err) {
+      res.status(401).send("CONNECTION ERROR");
+      return done(err);
+    }
   
-//     connection.query('SELECT * FROM tenants', function(queryErr, results) {
-//       connection.release(); // Release the connection back to the pool
+    connection.query('SELECT * FROM tenants', function(queryErr, results) {
+      connection.release(); // Release the connection back to the pool
   
-//       if (queryErr) {
-//         res.status(401).send("QUERY ERROR");
-//         return;
-//       }
-//       res.send(results);
-//     });
-//   })
-// });
+      if (queryErr) {
+        res.status(401).send("QUERY ERROR");
+        return;
+      }
+      res.send(results);
+    });
+  })
+});
 
 module.exports = authRouter;
