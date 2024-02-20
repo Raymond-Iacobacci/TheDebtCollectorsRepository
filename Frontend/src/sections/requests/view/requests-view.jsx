@@ -101,7 +101,6 @@ export default function RequestsView() {
                   { id: 'address', label: 'Address' },
                   { id: 'type', label: 'Type' },
                   { id: 'status', label: 'Status'},
-                  { id: '' },
                 ]}
               />
               <TableBody>
