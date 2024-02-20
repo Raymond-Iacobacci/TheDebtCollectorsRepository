@@ -18,7 +18,7 @@ authRouter.use(passport.session());
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://localhost:8080/auth/google/callback",
+  callbackURL: "https://thedebtcollectorstest-kxfzqfz2rq-uc.a.run.app/auth/google/callback",
   passReqToCallback: true
 },
 function(request, accessToken, refreshToken, profile, done) {
@@ -71,7 +71,7 @@ passport.deserializeUser(function(obj, done) {
 
 authRouter.get('/send-email', (req, res) => {
   const emailToken = crypto.randomBytes(20).toString('hex');
-  const oauthLink = `http://localhost:8080/auth/login?oauth_token=${emailToken}`;
+  const oauthLink = `https://thedebtcollectorstest-kxfzqfz2rq-uc.a.run.app/auth/login?oauth_token=${emailToken}`;
   const subject = 'Create a DebtCollectors Account';
   const text = "Your manager has invited you to create a DebtCollectors Account:\n\n" + "Link: " + oauthLink;
 
