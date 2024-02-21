@@ -1,6 +1,7 @@
 const express = require('express');
-const {pool, displayConnectionError, displayQueryError} = require('./pool.js')
+const { pool, displayConnectionError, displayQueryError } = require('./pool.js');
 const authRouter = require('./auth');
+const cors = require('cors'); 
 require('dotenv').config({ path: '../.env' });
 
 const app = express();
@@ -8,6 +9,7 @@ const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 app.use('/auth', authRouter);
 
 const showEntries = (tableName, res) => {
