@@ -1,6 +1,4 @@
-// import { useState } from 'react';
 import PropTypes from 'prop-types';
-// import { useNavigate } from 'react-router-dom';
 
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -13,8 +11,8 @@ import { requests } from 'src/_mock/request';
 
 import Iconify from 'src/components/iconify';
 
-import RequestDescription from '../request-description';
-import RequestLogTimeline from '../request-log-timeline';
+import RequestDescription from '../specifics-components/request-description';
+import RequestLogTimeline from '../specifics-components/request-log-timeline';
 
 // ----------------------------------------------------------------------
 
@@ -41,12 +39,13 @@ export default function RequestSpecificView({ id }) {
             <Grid container spacing={3}>
             <Grid xs={12} md={7} lg={8}>
                 <RequestDescription
-                title={currentRequest.type}
-                subheader={`${currentRequest.name}  @  ${currentRequest.address}`}
-                description={currentRequest.description}
-                list={currentRequest.attachments}
-                request={currentRequest}
-                commentList={currentRequest.comments}
+                  id={id}
+                  title={currentRequest.type}
+                  subheader={`${currentRequest.name}  @  ${currentRequest.address}`}
+                  description={currentRequest.description}
+                  list={currentRequest.attachments}
+                  request={currentRequest}
+                  commentList={currentRequest.comments}
                 />
             </Grid>
             <Grid xs={12} md={5} lg={4}>

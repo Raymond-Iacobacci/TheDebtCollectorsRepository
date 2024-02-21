@@ -15,12 +15,12 @@ import { requests } from 'src/_mock/request';
 
 import Scrollbar from 'src/components/scrollbar';
 
-import TableNoData from '../table-no-data';
-import UserTableHead from '../user-table-head';
-import UserTableRow from '../request-table-row';
-import TableEmptyRows from '../table-empty-rows';
-import UserTableToolbar from '../user-table-toolbar';
-import { emptyRows, applyFilter, getComparator } from '../utils';
+import TableNoData from '../table-components/table-no-data';
+import TableEmptyRows from '../table-components/table-empty-rows';
+import RequestTableRow from '../table-components/request-table-row';
+import RequestTableHead from '../table-components/request-table-head';
+import { emptyRows, applyFilter, getComparator } from '../hooks/utils';
+import UserTableToolbar from '../table-components/request-table-toolbar';
 
 // ----------------------------------------------------------------------
 
@@ -91,7 +91,7 @@ export default function RequestsView() {
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
-              <UserTableHead
+              <RequestTableHead
                 order={order}
                 orderBy={orderBy}
                 rowCount={requests.length}
@@ -107,7 +107,7 @@ export default function RequestsView() {
                 {dataFiltered
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
-                    <UserTableRow
+                    <RequestTableRow
                       key={row.id}
                       id={row.id}
                       avatarUrl={row.avatarUrl}

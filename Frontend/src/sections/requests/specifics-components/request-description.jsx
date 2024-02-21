@@ -25,7 +25,15 @@ import Scrollbar from 'src/components/scrollbar';
 
 // ----------------------------------------------------------------------
 
-export default function RequestDescription({ title, subheader, description, list, commentList, request, ...other }) {
+export default function RequestDescription({ 
+  id, 
+  title, 
+  subheader, 
+  description, 
+  list, 
+  commentList, 
+  request,
+}) {
 
   const [comments, setComments] = useState(commentList);
   const [commentField, setCommentField] = useState("");
@@ -35,6 +43,13 @@ export default function RequestDescription({ title, subheader, description, list
 
   const [commentLabel, setCommentLabel] = useState("New Comment");
   const [validate, setValidate] = useState(true);
+
+  // API CALL FOR INFORMAITON
+  // const requestInfo = () => {
+  //   (async () => {
+
+  //   })()
+  // };
 
   const handleAddComment = (event) => {
     if( commentField !== "" ) {
@@ -79,7 +94,7 @@ export default function RequestDescription({ title, subheader, description, list
   };
 
   return (
-    <Card {...other}>
+    <Card>
       <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={3} sx={{ p: 0, pr: 3 }}>
         <CardHeader title={title} subheader={subheader} />
         <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={3} sx={{ p: 0, pr: 0 }}>
@@ -168,6 +183,7 @@ export default function RequestDescription({ title, subheader, description, list
 }
 
 RequestDescription.propTypes = {
+  id: PropTypes.string,
   title: PropTypes.string,
   subheader: PropTypes.string,
   description: PropTypes.string,
