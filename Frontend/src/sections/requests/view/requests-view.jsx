@@ -16,11 +16,11 @@ import { requests } from 'src/_mock/request';
 import Scrollbar from 'src/components/scrollbar';
 
 import TableNoData from '../table-components/table-no-data';
+import RequestTableRow from '../table-components/table-row';
+import RequestTableHead from '../table-components/table-head';
+import UserTableToolbar from '../table-components/table-toolbar';
 import TableEmptyRows from '../table-components/table-empty-rows';
-import RequestTableRow from '../table-components/request-table-row';
-import RequestTableHead from '../table-components/request-table-head';
 import { emptyRows, applyFilter, getComparator } from '../hooks/utils';
-import UserTableToolbar from '../table-components/request-table-toolbar';
 
 // ----------------------------------------------------------------------
 
