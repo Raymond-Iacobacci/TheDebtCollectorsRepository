@@ -15,6 +15,8 @@ import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
+import { testAPICall } from '../hooks/request-specifics'
+
 // ----------------------------------------------------------------------
 
 export default function RequestHeaderInfo({ id }) {
@@ -27,7 +29,21 @@ export default function RequestHeaderInfo({ id }) {
   const [description, setDescription] = useState("");
 
   useEffect(() => {
-    const request = requests.find((req) => req.id === id); // API CALL HERE
+    // Test API
+    const fetchData = async () => {
+      try {
+        const result = await testAPICall(id);
+        console.log(result);
+      } catch (error) {
+        // setError(error.message);
+      } finally {
+        // setLoading(false);
+      }
+    };
+    fetchData();
+    
+    // Actual data is fetched here
+    const request = requests.find((req) => req.id === id); 
     setTitle(request.type);
     setName(request.name);
     setAddress(request.address);

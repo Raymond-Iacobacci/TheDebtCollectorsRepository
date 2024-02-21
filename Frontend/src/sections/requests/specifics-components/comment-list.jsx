@@ -132,6 +132,6 @@ CommentItem.propTypes = {
   comment: PropTypes.shape({
     user: PropTypes.string,
     text: PropTypes.string,
-    postedAt: PropTypes.instanceOf(Date),
+    postedAt: PropTypes.string,
   }),
 };
