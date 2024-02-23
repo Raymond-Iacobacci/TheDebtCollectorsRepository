@@ -40,8 +40,7 @@ function(request, accessToken, refreshToken, profile, done) {
         connection.release();
         return done(null, results[0]);
       }
-  
-      connection.query('INSERT INTO tenants VALUES (?, ?)', [profile.id, profile.email], function(queryErr, results) {
+      connection.query('INSERT INTO tenants (email, firstName, lastName, address, unit, googleID) values (?, ?, ?, ?, ?, ?);', ['null', 'null', 'null', 'null', 'null', 'null'], function(queryErr, results) {
         connection.release();
         if (queryErr) {
           console.error('Error executing INSERT query:', queryErr);
@@ -118,26 +117,6 @@ function checkAuthentication(req, res, next) {
 
 authRouter.get('/protected', checkAuthentication, (req, res) => {
   res.send('This is a protected route');
-});
-
-// TEST TO SEE IF CONTAINER CAN CONNECT TO DATABASE
-authRouter.get('/show-queries', (req, res) => {
-  pool.getConnection(function(err, connection) {
-    if (err) {
-      res.status(401).send("CONNECTION ERROR");
-      return done(err);
-    }
-  
-    connection.query('SELECT * FROM tenants', function(queryErr, results) {
-      connection.release(); // Release the connection back to the pool
-  
-      if (queryErr) {
-        res.status(401).send("QUERY ERROR");
-        return;
-      }
-      res.send(results);
-    });
-  })
 });
 
 module.exports = authRouter;
