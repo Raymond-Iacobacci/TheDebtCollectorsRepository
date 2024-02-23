@@ -36,10 +36,12 @@ export default function RequestHeaderInfo({ id }) {
         console.log(result);
       } catch (error) {
         // setError(error.message);
+        console.log(error)
       } finally {
         // setLoading(false);
       }
     };
+
     fetchData();
     
     // Actual data is fetched here

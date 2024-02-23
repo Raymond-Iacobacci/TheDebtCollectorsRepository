@@ -4,7 +4,7 @@
 
 export async function testAPICall(id) {
   try {
-    const url = `${import.meta.env.VITE_MIDDLEWARE_URL}auth/show-queries`;
+    const url = `${import.meta.env.VITE_MIDDLEWARE_URL}/show-requests`;
     const response = await fetch(url, {
       method: 'GET',
     });
