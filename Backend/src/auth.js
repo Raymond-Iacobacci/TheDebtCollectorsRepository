@@ -3,8 +3,8 @@ const session = require('express-session');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
 const passport = require('passport');
 const crypto = require('crypto');
-const {pool} = require('./pool')
-const sendEmail = require('./sendEmail')
+const {pool} = require('./pool');
+const sendEmail = require('./sendEmail');
 require('dotenv').config({ path: '../.env' });
 
 const authRouter = express.Router();
@@ -18,7 +18,7 @@ authRouter.use(passport.session());
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "https://thedebtcollectorstest-kxfzqfz2rq-uc.a.run.app/auth/google/callback",
+  callbackURL: 'https://backend-kxfzqfz2rq-uc.a.run.app/auth/google/callback',
   passReqToCallback: true
 },
 function(request, accessToken, refreshToken, profile, done) {
@@ -40,6 +40,7 @@ function(request, accessToken, refreshToken, profile, done) {
         connection.release();
         return done(null, results[0]);
       }
+
       connection.query("INSERT INTO tenants (email, firstName, lastName, address, unit, googleID) values (null, null, null, null, null, null);", function(queryErr, results) {
         connection.release();
         if (queryErr) {
@@ -85,9 +86,10 @@ authRouter.get('/send-email', (req, res) => {
 
 authRouter.get('/login', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-authRouter.get('/logout', (req, res) => {
-  req.logout(() => {
-      res.redirect(req.baseUrl + '/loggedout');
+authRouter.get('/logout', function(req, res, next){
+  req.logout(function(err) {
+    if (err) { return next(err); }
+    res.redirect(req.baseUrl + '/loggedout');
   });
 });
 
