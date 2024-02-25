@@ -40,7 +40,7 @@ function(request, accessToken, refreshToken, profile, done) {
         connection.release();
         return done(null, results[0]);
       }
-      connection.query('INSERT INTO tenants (email, firstName, lastName, address, unit, googleID) values (?, ?, ?, ?, ?, ?);', ['null', 'null', 'null', 'null', 'null', 'null'], function(queryErr, results) {
+      connection.query("INSERT INTO tenants (email, firstName, lastName, address, unit, googleID) values (null, null, null, null, null, null);", function(queryErr, results) {
         connection.release();
         if (queryErr) {
           console.error('Error executing INSERT query:', queryErr);
