@@ -69,21 +69,6 @@ passport.deserializeUser(function(obj, done) {
   done(null, obj);
 });
 
-authRouter.get('/send-email', (req, res) => {
-  const emailToken = crypto.randomBytes(20).toString('hex');
-  const oauthLink = `https://thedebtcollectorstest-kxfzqfz2rq-uc.a.run.app/auth/login?oauth_token=${emailToken}`;
-  const subject = 'Create a DebtCollectors Account';
-  const text = "Your manager has invited you to create a DebtCollectors Account:\n\n" + "Link: " + oauthLink;
-
-  sendEmail('ajay.talanki@gmail.com', subject, text, (err) => {
-      if (err) {
-          res.status(500).json({ message: 'Failed to send email' });
-      } else {
-          res.json({ message: 'Email sent successfully' });
-      }
-  });
-});
-
 authRouter.get('/login', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 authRouter.get('/logout', function(req, res, next){
