@@ -12,23 +12,24 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use('/auth', authRouter);
 
-const showEntries = (tableName, res) => {
-  pool.getConnection((err, connection) => {
+const selectQuery = (query) => {
+  return new Promise((resolve, reject) => {
+    pool.getConnection((err, connection) => {
       if (err) {
-          displayConnectionError(err, res);
-          return;
+        reject(err);
+        return;
       }
-      const query = `SELECT * FROM ${tableName};`;
       connection.query(query, (queryErr, results) => {
-          connection.release();
-          if (queryErr) {
-              displayQueryError(queryErr, res);
-              return;
-          }
-          res.json(results);
+        connection.release();
+        if (queryErr) {
+          reject(queryErr);
+          return;
+        }
+        resolve(results);
       });
+    });
   });
-}
+};
 
 const addEntries = (tableName, req, res) => {
   pool.getConnection((err, connection) => {
@@ -80,42 +81,38 @@ authRouter.get('/send-email', (req, res) => {
   });
 });
 
-app.get('/requests/specifics/header-info', (req, res) => {
-  const requestId = req.query['request-id'];
-  pool.getConnection((err, connection) => {
-    if (err) {
-      displayConnectionError(err, res);
+app.get('/requests/specifics/header-info', async (req, res) => {
+  try {
+    const requestId = req.query['request-id'];
+    let query = `SELECT tenantID, description, status FROM requests where requestID = ${requestId};`;
+    const requestResults = await selectQuery(query);
+    const request = requestResults[0];
+    console.log(request);
+    if (!request) {
+      res.status(404).json({ error: 'requestID not found in requests table' });
       return;
     }
-    connection.query('SELECT tenantID, description, status FROM requests where requestID = ?', [requestId], (queryErr, requestResults) => {
-      if (queryErr) {
-        connection.release();
-        displayQueryError(queryErr, res);
-        return;
-      }
-      const request = requestResults[0]; 
-      if (!request) {
-        connection.release();
-        res.status(404).json({ error: 'Request not found' });
-        return;
-      }
-      connection.query('SELECT firstName, lastName FROM tenants WHERE tenantID = ?', [request.tenantID], (queryErr, tenantResults) => {
-        if (queryErr) {
-          connection.release();
-          displayQueryError(queryErr, res);
-          return;
-        }
-        const tenant = tenantResults[0]; 
-        res.json({
-          description: request.description,
-          tenant: tenant ? `${tenant.firstName} ${tenant.lastName}` : null,
-          status: request.status,
-          unit : request.unit
-        });
-        connection.release();
-      });
+
+    query = `SELECT firstName, lastName, unit FROM tenants WHERE tenantID = ${'0x' + request.tenantID.toString('hex').toUpperCase()};`;
+    console.log(query);
+    const tenantResults = await selectQuery(query);
+
+    const tenant = tenantResults[0];
+    if (!tenant) {
+      res.status(404).json({ error: 'tenantID not found in tenants table.' });
+      return;
+    }
+
+    res.json({
+      description: request.description,
+      tenant: `${tenant.firstName} ${tenant.lastName}`,
+      status: request.status,
+      unit: request.unit
     });
-  });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 app.get('/requests/specifics/comments', (req, res) => {
@@ -169,15 +166,15 @@ app.get('/requests/specifics/comments', (req, res) => {
 });
 
 app.get('/show-tenants', (req, res) => {
-  showEntries('tenants', res);
+  selectQuery('tenants', res);
 });
 
 app.get('/show-managers', (req, res) => {
-  showEntries('managers', res);
+  selectQuery('managers', res);
 });
 
 app.get('/show-requests', (req, res) => {
-  showEntries('requests', res);
+  selectQuery('requests', res);
 });
   
 app.post('/add-tenant', (req, res) => {
