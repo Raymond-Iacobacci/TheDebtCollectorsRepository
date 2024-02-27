@@ -87,14 +87,12 @@ app.get('/requests/specifics/header-info', async (req, res) => {
     let query = `SELECT tenantID, description, status FROM requests where requestID = ${requestId};`;
     const requestResults = await selectQuery(query);
     const request = requestResults[0];
-    console.log(request);
     if (!request) {
       res.status(404).json({ error: 'requestID not found in requests table' });
       return;
     }
 
     query = `SELECT firstName, lastName, unit FROM tenants WHERE tenantID = ${'0x' + request.tenantID.toString('hex').toUpperCase()};`;
-    console.log(query);
     const tenantResults = await selectQuery(query);
 
     const tenant = tenantResults[0];
@@ -107,7 +105,7 @@ app.get('/requests/specifics/header-info', async (req, res) => {
       description: request.description,
       tenant: `${tenant.firstName} ${tenant.lastName}`,
       status: request.status,
-      unit: request.unit
+      unit: tenant.unit
     });
   } catch (error) {
     console.error(error);
