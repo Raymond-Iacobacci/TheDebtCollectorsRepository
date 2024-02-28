@@ -39,20 +39,30 @@ router.get('/specifics/header-info', async (req, res) => {
 router.get('/specifics/comments', async (req, res) => {
   try {
     const requestID = req.query['request-id'];
-    const query = `SELECT user, comment, datePosted FROM comments WHERE requestID = ${requestID} ORDER BY datePosted DESC;`;
-    const commentResults = await selectQuery(query);
+    const requestQuery = `SELECT userID, comment, datePosted FROM comments WHERE requestID = ${requestID} ORDER BY datePosted DESC;`;
+    const commentResults = await selectQuery(requestQuery);
+    const comments = [];
 
     if (commentResults.length === 0) {
       res.status(404).json({ error: 'Comments not found for this request' });
       return;
     }
 
-    const comments = commentResults.map(commentEntry => ({
-      user: commentEntry.user,
-      comment: commentEntry.comment,
-      datePosted: commentEntry.datePosted
-    }));
-
+    for(const commentEntry of commentResults){
+      const userQuery = `select firstName, lastName FROM tenants WHERE tenantID = ${uuidToString(commentEntry.userID)};`
+      const userResults = await selectQuery(userQuery);
+      let user = userResults[0];
+      if(!user){
+        const userQuery = `select firstName, lastName FROM managers WHERE managerID = ${uuidToString(commentEntry.userID)};`
+        const userResults = await selectQuery(userQuery);
+        user = userResults[0];
+      }
+      comments.push({
+        user: user.firstName + ' ' + user.lastName,
+        comment: commentEntry.comment,
+        datePosted: commentEntry.datePosted
+      })
+    }
     res.send(comments);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
