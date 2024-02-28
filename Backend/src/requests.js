@@ -1,5 +1,5 @@
 const express = require('express');
-const { selectQuery, uuidToString } = require('./db'); 
+const { selectQuery, insertQuery, uuidToString } = require('./db'); 
 
 const router = express.Router();
 
@@ -68,5 +68,21 @@ router.get('/specifics/comments', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+router.post('/specifics/new-comment', async (req, res) => {
+  try {
+    const requestID = Buffer.from(req.query['request-id'], 'hex');
+    const userID = Buffer.from(req.query['user-id'], 'hex');
+    const comment = req.query['comment'];
+    const datePosted = req.query['date-posted'];
+    const query = 'INSERT INTO comments (requestID, datePosted, comment, userID) VALUES (?, ?, ?, ?)';
+    const values = [requestID, datePosted, comment, userID];
+    const results = await insertQuery(query, values);
+    res.send(results);
+  } catch (error) {
+    res.status(500).json({ error: 'Error inserting into table' });
+  }
+});
+
 
 module.exports = router;

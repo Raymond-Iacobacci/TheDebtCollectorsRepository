@@ -35,6 +35,24 @@ const selectQuery = (query) => {
     });
   });
 };
-  
 
-module.exports = {pool, selectQuery, uuidToString};
+const insertQuery = (query, values) => {
+  return new Promise((resolve, reject) => {
+    pool.getConnection((err, connection) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      connection.query(query, values, (queryErr, results) => {
+        connection.release();
+        if (queryErr) {
+          reject(queryErr);
+          return;
+        }
+        resolve(results);
+      });
+    });
+  });
+};
+
+module.exports = {pool, selectQuery, insertQuery, uuidToString};
