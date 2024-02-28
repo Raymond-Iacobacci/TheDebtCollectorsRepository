@@ -14,6 +14,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use('/auth', authRouter);
 
+const uuidToString = (buffer) => {
+  if(buffer){
+    return '0x' + buffer.toString('hex').toUpperCase();
+  }
+  return null;
+}
+
 const selectQuery = (query) => {
   return new Promise((resolve, reject) => {
     pool.getConnection((err, connection) => {
@@ -94,7 +101,7 @@ app.get('/requests/specifics/header-info', async (req, res) => {
       return;
     }
 
-    query = `SELECT firstName, lastName, unit FROM tenants WHERE tenantID = ${'0x' + request.tenantID.toString('hex').toUpperCase()};`;
+    query = `SELECT firstName, lastName, unit FROM tenants WHERE tenantID = ${uuidToString(request.tenantID)};`;
     const tenantResults = await selectQuery(query);
 
     const tenant = tenantResults[0];
