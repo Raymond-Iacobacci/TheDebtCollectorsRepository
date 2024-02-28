@@ -3,6 +3,8 @@ const { pool, displayConnectionError, displayQueryError } = require('./pool.js')
 const authRouter = require('./auth');
 const cors = require('cors'); 
 require('dotenv').config({ path: '../.env' });
+const sendEmail = require('./sendEmail');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -113,54 +115,28 @@ app.get('/requests/specifics/header-info', async (req, res) => {
   }
 });
 
-app.get('/requests/specifics/comments', (req, res) => {
-  const requestId = req.query['request-id'];
-  pool.getConnection((err, connection) => {
-    if (err) {
-      displayConnectionError(err, res);
+app.get('/requests/specifics/comments', async (req, res) => {
+  try {
+    const requestID = req.query['request-id'];
+    const query = `SELECT user, comment, datePosted FROM comments WHERE requestID = ${requestID} ORDER BY datePosted DESC;`;
+
+    const commentResults = await selectQuery(query);
+
+    if (commentResults.length === 0) {
+      res.status(404).json({ error: 'Comments not found for this request' });
       return;
     }
-    connection.query('SELECT comment, datePosted FROM comments WHERE requestID = ?', [requestId], (queryErr, commentResults) => {
-      if (queryErr) {
-        connection.release();
-        displayQueryError(queryErr, res);
-        return;
-      }
-      const comment = commentResults[0]; 
-      if (!comment) {
-        connection.release();
-        res.status(404).json({ error: 'Comments not found for this request' });
-        return;
-      }
-      connection.query('SELECT tenantID FROM requests WHERE requestID = ?', [requestId], (queryErr, requestResults) => {
-        if (queryErr) {
-          connection.release();
-          displayQueryError(queryErr, res);
-          return;
-        }
-        const request = requestResults[0];
-        if (!request) {
-          connection.release();
-          res.status(404).json({ error: 'Request not found' });
-          return;
-        }
-        connection.query('SELECT firstName, lastName FROM tenants WHERE tenantID = ?', [request.tenantID], (queryErr, tenantResults) => {
-          if (queryErr) {
-            connection.release();
-            displayQueryError(queryErr, res);
-            return;
-          }
-          const tenant = tenantResults[0];
-          res.json({
-            tenant: tenant ? `${tenant.firstName} ${tenant.lastName}` : null,
-            comment: comment.comment,
-            datePosted: comment.datePosted
-          });
-          connection.release(); 
-        }); 
-      });
-    });
-  });
+
+    const comments = commentResults.map(commentEntry => ({
+      user: commentEntry.user,
+      comment: commentEntry.comment,
+      datePosted: commentEntry.datePosted
+    }));
+
+    res.send(comments);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 app.get('/show-tenants', (req, res) => {

@@ -2,9 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
 const passport = require('passport');
-const crypto = require('crypto');
 const {pool} = require('./pool');
-const sendEmail = require('./sendEmail');
 require('dotenv').config({ path: '../.env' });
 
 const authRouter = express.Router();
