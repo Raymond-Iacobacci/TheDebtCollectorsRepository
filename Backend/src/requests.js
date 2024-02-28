@@ -9,10 +9,12 @@ router.get('/specifics/header-info', async (req, res) => {
     const requestQuery = `SELECT tenantID, description, status FROM requests where requestID = ${requestId};`;
     const requestResults = await selectQuery(requestQuery);
     const request = requestResults[0];
+
     if (!request) {
       res.status(404).json({ error: 'requestID not found in requests table' });
       return;
     }
+
     const tenantQuery = `SELECT firstName, lastName, unit FROM tenants WHERE tenantID = ${uuidToString(request.tenantID)};`
     const tenantResults = await selectQuery(tenantQuery);
     const tenant = tenantResults[0];
@@ -28,8 +30,8 @@ router.get('/specifics/header-info', async (req, res) => {
       status: request.status,
       unit: tenant.unit
     });
+
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -38,7 +40,6 @@ router.get('/specifics/comments', async (req, res) => {
   try {
     const requestID = req.query['request-id'];
     const query = `SELECT user, comment, datePosted FROM comments WHERE requestID = ${requestID} ORDER BY datePosted DESC;`;
-
     const commentResults = await selectQuery(query);
 
     if (commentResults.length === 0) {

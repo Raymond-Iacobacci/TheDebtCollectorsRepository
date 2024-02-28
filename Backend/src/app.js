@@ -1,5 +1,5 @@
 const express = require('express');
-const { pool, displayConnectionError, displayQueryError, selectQuery, uuidToString } = require('./db');
+const { pool, selectQuery} = require('./db');
 const authRouter = require('./auth');
 const requestsRouter = require('./requests'); 
 const cors = require('cors'); 
@@ -19,8 +19,9 @@ app.use('/requests', requestsRouter);
 const addEntries = (tableName, req, res) => {
   pool.getConnection((err, connection) => {
       if (err) {
-          displayConnectionError(err, res);
-          return;
+        console.error('Error getting database connection:', err);
+        res.status(500).send('Error getting database connection');
+        return;
       }
 
       let query = "";
@@ -43,7 +44,8 @@ const addEntries = (tableName, req, res) => {
       connection.query(query, values, (queryErr, results) => {
           connection.release();
           if (queryErr) {
-              displayQueryError(queryErr, res);
+              console.error('Error executing query:', queryErr);
+              res.status(500).send('Error executing query');
               return;
           }
           res.json(results);
