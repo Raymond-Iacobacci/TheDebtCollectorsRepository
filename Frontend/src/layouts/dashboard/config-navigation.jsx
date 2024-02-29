@@ -1,4 +1,4 @@
-import Iconify from 'src/components/iconify';
+// import Iconify from 'src/components/iconify';
 import SvgColor from 'src/components/svg-color';
 
 
@@ -19,11 +19,11 @@ const navConfig = [
     path: '/requests',
     icon: icon('ic_user'),
   },
-  {
-    title: 'notifications',
-    path: '/notifications',
-    icon: <Iconify width={24} icon="solar:bell-bing-bold-duotone" />,
-  },
+  // {
+  //   title: 'notifications',
+  //   path: '/notifications',
+  //   icon: <Iconify width={24} icon="solar:bell-bing-bold-duotone" />,
+  // },
   // {
   //   title: 'product',
   //   path: '/products',

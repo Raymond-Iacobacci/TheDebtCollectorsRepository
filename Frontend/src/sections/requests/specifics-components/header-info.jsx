@@ -15,7 +15,7 @@ import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
-import { testAPICall } from '../hooks/request-specifics'
+import { getHeaderInfo } from '../hooks/request-specifics'
 
 // ----------------------------------------------------------------------
 
@@ -32,16 +32,16 @@ export default function RequestHeaderInfo({ id }) {
     // Test API
     const fetchData = async () => {
       try {
-        const result = await testAPICall(id);
-        console.log(result);
+        setLoading(true);
+        const result = await getHeaderInfo(id);
+        console.log(result)
       } catch (error) {
         // setError(error.message);
-        console.log(error)
+        console.log(`HeaderInfo API Error: ${error}`)
       } finally {
-        // setLoading(false);
+        setLoading(false);
       }
     };
-
     fetchData();
     
     // Actual data is fetched here

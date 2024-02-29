@@ -27,7 +27,7 @@ export default function Router() {
         { element: <IndexPage />, index: true },
         { path: 'requests', element: <RequestPage /> },
         { path: 'requests/:requestID', element: <RequestDetailsPage /> },
-        { path: 'notifications', element: <Page404 /> },
+        // { path: 'notifications', element: <Page404 /> },
         // { path: 'products', element: <ProductsPage /> },
         // { path: 'blog', element: <BlogPage /> },
       ],
