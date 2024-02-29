@@ -9,7 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import CardHeader from '@mui/material/CardHeader';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { requests } from 'src/_mock/request';
+// import { requests } from 'src/_mock/request';
 
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
@@ -27,31 +27,35 @@ export default function RequestHeaderInfo({ id }) {
   const [name, setName] = useState(""); 
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
+  const [errorMsg, setError] = useState("");
 
   useEffect(() => {
-    // Test API
     const fetchData = async () => {
       try {
         setLoading(true);
-        const result = await getHeaderInfo(id);
-        console.log(result)
-      } catch (error) {
-        // setError(error.message);
-        console.log(`HeaderInfo API Error: ${error}`)
-      } finally {
+        const request = await getHeaderInfo(id);
+        console.log(`RequestHeader: ${request}`)
+        setTitle(request.type);
+        setName(request.name);
+        setAddress(request.address);
+        setDescription(request.description);
+        setStatus(request.status);
         setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        console.log(`HeaderInfo API: ${error}`)
       }
     };
+
     fetchData();
-    
     // Actual data is fetched here
-    const request = requests.find((req) => req.id === id); 
-    setTitle(request.type);
-    setName(request.name);
-    setAddress(request.address);
-    setDescription(request.description);
-    setStatus(request.status);
-    setLoading(false);
+    // const request = requests.find((req) => req.id === id); 
+    // setTitle(request.type);
+    // setName(request.name);
+    // setAddress(request.address);
+    // setDescription(request.description);
+    // setStatus(request.status);
+    // setLoading(false);
   }, [id]);
 
   const handleOpenStatusPopover = (event) => {
@@ -86,7 +90,19 @@ export default function RequestHeaderInfo({ id }) {
           spacing={3}
           sx={{ p: 3 }}
         >
-          <CircularProgress color="primary" />
+          {errorMsg ? 
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              spacing={3}
+              sx={{ p: 0, pr: 3 }}
+            >
+              <Label color='error'>{errorMsg}</Label>
+            </Stack>
+            :
+            <CircularProgress color="primary" />
+          }
         </Stack>
       ) : (
         <>
@@ -109,7 +125,8 @@ export default function RequestHeaderInfo({ id }) {
                 color={
                   (status === 'Not Started' && 'error') ||
                   (status === 'Ongoing' && 'warning') ||
-                  (status === 'Completed' && 'success')
+                  (status === 'Completed' && 'success') ||
+                  'error'
                 }
               >
                 {status}
