@@ -9,8 +9,6 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
-import { usePathname } from 'src/routes/hooks';
-
 import { requests } from 'src/_mock/request';
 
 import Scrollbar from 'src/components/scrollbar';
@@ -25,8 +23,6 @@ import { emptyRows, applyFilter, getComparator } from '../hooks/utils';
 // ----------------------------------------------------------------------
 
 export default function RequestsView() {
-
-  const pathname = usePathname();
 
   const [page, setPage] = useState(0);
 
@@ -44,10 +40,6 @@ export default function RequestsView() {
       setOrder(isAsc ? 'desc' : 'asc');
       setOrderBy(id);
     }
-  };
-
-  const handleExpand = (event, name) => {
-    console.log(`${pathname}/${name}`);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -115,7 +107,6 @@ export default function RequestsView() {
                       address={row.address}
                       type={row.type}
                       status={row.status}
-                      handleClick={(event) => handleExpand(event, row.id)}
                     />
                   ))}
 

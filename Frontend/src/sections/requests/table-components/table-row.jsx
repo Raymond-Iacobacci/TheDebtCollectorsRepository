@@ -10,7 +10,7 @@ import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
-import { usePathname } from 'src/routes/hooks';
+import { useRouter } from 'src/routes/hooks';
 
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
@@ -24,28 +24,26 @@ export default function UserTableRow({
   address,
   type,
   status,
-  handleClick,
 }) {
 
-  const pathname = usePathname();
+  const router = useRouter();
 
-  // const [open, setOpen] = useState(null);
-
-  // const handleOpenMenu = (event) => {
-  //   setOpen(event.currentTarget);
-  // };
-
-  // const handleCloseMenu = () => {
-  //   setOpen(null);
-  // };
+  const handleRowClick = () =>{
+    router.push(id)
+  }
 
   return (
     <>
-      <TableRow hover tabIndex={-1} role="checkbox">
+      <TableRow 
+        hover 
+        tabIndex={-1} 
+        role="checkbox"
+        onDoubleClick={handleRowClick}
+      >
         <TableCell align="center" padding="checkbox">
           <IconButton 
-            href={`${pathname}/${id}`}
-            onClick={handleClick}>
+            onClick={handleRowClick}
+          >
             <Iconify icon="eva:expand-fill" />
           </IconButton>
         </TableCell>
@@ -99,7 +97,6 @@ export default function UserTableRow({
 UserTableRow.propTypes = {
   id: PropTypes.any,
   avatarUrl: PropTypes.any,
-  handleClick: PropTypes.func,
   name: PropTypes.any,
   address: PropTypes.any,
   type: PropTypes.any,

@@ -4,6 +4,7 @@
 
 export async function testAPICall(id) {
   try {
+    console.log(`env: ${import.meta.env.VITE_MIDDLEWARE_URL}`)
     const url = `${import.meta.env.VITE_MIDDLEWARE_URL}/show-requests`;
     const response = await fetch(url, {
       method: 'GET',
