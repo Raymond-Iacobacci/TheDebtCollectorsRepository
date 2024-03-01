@@ -88,7 +88,7 @@ app.post('/add-manager', (req, res) => {
   addEntries('managers', req, res);
 });
 
-app.post('/make-request', (req, res) =>{
+app.post('/make-request', (req, res) =>{  
   addEntries('requests', req, res);
 });
 

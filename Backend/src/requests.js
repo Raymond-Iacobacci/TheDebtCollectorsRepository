@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get('/specifics/header-info', async (req, res) => {
   try {
-    const requestId = req.query['request-id'];
+    const requestId = '0x' + req.query['request-id'];
     const requestQuery = `SELECT tenantID, description, status FROM requests where requestID = ${requestId};`;
     const requestResults = await selectQuery(requestQuery);
     const request = requestResults[0];
@@ -38,7 +38,7 @@ router.get('/specifics/header-info', async (req, res) => {
 
 router.get('/specifics/comments', async (req, res) => {
   try {
-    const requestID = req.query['request-id'];
+    const requestID = '0x' + req.query['request-id'];
     const requestQuery = `SELECT userID, comment, datePosted FROM comments WHERE requestID = ${requestID} ORDER BY datePosted DESC;`;
     const commentResults = await selectQuery(requestQuery);
     const comments = [];
