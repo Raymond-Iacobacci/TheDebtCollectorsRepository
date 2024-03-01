@@ -3,6 +3,11 @@ const { selectQuery, insertQuery, uuidToString } = require('./db');
 
 const router = express.Router();
 
+function getDate(){
+  const date = new Date();
+  return date.toISOString();
+}
+
 router.get('/specifics/header-info', async (req, res) => {
   try {
     const requestId = '0x' + req.query['request-id'];
@@ -74,7 +79,7 @@ router.post('/specifics/new-comment', async (req, res) => {
     const requestID = Buffer.from(req.query['request-id'], 'hex');
     const userID = Buffer.from(req.query['user-id'], 'hex');
     const comment = req.query['comment'];
-    const datePosted = req.query['date-posted'];
+    const datePosted = getDate();
     const query = 'INSERT INTO comments (requestID, datePosted, comment, userID) VALUES (?, ?, ?, ?)';
     const values = [requestID, datePosted, comment, userID];
     const results = await insertQuery(query, values);
