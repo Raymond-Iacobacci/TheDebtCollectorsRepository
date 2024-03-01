@@ -83,7 +83,44 @@ router.post('/specifics/new-comment', async (req, res) => {
     const query = 'INSERT INTO comments (requestID, datePosted, comment, userID) VALUES (?, ?, ?, ?)';
     const values = [requestID, datePosted, comment, userID];
     const results = await insertQuery(query, values);
+    console.log(results.insertId)
     res.send(results);
+  } catch (error) {
+    res.status(500).json({ error: 'Error inserting into table' });
+  }
+});
+
+router.post('/new', async (req, res) => {
+  try {
+    const tenantID = req.query['user-id'];
+    const description = req.query['description'];
+    const status = 'Unresolved';
+    const dateRequested = getDate();
+
+    const managerIDQuery = `SELECT managerID FROM tenants where tenantID = ${'0x' + tenantID};`;
+    const managerResults = await selectQuery(managerIDQuery);
+    const managerObject = managerResults[0];
+
+    if (!managerObject) {
+      res.status(404).json({ error: 'managerID not found in managers table' });
+      return;
+    }
+
+    const managerID = managerObject.managerID;
+
+    const query = 'INSERT INTO requests (description, tenantID, managerID, status, dateRequested) VALUES (?, ?, ?, ?, ?)';
+    const values = [description, Buffer.from(tenantID, 'hex'), Buffer.from(managerID, 'hex'), status, dateRequested];
+    await insertQuery(query, values);
+    console.log(query);
+    const results = await selectQuery(`SELECT requestID FROM requests where tenantID = ${'0x' + tenantID} AND dateRequested = '${dateRequested}';`);
+    const requestID = results[0];
+
+    if (!requestID) {
+      res.status(404).json({ error: 'requestID not found in requests table.' });
+      return;
+    }
+
+    res.send(uuidToString(requestID.requestID));
   } catch (error) {
     res.status(500).json({ error: 'Error inserting into table' });
   }
