@@ -1,7 +1,10 @@
 const express = require('express');
-const { selectQuery, insertQuery, uuidToString } = require('./db'); 
-
 const router = express.Router();
+const multer = require('multer');
+const { selectQuery, insertQuery, uuidToString } = require('./db');
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 function getDate(){
   const date = new Date();
@@ -134,6 +137,20 @@ router.put('/specifics/change-status', async (req, res) => {
     res.send(results);
   } catch (error) {
     res.status(500).json({ error: 'Error updating status'});
+  }
+});
+
+router.post('/specifics/attachments', upload.single('attachment'), async (req, res) => { 
+  try {
+    const requestID = Buffer.from(req.body['request-id'], 'hex');
+    const attachmentFile = req.file.buffer; 
+    const query = 'INSERT INTO attachments (requestID, attachment) VALUES (?, ?)';
+    const values = [requestID, attachmentFile];
+    const results = await insertQuery(query, values);
+    res.send(results);
+  } catch (error) {
+    console.error('Error adding attachment:', error);
+    res.status(500).json({ error: 'Error adding attachment' });
   }
 });
 
