@@ -111,7 +111,6 @@ router.post('/new', async (req, res) => {
     const query = 'INSERT INTO requests (description, tenantID, managerID, status, dateRequested) VALUES (?, ?, ?, ?, ?)';
     const values = [description, Buffer.from(tenantID, 'hex'), Buffer.from(managerID, 'hex'), status, dateRequested];
     await insertQuery(query, values);
-    console.log(query);
     const results = await selectQuery(`SELECT requestID FROM requests where tenantID = ${'0x' + tenantID} AND dateRequested = '${dateRequested}';`);
     const requestID = results[0];
 
@@ -123,6 +122,18 @@ router.post('/new', async (req, res) => {
     res.send(uuidToString(requestID.requestID));
   } catch (error) {
     res.status(500).json({ error: 'Error inserting into table' });
+  }
+});
+
+router.put('/specifics/change-status', async (req, res) => {
+  try {
+    const requestID = req.query['request-id'];
+    const newStatusString = req.query['status'];
+    const query = `UPDATE requests SET status = '${newStatusString}' WHERE requestID = ${requestID};`;
+    const results = await selectQuery(query);
+    res.send(results);
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating status'});
   }
 });
 

@@ -53,7 +53,7 @@ const addEntries = (tableName, req, res) => {
   });
 }
 
-authRouter.get('/send-email', (req, res) => {
+app.get('/send-email', (req, res) => {
   const emailToken = crypto.randomBytes(20).toString('hex');
   const oauthLink = `https://thedebtcollectorstest-kxfzqfz2rq-uc.a.run.app/auth/login?oauth_token=${emailToken}`;
   const subject = 'Create a DebtCollectors Account';
@@ -86,10 +86,6 @@ app.post('/add-tenant', (req, res) => {
 
 app.post('/add-manager', (req, res) => {
   addEntries('managers', req, res);
-});
-
-app.post('/make-request', (req, res) =>{  
-  addEntries('requests', req, res);
 });
 
 app.listen(PORT, () => {
