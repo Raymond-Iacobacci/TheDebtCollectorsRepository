@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router();
+const requestsRouter = express.Router();
 const multer = require('multer');
 const { selectQuery, insertQuery, uuidToString } = require('./db');
 
@@ -11,7 +11,21 @@ function getDate(){
   return date.toISOString();
 }
 
-router.get('/specifics/header-info', async (req, res) => {
+requestsRouter.get('/get', async (req, res) => {
+  try {
+    const tenantID = '0x' + req.query['user-id'];
+    const requestResults = await selectQuery(`SELECT requestID FROM requests where tenantID = ${tenantID} ORDER BY dateRequested;`);
+    if (!requestResults) {
+      res.status(404).json({ error: 'requestIDs not found for tenant' });
+      return;
+    }
+    res.send(requestResults);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+requestsRouter.get('/specifics/header-info', async (req, res) => {
   try {
     const requestId = '0x' + req.query['request-id'];
     const requestQuery = `SELECT tenantID, description, status FROM requests where requestID = ${requestId};`;
@@ -44,7 +58,7 @@ router.get('/specifics/header-info', async (req, res) => {
   }
 });
 
-router.get('/specifics/comments', async (req, res) => {
+requestsRouter.get('/specifics/comments', async (req, res) => {
   try {
     const requestID = '0x' + req.query['request-id'];
     const requestQuery = `SELECT userID, comment, datePosted FROM comments WHERE requestID = ${requestID} ORDER BY datePosted DESC;`;
@@ -77,7 +91,7 @@ router.get('/specifics/comments', async (req, res) => {
   }
 });
 
-router.post('/specifics/new-comment', async (req, res) => {
+requestsRouter.post('/specifics/new-comment', async (req, res) => {
   try {
     const requestID = Buffer.from(req.query['request-id'], 'hex');
     const userID = Buffer.from(req.query['user-id'], 'hex');
@@ -93,7 +107,7 @@ router.post('/specifics/new-comment', async (req, res) => {
   }
 });
 
-router.post('/new', async (req, res) => {
+requestsRouter.post('/new', async (req, res) => {
   try {
     const tenantID = req.query['user-id'];
     const description = req.query['description'];
@@ -128,7 +142,7 @@ router.post('/new', async (req, res) => {
   }
 });
 
-router.put('/specifics/change-status', async (req, res) => {
+requestsRouter.put('/specifics/change-status', async (req, res) => {
   try {
     const requestID = req.query['request-id'];
     const newStatusString = req.query['status'];
@@ -140,7 +154,7 @@ router.put('/specifics/change-status', async (req, res) => {
   }
 });
 
-router.post('/specifics/new-attachment', upload.single('attachment'), async (req, res) => { 
+requestsRouter.post('/specifics/new-attachment', upload.single('attachment'), async (req, res) => { 
   try {
     const requestID = Buffer.from(req.body['request-id'], 'hex');
     const attachmentFile = req.file.buffer; 
@@ -155,16 +169,14 @@ router.post('/specifics/new-attachment', upload.single('attachment'), async (req
   }
 });
 
-router.get('/specifics/attachments', async (req, res) => { 
+requestsRouter.get('/specifics/attachments', async (req, res) => { 
   try {
     const requestID = '0x' + req.query['request-id'];
-    console.log(requestID);
     const requestResults = await selectQuery(`SELECT attachment, datePosted FROM attachments where requestID = ${requestID} ORDER BY datePosted;`);
     res.send(requestResults);
-    console.log('DONE');
   } catch (error) {
     res.status(500).json({ error: 'There are no attachments given this requestID' });
   }
 });
 
-module.exports = router;
+module.exports = requestsRouter;
