@@ -140,12 +140,13 @@ router.put('/specifics/change-status', async (req, res) => {
   }
 });
 
-router.post('/specifics/attachments', upload.single('attachment'), async (req, res) => { 
+router.post('/specifics/new-attachment', upload.single('attachment'), async (req, res) => { 
   try {
     const requestID = Buffer.from(req.body['request-id'], 'hex');
     const attachmentFile = req.file.buffer; 
-    const query = 'INSERT INTO attachments (requestID, attachment) VALUES (?, ?)';
-    const values = [requestID, attachmentFile];
+    const datePosted = getDate();
+    const query = 'INSERT INTO attachments (requestID, attachment, datePosted) VALUES (?, ?, ?)';
+    const values = [requestID, attachmentFile, datePosted];
     const results = await insertQuery(query, values);
     res.send(results);
   } catch (error) {
@@ -154,5 +155,16 @@ router.post('/specifics/attachments', upload.single('attachment'), async (req, r
   }
 });
 
+router.get('/specifics/attachments', async (req, res) => { 
+  try {
+    const requestID = '0x' + req.query['request-id'];
+    console.log(requestID);
+    const requestResults = await selectQuery(`SELECT attachment, datePosted FROM attachments where requestID = ${requestID} ORDER BY datePosted;`);
+    res.send(requestResults);
+    console.log('DONE');
+  } catch (error) {
+    res.status(500).json({ error: 'There are no attachments given this requestID' });
+  }
+});
 
 module.exports = router;
