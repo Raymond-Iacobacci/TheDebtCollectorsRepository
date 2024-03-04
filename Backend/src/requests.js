@@ -13,13 +13,13 @@ function getDate(){
 
 requestsRouter.get('/get', async (req, res) => {
   try {
-    const tenantID = '0x' + req.query['user-id'];
+    const tenantID = '0x' + req.query['tenant-id'];
     const requestResults = await selectQuery(`SELECT requestID FROM requests where tenantID = ${tenantID} ORDER BY dateRequested;`);
     if (!requestResults) {
       res.status(404).json({ error: 'requestIDs not found for tenant' });
       return;
     }
-    res.send(requestResults);
+    res.send(requestResults.map(element => element.requestID.toString('hex').toUpperCase()));
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
@@ -50,7 +50,7 @@ requestsRouter.get('/specifics/header-info', async (req, res) => {
       type: request.type,
       tenant: `${tenant.firstName} ${tenant.lastName}`,
       address: tenant.address,
-      description: request.description,
+      description: request.description, 
       status: request.status
     });
 
@@ -108,10 +108,26 @@ requestsRouter.post('/specifics/new-comment', async (req, res) => {
   }
 });
 
+requestsRouter.post('/specifics/new-attachment', upload.single('attachment'), async (req, res) => { 
+  try {
+    const requestID = Buffer.from(req.body['request-id'], 'hex');
+    const attachmentFile = req.file.buffer; 
+    const datePosted = getDate();
+    const query = 'INSERT INTO attachments (requestID, attachment, datePosted) VALUES (?, ?, ?)';
+    const values = [requestID, attachmentFile, datePosted];
+    const results = await insertQuery(query, values);
+    res.send(results);
+  } catch (error) {
+    console.error('Error adding attachment:', error);
+    res.status(500).json({ error: 'Error adding attachment' });
+  }
+});
+
 requestsRouter.post('/new', async (req, res) => {
   try {
-    const tenantID = req.query['user-id'];
+    const tenantID = req.query['tenant-id'];
     const description = req.query['description'];
+    const type = req.query['type'];
     const status = 'Unresolved';
     const dateRequested = getDate();
 
@@ -126,9 +142,10 @@ requestsRouter.post('/new', async (req, res) => {
 
     const managerID = managerObject.managerID;
 
-    const query = 'INSERT INTO requests (description, tenantID, managerID, status, dateRequested) VALUES (?, ?, ?, ?, ?)';
-    const values = [description, Buffer.from(tenantID, 'hex'), Buffer.from(managerID, 'hex'), status, dateRequested];
+    const query = 'INSERT INTO requests (description, tenantID, managerID, status, dateRequested, type) VALUES (?, ?, ?, ?, ?, ?)';
+    const values = [description, Buffer.from(tenantID, 'hex'), Buffer.from(managerID, 'hex'), status, dateRequested, type];
     await insertQuery(query, values);
+
     const results = await selectQuery(`SELECT requestID FROM requests where tenantID = ${'0x' + tenantID} AND dateRequested = '${dateRequested}';`);
     const requestID = results[0];
 
@@ -152,21 +169,6 @@ requestsRouter.put('/specifics/change-status', async (req, res) => {
     res.send(results);
   } catch (error) {
     res.status(500).json({ error: 'Error updating status'});
-  }
-});
-
-requestsRouter.post('/specifics/new-attachment', upload.single('attachment'), async (req, res) => { 
-  try {
-    const requestID = Buffer.from(req.body['request-id'], 'hex');
-    const attachmentFile = req.file.buffer; 
-    const datePosted = getDate();
-    const query = 'INSERT INTO attachments (requestID, attachment, datePosted) VALUES (?, ?, ?)';
-    const values = [requestID, attachmentFile, datePosted];
-    const results = await insertQuery(query, values);
-    res.send(results);
-  } catch (error) {
-    console.error('Error adding attachment:', error);
-    res.status(500).json({ error: 'Error adding attachment' });
   }
 });
 

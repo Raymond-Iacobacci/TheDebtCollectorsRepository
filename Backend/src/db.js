@@ -24,7 +24,6 @@ const selectQuery = (query) => {
       reject(err);
       return;
     }
-    console.log(query);
     connection.query(query, (queryErr, results) => {
       connection.release();
       if (queryErr) {
