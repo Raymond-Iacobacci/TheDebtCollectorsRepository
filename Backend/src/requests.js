@@ -28,7 +28,7 @@ requestsRouter.get('/get', async (req, res) => {
 requestsRouter.get('/specifics/header-info', async (req, res) => {
   try {
     const requestId = '0x' + req.query['request-id'];
-    const requestQuery = `SELECT tenantID, description, status FROM requests where requestID = ${requestId};`;
+    const requestQuery = `SELECT tenantID, description, status, type FROM requests where requestID = ${requestId};`;
     const requestResults = await selectQuery(requestQuery);
     const request = requestResults[0];
 
@@ -37,7 +37,7 @@ requestsRouter.get('/specifics/header-info', async (req, res) => {
       return;
     }
 
-    const tenantQuery = `SELECT firstName, lastName, unit FROM tenants WHERE tenantID = ${uuidToString(request.tenantID)};`
+    const tenantQuery = `SELECT firstName, lastName, address FROM tenants WHERE tenantID = ${uuidToString(request.tenantID)};`
     const tenantResults = await selectQuery(tenantQuery);
     const tenant = tenantResults[0];
 
@@ -47,10 +47,11 @@ requestsRouter.get('/specifics/header-info', async (req, res) => {
     }
 
     res.json({
-      description: request.description,
+      type: request.type,
       tenant: `${tenant.firstName} ${tenant.lastName}`,
-      status: request.status,
-      unit: tenant.unit
+      address: tenant.address,
+      description: request.description,
+      status: request.status
     });
 
   } catch (error) {
