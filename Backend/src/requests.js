@@ -2,6 +2,7 @@ const express = require('express');
 const requestsRouter = express.Router();
 const multer = require('multer');
 const { selectQuery, insertQuery, uuidToString } = require('./db');
+requestsRouter.use(express.json());
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -13,17 +14,31 @@ function getDate(){
 
 requestsRouter.get('/get', async (req, res) => {
   try {
-    const tenantID = '0x' + req.query['tenant-id'];
-    const requestResults = await selectQuery(`SELECT requestID FROM requests where tenantID = ${tenantID} ORDER BY dateRequested;`);
-    if (!requestResults) {
-      res.status(404).json({ error: 'requestIDs not found for tenant' });
+    const managerID = '0x' + req.query['manager-id'];
+    const tenantResults = await selectQuery(`SELECT tenantID FROM tenants WHERE managerID = ${managerID};`);
+    const requests = [];
+
+    if (!tenantResults.length) {
+      res.status(404).json({ error: 'TenantID not found for manager' });
       return;
     }
-    res.send(requestResults.map(element => element.requestID.toString('hex').toUpperCase()));
+
+    for (const tenant of tenantResults) {
+      const requestResults = await selectQuery(`SELECT requestID FROM requests WHERE tenantID = ${tenant.tenantID} ORDER BY dateRequested;`);
+      if (!requestResults.length) {
+        res.status(404).json({ error: 'requestID not found for tenant' });
+        return;
+      }
+      for (const request of requestResults) {
+        requests.push(request.requestID);
+      }
+    }
+
+    res.send(requests);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
-});
+}); 
 
 requestsRouter.get('/specifics/header-info', async (req, res) => {
   try {
@@ -67,10 +82,8 @@ requestsRouter.get('/specifics/comments', async (req, res) => {
     const comments = [];
 
     if (commentResults.length === 0) {
-      res.status(404).json({ error: 'Comments not found for this request' });
-      return;
+      res.send({});
     }
-
     for(const commentEntry of commentResults){
       const userQuery = `select firstName, lastName FROM tenants WHERE tenantID = ${uuidToString(commentEntry.userID)};`
       const userResults = await selectQuery(userQuery);
@@ -95,8 +108,8 @@ requestsRouter.get('/specifics/comments', async (req, res) => {
 requestsRouter.post('/specifics/new-comment', async (req, res) => {
   try {
     const requestID = Buffer.from(req.query['request-id'], 'hex');
-    const userID = Buffer.from(req.query['user-id'], 'hex');
-    const comment = req.query['comment'];
+    const userID = Buffer.from(req.body.userID, 'hex');
+    const comment = req.body['comment'];
     const datePosted = getDate();
     const query = 'INSERT INTO comments (requestID, datePosted, comment, userID) VALUES (?, ?, ?, ?)';
     const values = [requestID, datePosted, comment, userID];
@@ -110,7 +123,7 @@ requestsRouter.post('/specifics/new-comment', async (req, res) => {
 
 requestsRouter.post('/specifics/new-attachment', upload.single('attachment'), async (req, res) => { 
   try {
-    const requestID = Buffer.from(req.body['request-id'], 'hex');
+    const requestID = Buffer.from(req.query['request-id'], 'hex');
     const attachmentFile = req.file.buffer; 
     const datePosted = getDate();
     const query = 'INSERT INTO attachments (requestID, attachment, datePosted) VALUES (?, ?, ?)';
@@ -163,7 +176,8 @@ requestsRouter.post('/new', async (req, res) => {
 requestsRouter.put('/specifics/change-status', async (req, res) => {
   try {
     const requestID = req.query['request-id'];
-    const newStatusString = req.query['status'];
+    const newStatusString = req.body.status;
+    console.log(newStatusString);
     const query = `UPDATE requests SET status = '${newStatusString}' WHERE requestID = ${requestID};`;
     const results = await selectQuery(query);
     res.send(results);
@@ -176,7 +190,14 @@ requestsRouter.get('/specifics/attachments', async (req, res) => {
   try {
     const requestID = '0x' + req.query['request-id'];
     const requestResults = await selectQuery(`SELECT attachment, datePosted FROM attachments where requestID = ${requestID} ORDER BY datePosted;`);
-    res.send(requestResults);
+    attachments = []
+    for(const request of requestResults){
+      const data = request.attachment;
+      const base64Data = data.toString('base64');
+      console.log(base64Data);
+      attachments.push(base64Data);
+    }
+    res.send(attachments);
   } catch (error) {
     res.status(500).json({ error: 'There are no attachments given this requestID' });
   }
