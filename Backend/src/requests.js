@@ -12,7 +12,7 @@ function getDate(){
   return date.toISOString();
 }
 
-requestsRouter.get('/get', async (req, res) => {
+requestsRouter.get('/get-manager-view', async (req, res) => {
   try {
     const managerID = '0x' + req.query['manager-id'];
     const tenantResults = await selectQuery(`SELECT tenantID, firstName, lastName, address FROM tenants WHERE managerID = ${managerID};`);
@@ -43,7 +43,30 @@ requestsRouter.get('/get', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
-}); 
+});
+
+requestsRouter.get('/get-tenant-view', async (req, res) => {
+  try {
+    const tenantID = '0x' + req.query['tenant-id'];
+    const requestResults = await selectQuery(`SELECT description, type, status, dateRequested FROM requests WHERE tenantID = ${tenantID};`);
+    const requests = []
+    if(!requestResults){
+      res.send('no requestID for this tenantID');
+      return;
+    }
+    for(const request of requestResults){
+      requests.push({
+        description: request.description,
+        type: request.type,
+        status: request.status,
+        datePosted: request.datePosted
+      });
+    }
+    res.send(requests);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 requestsRouter.get('/specifics/header-info', async (req, res) => {
   try {
