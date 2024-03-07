@@ -15,25 +15,30 @@ function getDate(){
 requestsRouter.get('/get', async (req, res) => {
   try {
     const managerID = '0x' + req.query['manager-id'];
-    const tenantResults = await selectQuery(`SELECT tenantID FROM tenants WHERE managerID = ${managerID};`);
+    const tenantResults = await selectQuery(`SELECT tenantID, firstName, lastName, address FROM tenants WHERE managerID = ${managerID};`);
     const requests = [];
 
-    if (!tenantResults.length) {
-      res.status(404).json({ error: 'TenantID not found for manager' });
+    if (!tenantResults) {
+      res.send('TenantID not found for managerID');
       return;
     }
 
     for (const tenant of tenantResults) {
-      const requestResults = await selectQuery(`SELECT requestID FROM requests WHERE tenantID = ${tenant.tenantID} ORDER BY dateRequested;`);
-      if (!requestResults.length) {
-        res.status(404).json({ error: 'requestID not found for tenant' });
+      const requestResults = await selectQuery(`SELECT requestID, type, status FROM requests WHERE tenantID = ${uuidToString(tenant.tenantID)} ORDER BY dateRequested;`);
+      if (!requestResults) {
+        res.send('requestID not found for request');
         return;
       }
       for (const request of requestResults) {
-        requests.push(request.requestID);
+        requests.push({
+          "requestID" : uuidToString(request.requestID), 
+          "name" : tenant.firstName + " " + tenant.lastName,
+          "address" : tenant.address,
+          "type" : request.type,
+          "status" : request.status
+        });
       }
     }
-
     res.send(requests);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
