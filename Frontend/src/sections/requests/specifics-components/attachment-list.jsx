@@ -9,19 +9,16 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { fDateTime } from 'src/utils/format-time';
 
-import { requests } from 'src/_mock/request';
-
 import Scrollbar from 'src/components/scrollbar';
 
 // ----------------------------------------------------------------------
 
 export default function RequestAttachments({ id }) {
   const [loading, setLoading] = useState(true);
-  const [attachmentList, setAttachmentList] = useState([]);
+  // const [attachmentList, setAttachmentList] = useState([]);
 
   useEffect(() => {
-    const request = requests.find((req) => req.id === id); // API CALL HERE
-    setAttachmentList(request.attachments);
+    // setAttachmentList({});
     setLoading(false);
   }, [id]);
 
@@ -38,9 +35,9 @@ export default function RequestAttachments({ id }) {
               Attachments
             </Typography>
             <Stack spacing={3} sx={{ pt: 2, pr: 0 }}>
-              {attachmentList.map((attachment) => (
+              {/* {attachmentList.map((attachment) => (
                 <AttachmentItem key={attachment.id} attachment={attachment} />
-              ))}
+              ))} */}
             </Stack>
           </Stack>
         </Scrollbar>

@@ -14,7 +14,7 @@ import Iconify from 'src/components/iconify';
 import RequestComments from '../specifics-components/comment-list';
 import RequestHeaderInfo from '../specifics-components/header-info';
 import RequestAttachments from '../specifics-components/attachment-list';
-import RequestLogTimeline from '../specifics-components/request-log-timeline';
+// import RequestLogTimeline from '../specifics-components/request-log-timeline';
 
 // ----------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ export default function RequestSpecificView({ id }) {
               </Card>
             </Grid>
             <Grid xs={12} md={5} lg={4}>
-              <RequestLogTimeline id={id} />
+              {/* <RequestLogTimeline id={id} /> */}
             </Grid>
           </Grid>
     </Container>

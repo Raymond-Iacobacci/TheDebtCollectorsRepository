@@ -9,8 +9,6 @@ import IconButton from '@mui/material/IconButton';
 import CardHeader from '@mui/material/CardHeader';
 import CircularProgress from '@mui/material/CircularProgress';
 
-// import { requests } from 'src/_mock/request';
-
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -33,13 +31,15 @@ export default function RequestHeaderInfo({ id }) {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const request = await getHeaderInfo(id);
-        console.log(`RequestHeader: ${request}`)
-        setTitle(request.type);
-        setName(request.name);
-        setAddress(request.address);
-        setDescription(request.description);
-        setStatus(request.status);
+        await getHeaderInfo(id)
+          .then(data => {
+            console.log(data);
+            setName(data.tenant);
+            setDescription(data.description);
+            setStatus(data.status);
+            setAddress(data.address);
+            setTitle(data.type);
+        });
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -48,14 +48,7 @@ export default function RequestHeaderInfo({ id }) {
     };
 
     fetchData();
-    // Actual data is fetched here
     // const request = requests.find((req) => req.id === id); 
-    // setTitle(request.type);
-    // setName(request.name);
-    // setAddress(request.address);
-    // setDescription(request.description);
-    // setStatus(request.status);
-    // setLoading(false);
   }, [id]);
 
   const handleOpenStatusPopover = (event) => {

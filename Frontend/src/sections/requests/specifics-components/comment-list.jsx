@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
+// import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -12,17 +13,19 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { fDateTime } from 'src/utils/format-time';
 
-import { requests } from 'src/_mock/request';
-
+import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
+
+import { getComments } from '../hooks/request-specifics'
 
 // ----------------------------------------------------------------------
 
 export default function RequestComments({ id }) {
   const [loading, setLoading] = useState(true);
-  const [commentList, setCommentList] = useState([]);
+  const [commentList, setCommentList] = useState({comment: 'test'});
   const [commentField, setCommentField] = useState("");
+  const [errorMsg, setError] = useState("");
 
   const [commentLabel, setCommentLabel] = useState("New Comment");
   const [validate, setValidate] = useState(true);
@@ -47,17 +50,48 @@ export default function RequestComments({ id }) {
   }
 
   useEffect(() => {
-    const request = requests.find((req) => req.id === id); // API CALL HERE
-    setCommentList(request.comments);
-    setLoading(false);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        await getComments(id)
+          .then(data => {
+            console.log(data);
+            setCommentList(data);
+        });
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        console.log(`Comments API: ${error}`)
+      }
+    };
+    fetchData();
+
+    // const request = requests.find((req) => req.id === id); // API CALL HERE
   }, [id]);
 
   return (
     <>
       {loading ? (
-        <Stack direction="column" alignItems="center" spacing={3} sx={{ p: 3 }}>
+        <Stack
+        direction="column"
+        alignItems="center"
+        spacing={3}
+        sx={{ p: 3 }}
+      >
+        {errorMsg ? 
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            spacing={3}
+            sx={{ p: 0, pr: 3 }}
+          >
+            <Label color='error'>{errorMsg}</Label>
+          </Stack>
+          :
           <CircularProgress color="primary" />
-        </Stack>
+        }
+      </Stack>
       ) : (
         <Scrollbar>
           <Stack sx={{ p: 3 }}>
@@ -65,9 +99,20 @@ export default function RequestComments({ id }) {
               Comments
             </Typography>
             <Stack spacing={3} sx={{ pt: 2, pr: 0 }}>
-              {commentList.map((comment) => (
-                <CommentItem key={comment.id} comment={comment} />
-              ))}
+              {/* {(commentList.length === 0)?
+                <Paper
+                  sx={{
+                    textAlign: 'center',
+                  }}
+                >
+                  <Typography variant="h6" paragraph>
+                    No comments...
+                  </Typography>
+                </Paper>
+              : commentList.map((comment) => (
+                  <CommentItem key={comment.id} item={comment} />
+                ))
+              } */}
             </Stack>
             <Stack
               direction="row"
@@ -106,8 +151,8 @@ RequestComments.propTypes = {
 
 // ----------------------------------------------------------------------
 
-function CommentItem({ comment }) {
-  const { user, text, postedAt } = comment;
+function CommentItem({ item }) {
+  const { user, comment, datePosted } = item;
 
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
@@ -117,21 +162,21 @@ function CommentItem({ comment }) {
         </Typography>
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {text}
+          {comment}
         </Typography>
       </Box>
 
       <Typography variant="caption" sx={{ pr: 1, flexShrink: 0, color: 'text.secondary' }}>
-        {fDateTime(postedAt)}
+        {fDateTime(datePosted)}
       </Typography>
     </Stack>
   );
 }
 
 CommentItem.propTypes = {
-  comment: PropTypes.shape({
+  item: PropTypes.shape({
     user: PropTypes.string,
-    text: PropTypes.string,
-    postedAt: PropTypes.string,
+    comment: PropTypes.string,
+    datePosted: PropTypes.string,
   }),
 };
