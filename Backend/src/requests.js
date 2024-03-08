@@ -31,7 +31,7 @@ requestsRouter.get('/get-manager-view', async (req, res) => {
       }
       for (const request of requestResults) {
         requests.push({
-          "requestID" : uuidToString(request.requestID), 
+          "requestID" : request.requestID.toString('hex').toUpperCase(),
           "name" : tenant.firstName + " " + tenant.lastName,
           "address" : tenant.address,
           "type" : request.type,
@@ -59,7 +59,7 @@ requestsRouter.get('/get-tenant-view', async (req, res) => {
         description: request.description,
         type: request.type,
         status: request.status,
-        datePosted: request.datePosted
+        dateRequested : request.dateRequested
       });
     }
     res.send(requests);
@@ -137,12 +137,11 @@ requestsRouter.post('/specifics/new-comment', async (req, res) => {
   try {
     const requestID = Buffer.from(req.query['request-id'], 'hex');
     const userID = Buffer.from(req.body.userID, 'hex');
-    const comment = req.body['comment'];
+    const comment = req.body.comment;
     const datePosted = getDate();
     const query = 'INSERT INTO comments (requestID, datePosted, comment, userID) VALUES (?, ?, ?, ?)';
     const values = [requestID, datePosted, comment, userID];
     const results = await insertQuery(query, values);
-    console.log(results.insertId)
     res.send(results);
   } catch (error) {
     res.status(500).json({ error: 'Error inserting into table' });
@@ -167,21 +166,18 @@ requestsRouter.post('/specifics/new-attachment', upload.single('attachment'), as
 requestsRouter.post('/new', async (req, res) => {
   try {
     const tenantID = req.query['tenant-id'];
-    const description = req.query['description'];
-    const type = req.query['type'];
+    const description = req.body.description;
+    const type = req.body.type;
     const status = 'Unresolved';
     const dateRequested = getDate();
+    const managerResult = await selectQuery(`SELECT managerID FROM tenants where tenantID = ${'0x' + tenantID};`);
 
-    const managerIDQuery = `SELECT managerID FROM tenants where tenantID = ${'0x' + tenantID};`;
-    const managerResults = await selectQuery(managerIDQuery);
-    const managerObject = managerResults[0];
-
-    if (!managerObject) {
+    if (!managerResult) {
       res.status(404).json({ error: 'managerID not found in managers table' });
       return;
     }
 
-    const managerID = managerObject.managerID;
+    const managerID = managerResult[0].managerID;
 
     const query = 'INSERT INTO requests (description, tenantID, managerID, status, dateRequested, type) VALUES (?, ?, ?, ?, ?, ?)';
     const values = [description, Buffer.from(tenantID, 'hex'), Buffer.from(managerID, 'hex'), status, dateRequested, type];
@@ -203,11 +199,10 @@ requestsRouter.post('/new', async (req, res) => {
 
 requestsRouter.put('/specifics/change-status', async (req, res) => {
   try {
-    const requestID = req.query['request-id'];
+    const requestID = '0x' + req.query['request-id'];
     const newStatusString = req.body.status;
     console.log(newStatusString);
-    const query = `UPDATE requests SET status = '${newStatusString}' WHERE requestID = ${requestID};`;
-    const results = await selectQuery(query);
+    const results = await selectQuery(`UPDATE requests SET status = '${newStatusString}' WHERE requestID = ${requestID};`);
     res.send(results);
   } catch (error) {
     res.status(500).json({ error: 'Error updating status'});

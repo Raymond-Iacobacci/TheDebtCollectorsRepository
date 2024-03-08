@@ -1,5 +1,4 @@
 const express = require('express');
-const { pool, selectQuery} = require('./db');
 const authRouter = require('./auth');
 const requestsRouter = require('./requests'); 
 const cors = require('cors'); 
