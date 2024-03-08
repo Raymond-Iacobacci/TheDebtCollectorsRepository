@@ -2,7 +2,17 @@ const express = require('express');
 const requestsRouter = express.Router();
 const multer = require('multer');
 const { selectQuery, insertQuery, uuidToString } = require('./db');
+const cors = require('cors'); 
+
+requestsRouter.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
+
 requestsRouter.use(express.json());
+requestsRouter.use(cors());
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -12,7 +22,7 @@ function getDate(){
   return date.toISOString();
 }
 
-requestsRouter.get('/get-manager-view', async (req, res) => {
+requestsRouter.get('/get-manager-view', async (req, res, next) => {
   try {
     const managerID = '0x' + req.query['manager-id'];
     const tenantResults = await selectQuery(`SELECT tenantID, firstName, lastName, address FROM tenants WHERE managerID = ${managerID};`);
@@ -40,12 +50,13 @@ requestsRouter.get('/get-manager-view', async (req, res) => {
       }
     }
     res.send(requests);
+    next();
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-requestsRouter.get('/get-tenant-view', async (req, res) => {
+requestsRouter.get('/get-tenant-view', async (req, res, next) => {
   try {
     const tenantID = '0x' + req.query['tenant-id'];
     const requestResults = await selectQuery(`SELECT description, type, status, dateRequested FROM requests WHERE tenantID = ${tenantID};`);
@@ -63,12 +74,13 @@ requestsRouter.get('/get-tenant-view', async (req, res) => {
       });
     }
     res.send(requests);
+    next();
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-requestsRouter.get('/specifics/header-info', async (req, res) => {
+requestsRouter.get('/specifics/header-info', async (req, res, next) => {
   try {
     const requestId = '0x' + req.query['request-id'];
     const requestQuery = `SELECT tenantID, description, status, type FROM requests where requestID = ${requestId};`;
@@ -89,24 +101,23 @@ requestsRouter.get('/specifics/header-info', async (req, res) => {
       return;
     }
 
-    res.json({
+    res.send({
       type: request.type,
       tenant: `${tenant.firstName} ${tenant.lastName}`,
       address: tenant.address,
       description: request.description, 
       status: request.status
     });
-
+    next();
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-requestsRouter.get('/specifics/comments', async (req, res) => {
+requestsRouter.get('/specifics/comments', async (req, res, next) => {
   try {
     const requestID = '0x' + req.query['request-id'];
-    const requestQuery = `SELECT userID, comment, datePosted FROM comments WHERE requestID = ${requestID} ORDER BY datePosted DESC;`;
-    const commentResults = await selectQuery(requestQuery);
+    const commentResults = await selectQuery(`SELECT userID, comment, datePosted FROM comments WHERE requestID = ${requestID} ORDER BY datePosted DESC;`);
     const comments = [];
 
     if (commentResults.length === 0) {
@@ -128,12 +139,13 @@ requestsRouter.get('/specifics/comments', async (req, res) => {
       })
     }
     res.send(comments);
+    next();
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-requestsRouter.post('/specifics/new-comment', async (req, res) => {
+requestsRouter.post('/specifics/new-comment', async (req, res, next) => {
   try {
     const requestID = Buffer.from(req.query['request-id'], 'hex');
     const userID = Buffer.from(req.body.userID, 'hex');
@@ -143,12 +155,13 @@ requestsRouter.post('/specifics/new-comment', async (req, res) => {
     const values = [requestID, datePosted, comment, userID];
     const results = await insertQuery(query, values);
     res.send(results);
+    next();
   } catch (error) {
     res.status(500).json({ error: 'Error inserting into table' });
   }
 });
 
-requestsRouter.post('/specifics/new-attachment', upload.single('attachment'), async (req, res) => { 
+requestsRouter.post('/specifics/new-attachment', upload.single('attachment'), async (req, res, next) => { 
   try {
     const requestID = Buffer.from(req.query['request-id'], 'hex');
     const attachmentFile = req.file.buffer; 
@@ -157,13 +170,14 @@ requestsRouter.post('/specifics/new-attachment', upload.single('attachment'), as
     const values = [requestID, attachmentFile, datePosted];
     const results = await insertQuery(query, values);
     res.send(results);
+    next();
   } catch (error) {
     console.error('Error adding attachment:', error);
     res.status(500).json({ error: 'Error adding attachment' });
   }
 });
 
-requestsRouter.post('/new', async (req, res) => {
+requestsRouter.post('/new', async (req, res, next) => {
   try {
     const tenantID = req.query['tenant-id'];
     const description = req.body.description;
@@ -192,24 +206,25 @@ requestsRouter.post('/new', async (req, res) => {
     }
 
     res.send(uuidToString(requestID.requestID));
+    next();
   } catch (error) {
     res.status(500).json({ error: 'Error inserting into table' });
   }
 });
 
-requestsRouter.put('/specifics/change-status', async (req, res) => {
+requestsRouter.put('/specifics/change-status', async (req, res, next) => {
   try {
     const requestID = '0x' + req.query['request-id'];
     const newStatusString = req.body.status;
-    console.log(newStatusString);
     const results = await selectQuery(`UPDATE requests SET status = '${newStatusString}' WHERE requestID = ${requestID};`);
     res.send(results);
+    next();
   } catch (error) {
     res.status(500).json({ error: 'Error updating status'});
   }
 });
 
-requestsRouter.get('/specifics/attachments', async (req, res) => { 
+requestsRouter.get('/specifics/attachments', async (req, res, next) => { 
   try {
     const requestID = '0x' + req.query['request-id'];
     const requestResults = await selectQuery(`SELECT attachment, datePosted FROM attachments where requestID = ${requestID} ORDER BY datePosted;`);
@@ -217,10 +232,10 @@ requestsRouter.get('/specifics/attachments', async (req, res) => {
     for(const request of requestResults){
       const data = request.attachment;
       const base64Data = data.toString('base64');
-      console.log(base64Data);
       attachments.push(base64Data);
     }
     res.send(attachments);
+    next();
   } catch (error) {
     res.status(500).json({ error: 'There are no attachments given this requestID' });
   }

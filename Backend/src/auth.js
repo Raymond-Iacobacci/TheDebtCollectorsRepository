@@ -7,6 +7,9 @@ require('dotenv').config({ path: '../.env' });
 
 const authRouter = express.Router();
 
+const cors = require('cors'); 
+authRouter.use(cors());
+
 authRouter.use(express.json());
 authRouter.use(express.urlencoded({ extended: true }));
 authRouter.use(session({ secret: 'your_secret_key', resave: false, saveUninitialized: false }));
