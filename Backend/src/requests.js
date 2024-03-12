@@ -2,17 +2,8 @@ const express = require('express');
 const requestsRouter = express.Router();
 const multer = require('multer');
 const { selectQuery, insertQuery, uuidToString } = require('./db');
-const cors = require('cors'); 
-
-requestsRouter.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  next();
-});
 
 requestsRouter.use(express.json());
-requestsRouter.use(cors());
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -22,21 +13,26 @@ function getDate(){
   return date.toISOString();
 }
 
-requestsRouter.get('/get-manager-view', async (req, res, next) => {
+requestsRouter.get('/get-manager-view', async (req, res) => {
   try {
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Vary');
+
     const managerID = '0x' + req.query['manager-id'];
     const tenantResults = await selectQuery(`SELECT tenantID, firstName, lastName, address FROM tenants WHERE managerID = ${managerID};`);
     const requests = [];
 
     if (!tenantResults) {
-      res.send('TenantID not found for managerID');
+      res.send('TenantID not found for managerID').end();
       return;
     }
 
     for (const tenant of tenantResults) {
       const requestResults = await selectQuery(`SELECT requestID, type, status FROM requests WHERE tenantID = ${uuidToString(tenant.tenantID)} ORDER BY dateRequested;`);
       if (!requestResults) {
-        res.send('requestID not found for request');
+        res.send('requestID not found for request').end();
         return;
       }
       for (const request of requestResults) {
@@ -49,14 +45,13 @@ requestsRouter.get('/get-manager-view', async (req, res, next) => {
         });
       }
     }
-    res.send(requests);
-    next();
+    res.send(requests).end();
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: `MANAGER VIEW ERROR: ${error}` }).end();
   }
 });
 
-requestsRouter.get('/get-tenant-view', async (req, res, next) => {
+requestsRouter.get('/get-tenant-view', async (req, res) => {
   try {
     const tenantID = '0x' + req.query['tenant-id'];
     const requestResults = await selectQuery(`SELECT description, type, status, dateRequested FROM requests WHERE tenantID = ${tenantID};`);
@@ -73,15 +68,19 @@ requestsRouter.get('/get-tenant-view', async (req, res, next) => {
         dateRequested : request.dateRequested
       });
     }
-    res.send(requests);
-    next();
+    res.send(requests).end();
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-requestsRouter.get('/specifics/header-info', async (req, res, next) => {
+requestsRouter.get('/specifics/header-info', async (req, res) => {
   try {
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Vary');
+
     const requestId = '0x' + req.query['request-id'];
     const requestQuery = `SELECT tenantID, description, status, type FROM requests where requestID = ${requestId};`;
     const requestResults = await selectQuery(requestQuery);
@@ -107,22 +106,28 @@ requestsRouter.get('/specifics/header-info', async (req, res, next) => {
       address: tenant.address,
       description: request.description, 
       status: request.status
-    });
-    next();
+    }).end();
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: `HEADER-INFO ERROR: ${error}` }).end();
   }
 });
 
-requestsRouter.get('/specifics/comments', async (req, res, next) => {
+requestsRouter.get('/specifics/comments', async (req, res) => {
   try {
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Vary');
+
     const requestID = '0x' + req.query['request-id'];
     const commentResults = await selectQuery(`SELECT userID, comment, datePosted FROM comments WHERE requestID = ${requestID} ORDER BY datePosted DESC;`);
     const comments = [];
 
     if (commentResults.length === 0) {
-      res.send({});
+      res.send({}).end();
+      return;
     }
+    
     for(const commentEntry of commentResults){
       const userQuery = `select firstName, lastName FROM tenants WHERE tenantID = ${uuidToString(commentEntry.userID)};`
       const userResults = await selectQuery(userQuery);
@@ -138,14 +143,13 @@ requestsRouter.get('/specifics/comments', async (req, res, next) => {
         datePosted: commentEntry.datePosted
       })
     }
-    res.send(comments);
-    next();
+    res.send(comments).end();
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: `COMMENTS ERROR: ${error}` }).end();
   }
 });
 
-requestsRouter.post('/specifics/new-comment', async (req, res, next) => {
+requestsRouter.post('/specifics/new-comment', async (req, res) => {
   try {
     const requestID = Buffer.from(req.query['request-id'], 'hex');
     const userID = Buffer.from(req.body.userID, 'hex');
@@ -155,13 +159,12 @@ requestsRouter.post('/specifics/new-comment', async (req, res, next) => {
     const values = [requestID, datePosted, comment, userID];
     const results = await insertQuery(query, values);
     res.send(results);
-    next();
   } catch (error) {
     res.status(500).json({ error: 'Error inserting into table' });
   }
 });
 
-requestsRouter.post('/specifics/new-attachment', upload.single('attachment'), async (req, res, next) => { 
+requestsRouter.post('/specifics/new-attachment', upload.single('attachment'), async (req, res) => { 
   try {
     const requestID = Buffer.from(req.query['request-id'], 'hex');
     const attachmentFile = req.file.buffer; 
@@ -170,14 +173,13 @@ requestsRouter.post('/specifics/new-attachment', upload.single('attachment'), as
     const values = [requestID, attachmentFile, datePosted];
     const results = await insertQuery(query, values);
     res.send(results);
-    next();
   } catch (error) {
     console.error('Error adding attachment:', error);
     res.status(500).json({ error: 'Error adding attachment' });
   }
 });
 
-requestsRouter.post('/new', async (req, res, next) => {
+requestsRouter.post('/new', async (req, res) => {
   try {
     const tenantID = req.query['tenant-id'];
     const description = req.body.description;
@@ -206,25 +208,23 @@ requestsRouter.post('/new', async (req, res, next) => {
     }
 
     res.send(uuidToString(requestID.requestID));
-    next();
   } catch (error) {
     res.status(500).json({ error: 'Error inserting into table' });
   }
 });
 
-requestsRouter.put('/specifics/change-status', async (req, res, next) => {
+requestsRouter.put('/specifics/change-status', async (req, res) => {
   try {
     const requestID = '0x' + req.query['request-id'];
     const newStatusString = req.body.status;
     const results = await selectQuery(`UPDATE requests SET status = '${newStatusString}' WHERE requestID = ${requestID};`);
     res.send(results);
-    next();
   } catch (error) {
     res.status(500).json({ error: 'Error updating status'});
   }
 });
 
-requestsRouter.get('/specifics/attachments', async (req, res, next) => { 
+requestsRouter.get('/specifics/attachments', async (req, res) => { 
   try {
     const requestID = '0x' + req.query['request-id'];
     const requestResults = await selectQuery(`SELECT attachment, datePosted FROM attachments where requestID = ${requestID} ORDER BY datePosted;`);
@@ -235,7 +235,6 @@ requestsRouter.get('/specifics/attachments', async (req, res, next) => {
       attachments.push(base64Data);
     }
     res.send(attachments);
-    next();
   } catch (error) {
     res.status(500).json({ error: 'There are no attachments given this requestID' });
   }

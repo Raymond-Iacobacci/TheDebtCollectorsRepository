@@ -1,7 +1,7 @@
 const express = require('express');
+const cors = require('cors');
 const authRouter = require('./auth');
 const requestsRouter = require('./requests'); 
-const cors = require('cors'); 
 require('dotenv').config({ path: '../.env' });
 const sendEmail = require('./sendEmail');
 const crypto = require('crypto');
@@ -9,11 +9,12 @@ const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+app.use(cors()); 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+
 app.use('/auth', authRouter);
-app.use('/requests', requestsRouter); 
+app.use('/requests', requestsRouter);
 
 app.get('/send-email', (req, res) => {
   const emailToken = crypto.randomBytes(20).toString('hex');
