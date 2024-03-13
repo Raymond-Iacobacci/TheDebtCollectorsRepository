@@ -3,22 +3,42 @@ import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
+import Paper from '@mui/material/Paper';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { fDateTime } from 'src/utils/format-time';
 
+import Label from 'src/components/label';
 import Scrollbar from 'src/components/scrollbar';
+
+import { getAttachments } from '../hooks/request-specifics'
 
 // ----------------------------------------------------------------------
 
 export default function RequestAttachments({ id }) {
   const [loading, setLoading] = useState(true);
-  // const [attachmentList, setAttachmentList] = useState([]);
+  const [attachmentList, setAttachmentList] = useState([]);
+  const [errorMsg, setError] = useState("");
 
   useEffect(() => {
-    // setAttachmentList({});
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        await getAttachments(id)
+          .then(data => {
+            console.log(data);
+            // setAttachmentList(data);
+            setAttachmentList([]);
+        });
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        console.log(`Comments API: ${error}`)
+      }
+    };
+    fetchData();
     setLoading(false);
   }, [id]);
 
@@ -26,7 +46,19 @@ export default function RequestAttachments({ id }) {
     <>
       {loading ? (
         <Stack direction="column" alignItems="center" spacing={3} sx={{ p: 3 }}>
+          {errorMsg ? 
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            spacing={3}
+            sx={{ p: 0, pr: 3 }}
+          >
+            <Label color='error'>{errorMsg}</Label>
+          </Stack>
+          :
           <CircularProgress color="primary" />
+        }
         </Stack>
       ) : (
         <Scrollbar>
@@ -35,9 +67,20 @@ export default function RequestAttachments({ id }) {
               Attachments
             </Typography>
             <Stack spacing={3} sx={{ pt: 2, pr: 0 }}>
-              {/* {attachmentList.map((attachment) => (
-                <AttachmentItem key={attachment.id} attachment={attachment} />
-              ))} */}
+              {(attachmentList.length === 0)?
+                <Paper
+                  sx={{
+                    textAlign: 'center',
+                  }}
+                >
+                  <Typography variant="body2" paragraph>
+                    No attachments.
+                  </Typography>
+                </Paper>
+              : attachmentList.map((attachment) => (
+                  <AttachmentItem key={attachment.id} attachment={attachment} />
+                ))
+              }
             </Stack>
           </Stack>
         </Scrollbar>

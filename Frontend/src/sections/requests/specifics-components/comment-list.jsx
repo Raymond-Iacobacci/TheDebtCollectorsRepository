@@ -1,11 +1,9 @@
-import { sample } from 'lodash';
 import PropTypes from 'prop-types';
-import { faker } from '@faker-js/faker';
 import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-// import Paper from '@mui/material/Paper';
+import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -17,13 +15,13 @@ import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
-import { getComments } from '../hooks/request-specifics'
+import { newComment, getComments } from '../hooks/request-specifics'
 
 // ----------------------------------------------------------------------
 
 export default function RequestComments({ id }) {
   const [loading, setLoading] = useState(true);
-  const [commentList, setCommentList] = useState({comment: 'test'});
+  const [commentList, setCommentList] = useState([]);
   const [commentField, setCommentField] = useState("");
   const [errorMsg, setError] = useState("");
 
@@ -33,15 +31,14 @@ export default function RequestComments({ id }) {
   const handleAddComment = (event) => {
     if( commentField !== "" ) {
       const newCommentArr = [...commentList, {
-        id: faker.string.uuid(),
-        user: sample(["Manager", "Tenant"]),
         text: commentField,
         postedAt: new Date(),
       }]
-      setCommentList(newCommentArr);
+      newComment(id, import.meta.env.VITE_TEST_MANAGER_ID, commentField);
       setCommentField("");
-      setCommentLabel("");
+      setCommentLabel("New comment");
       setValidate(true);
+      setCommentList(newCommentArr);
     }
     else {
       setValidate(false);
@@ -65,9 +62,7 @@ export default function RequestComments({ id }) {
       }
     };
     fetchData();
-
-    // const request = requests.find((req) => req.id === id); // API CALL HERE
-  }, [id]);
+  }, [id, commentList.length]);
 
   return (
     <>
@@ -99,20 +94,20 @@ export default function RequestComments({ id }) {
               Comments
             </Typography>
             <Stack spacing={3} sx={{ pt: 2, pr: 0 }}>
-              {/* {(commentList.length === 0)?
+              {(commentList.length === 0)?
                 <Paper
                   sx={{
                     textAlign: 'center',
                   }}
                 >
-                  <Typography variant="h6" paragraph>
-                    No comments...
+                  <Typography variant="body2" paragraph>
+                    No comments.
                   </Typography>
                 </Paper>
               : commentList.map((comment) => (
                   <CommentItem key={comment.id} item={comment} />
                 ))
-              } */}
+              }
             </Stack>
             <Stack
               direction="row"
