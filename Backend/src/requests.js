@@ -82,8 +82,7 @@ requestsRouter.get('/specifics/header-info', async (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Vary');
 
     const requestId = '0x' + req.query['request-id'];
-    const requestQuery = `SELECT tenantID, description, status, type FROM requests where requestID = ${requestId};`;
-    const requestResults = await selectQuery(requestQuery);
+    const requestResults = await selectQuery(`SELECT tenantID, description, status, type FROM requests where requestID = ${requestId};`);
     const request = requestResults[0];
 
     if (!request) {
@@ -91,8 +90,7 @@ requestsRouter.get('/specifics/header-info', async (req, res) => {
       return;
     }
 
-    const tenantQuery = `SELECT firstName, lastName, address FROM tenants WHERE tenantID = ${uuidToString(request.tenantID)};`
-    const tenantResults = await selectQuery(tenantQuery);
+    const tenantResults = await selectQuery(`SELECT firstName, lastName, address FROM tenants WHERE tenantID = ${uuidToString(request.tenantID)};`);
     const tenant = tenantResults[0];
 
     if (!tenant) {
@@ -120,24 +118,23 @@ requestsRouter.get('/specifics/comments', async (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Vary');
 
     const requestID = '0x' + req.query['request-id'];
-    const commentResults = await selectQuery(`SELECT userID, comment, datePosted FROM comments WHERE requestID = ${requestID} ORDER BY datePosted DESC;`);
+    const commentResults = await selectQuery(`SELECT commentID, userID, comment, datePosted FROM comments WHERE requestID = ${requestID} ORDER BY datePosted;`);
     const comments = [];
 
     if (commentResults.length === 0) {
-      res.send({}).end();
+      res.send([]).end();
       return;
     }
     
     for(const commentEntry of commentResults){
-      const userQuery = `select firstName, lastName FROM tenants WHERE tenantID = ${uuidToString(commentEntry.userID)};`
-      const userResults = await selectQuery(userQuery);
+      const userResults = await selectQuery(`SELECT firstName, lastName FROM tenants WHERE tenantID = ${uuidToString(commentEntry.userID)};`);
       let user = userResults[0];
       if(!user){
-        const userQuery = `select firstName, lastName FROM managers WHERE managerID = ${uuidToString(commentEntry.userID)};`
-        const userResults = await selectQuery(userQuery);
+        const userResults = await selectQuery(`SELECT firstName, lastName FROM managers WHERE managerID = ${uuidToString(commentEntry.userID)};`);
         user = userResults[0];
       }
       comments.push({
+        commentID: commentEntry.commentID.toString('hex').toUpperCase(),
         user: user.firstName + ' ' + user.lastName,
         comment: commentEntry.comment,
         datePosted: commentEntry.datePosted
