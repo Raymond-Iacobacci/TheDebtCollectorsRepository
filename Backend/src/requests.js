@@ -164,10 +164,12 @@ requestsRouter.post('/specifics/new-comment', async (req, res) => {
 requestsRouter.post('/specifics/new-attachment', upload.single('attachment'), async (req, res) => { 
   try {
     const requestID = Buffer.from(req.query['request-id'], 'hex');
+    const title = req.body.title;
+    const description = req.body.description;
     const attachmentFile = req.file.buffer; 
     const datePosted = getDate();
-    const query = 'INSERT INTO attachments (requestID, attachment, datePosted) VALUES (?, ?, ?)';
-    const values = [requestID, attachmentFile, datePosted];
+    const query = 'INSERT INTO attachments (title, description, attachment, requestID, datePosted) VALUES (?, ?, ?, ?, ?)';
+    const values = [title, description, attachmentFile, requestID, datePosted];
     const results = await insertQuery(query, values);
     res.send(results);
   } catch (error) {
@@ -224,12 +226,17 @@ requestsRouter.put('/specifics/change-status', async (req, res) => {
 requestsRouter.get('/specifics/attachments', async (req, res) => { 
   try {
     const requestID = '0x' + req.query['request-id'];
-    const requestResults = await selectQuery(`SELECT attachment, datePosted FROM attachments where requestID = ${requestID} ORDER BY datePosted;`);
+    const requestResults = await selectQuery(`SELECT title, description, datePosted, attachment FROM attachments where requestID = ${requestID} ORDER BY datePosted;`);
     attachments = []
     for(const request of requestResults){
       const data = request.attachment;
       const base64Data = data.toString('base64');
-      attachments.push(base64Data);
+      attachments.push({
+        title: request.title,
+        description: request.description,
+        datePosted: request.datePosted,
+        attachment: base64Data
+      });
     }
     res.send(attachments);
   } catch (error) {
