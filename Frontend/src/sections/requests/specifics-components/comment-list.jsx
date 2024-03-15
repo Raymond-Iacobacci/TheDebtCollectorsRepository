@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -28,17 +28,27 @@ export default function RequestComments({ id }) {
   const [commentLabel, setCommentLabel] = useState("New Comment");
   const [validate, setValidate] = useState(true);
 
-  const handleAddComment = (event) => {
+  const fetchData = useCallback( async () => {
+    try {
+      setLoading(true);
+      await getComments(id)
+        .then(data => {
+          setCommentList(data);
+      });
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      console.log(`Comments API: ${error}`)
+    }
+  }, [id]);
+
+  const handleAddComment = async (event) => {
     if( commentField !== "" ) {
-      const newCommentArr = [...commentList, {
-        text: commentField,
-        postedAt: new Date(),
-      }]
-      newComment(id, import.meta.env.VITE_TEST_MANAGER_ID, commentField);
+      await newComment(id, import.meta.env.VITE_TEST_MANAGER_ID, commentField);
       setCommentField("");
       setCommentLabel("New comment");
       setValidate(true);
-      setCommentList(newCommentArr);
+      await fetchData();
     }
     else {
       setValidate(false);
@@ -47,52 +57,38 @@ export default function RequestComments({ id }) {
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        await getComments(id)
-          .then(data => {
-            console.log(data);
-            setCommentList(data);
-        });
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        console.log(`Comments API: ${error}`)
-      }
-    };
     fetchData();
-  }, [id, commentList.length]);
+  }, [fetchData]);
 
   return (
-    <>
-      {loading ? (
-        <Stack
-        direction="column"
-        alignItems="center"
-        spacing={3}
-        sx={{ p: 3 }}
-      >
-        {errorMsg ? 
+    <Scrollbar>
+      <Stack sx={{ p: 3 }}>
+        <Typography variant="subtitle1" sx={{ color: 'text.primary' }}>
+          Comments
+        </Typography>
+        {loading ? (
           <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-            spacing={3}
-            sx={{ p: 0, pr: 3 }}
-          >
-            <Label color='error'>{errorMsg}</Label>
-          </Stack>
-          :
-          <CircularProgress color="primary" />
-        }
-      </Stack>
-      ) : (
-        <Scrollbar>
-          <Stack sx={{ p: 3 }}>
-            <Typography variant="subtitle1" sx={{ color: 'text.primary' }}>
-              Comments
-            </Typography>
+          direction="column"
+          alignItems="center"
+          spacing={3}
+          sx={{ p: 3 }}
+        >
+          {errorMsg ? 
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              spacing={3}
+              sx={{ p: 0, pr: 3 }}
+            >
+              <Label color='error'>{errorMsg}</Label>
+            </Stack>
+            :
+            <CircularProgress color="primary" />
+          }
+        </Stack>
+        ) : (
+          <>
             <Stack spacing={3} sx={{ pt: 2, pr: 0 }}>
               {(commentList.length === 0)?
                 <Paper
@@ -105,7 +101,7 @@ export default function RequestComments({ id }) {
                   </Typography>
                 </Paper>
               : commentList.map((comment) => (
-                  <CommentItem key={comment.id} item={comment} />
+                  <CommentItem key={comment.commentID} item={comment} />
                 ))
               }
             </Stack>
@@ -133,10 +129,10 @@ export default function RequestComments({ id }) {
                 <Iconify icon="eva:plus-circle-outline" />
               </IconButton>
             </Stack>
-          </Stack>
-        </Scrollbar>
-      )}
-    </>
+          </>
+        )}
+      </Stack>
+    </Scrollbar>
   );
 }
 

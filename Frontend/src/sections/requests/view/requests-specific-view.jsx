@@ -39,7 +39,7 @@ export default function RequestSpecificView({ id }) {
             </Button>
           </Stack>
           <Grid container spacing={3}>
-            <Grid xs={12} md={7} lg={8}>
+            <Grid xs={12} md={10} lg={10}>
               <Card>
                 <RequestHeaderInfo id={id} />
                 <Divider sx={{ borderStyle: 'dashed' }} />
@@ -48,9 +48,9 @@ export default function RequestSpecificView({ id }) {
                 <RequestComments id={id} />
               </Card>
             </Grid>
-            <Grid xs={12} md={5} lg={4}>
-              {/* <RequestLogTimeline id={id} /> */}
-            </Grid>
+            {/* <Grid xs={12} md={5} lg={4}>
+              <RequestLogTimeline id={id} />
+            </Grid> */}
           </Grid>
     </Container>
   );

@@ -47,7 +47,6 @@ export default function RequestsView() {
         setLoading(true);
         await getManagerRequests()
           .then(data => {
-            console.log(data);
             setRequests(data);
         });
         setLoading(false);
@@ -143,7 +142,7 @@ export default function RequestsView() {
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row) => (
                       <RequestTableRow
-                        key={row.id}
+                        key={row.requestID}
                         id={row.requestID}
                         avatarUrl={row.avatarUrl}
                         name={row.name}

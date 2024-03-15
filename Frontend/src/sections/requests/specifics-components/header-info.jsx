@@ -13,7 +13,7 @@ import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
-import { getHeaderInfo } from '../hooks/request-specifics'
+import { changeStatus, getHeaderInfo } from '../hooks/request-specifics'
 
 // ----------------------------------------------------------------------
 
@@ -33,7 +33,6 @@ export default function RequestHeaderInfo({ id }) {
         setLoading(true);
         await getHeaderInfo(id)
           .then(data => {
-            console.log(data);
             setName(data.tenant);
             setDescription(data.description);
             setStatus(data.status);
@@ -46,9 +45,7 @@ export default function RequestHeaderInfo({ id }) {
         console.log(`HeaderInfo API: ${error}`)
       }
     };
-
     fetchData();
-    // const request = requests.find((req) => req.id === id); 
   }, [id]);
 
   const handleOpenStatusPopover = (event) => {
@@ -59,17 +56,20 @@ export default function RequestHeaderInfo({ id }) {
     setStatusPopover(null);
   };
 
-  const handleEditStatusToCompleted = (event) => {
+  const handleEditStatusToCompleted = async (event) => {
+    await changeStatus(id, 'Completed');
     setStatus('Completed');
     setStatusPopover(null);
   };
 
-  const handleEditStatusToOngoing = (event) => {
+  const handleEditStatusToOngoing = async (event) => {
+    await changeStatus(id, 'Ongoing');
     setStatus('Ongoing');
     setStatusPopover(null);
   };
 
-  const handleEditStatusToNotStarted = (event) => {
+  const handleEditStatusToNotStarted = async (event) => {
+    await changeStatus(id, 'Not Started');
     setStatus('Not Started');
     setStatusPopover(null);
   };

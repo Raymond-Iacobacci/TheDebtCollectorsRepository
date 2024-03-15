@@ -13,6 +13,19 @@ export async function getHeaderInfo(id) {
     .then(data => data);
 }
 
+export async function changeStatus(id, new_status) {
+  await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/requests/specifics/change-status?request-id=${id}`, {
+    method: 'PUT',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      status: new_status
+    })
+  });
+}
+
 export async function getComments(id) {
   return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/requests/specifics/comments?request-id=${id}`)
     .then(res => res.json())
@@ -20,7 +33,7 @@ export async function getComments(id) {
 }
 
 export async function newComment(id, user_id, commentField) {
-  fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/requests/specifics/new-comment?request-id=${id}`, {
+  await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/requests/specifics/new-comment?request-id=${id}`, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
@@ -30,9 +43,7 @@ export async function newComment(id, user_id, commentField) {
       userID: user_id,
       comment: commentField
     })
-  }).then((res) => res.json())
-    .then((data) => console.log(data))
-    .catch((err) => console.log(err))
+  });
 }
 
 export async function getAttachments(id) {
