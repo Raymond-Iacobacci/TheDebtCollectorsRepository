@@ -178,7 +178,7 @@ requestsRouter.post('/specifics/new-attachment', upload.single('attachment'), as
   }
 });
 
-requestsRouter.post('/new', async (req, res) => {
+requestsRouter.post('/new', upload.single('attachment'), async (req, res) => {
   try {
     const tenantID = req.query['tenant-id'];
     const description = req.body.description;
@@ -199,14 +199,25 @@ requestsRouter.post('/new', async (req, res) => {
     await insertQuery(query, values);
 
     const results = await selectQuery(`SELECT requestID FROM requests where tenantID = ${'0x' + tenantID} AND dateRequested = '${dateRequested}';`);
-    const requestID = results[0];
+    const requestIDObject = results[0];
 
-    if (!requestID) {
+    if (!requestIDObject) {
       res.status(404).json({ error: 'requestID not found in requests table.' });
       return;
     }
 
-    res.send(uuidToString(requestID.requestID));
+    const requestID = uuidToString(requestIDObject.requestID);
+    const attachmentFile = req.file.buffer; 
+    const datePosted = getDate();
+    console.log(type);
+    console.log(description);
+    console.log(attachmentFile);
+    console.log(requestID);
+    console.log(datePosted);
+    const thisSTring = 'INSERT INTO attachments (title, description, attachment, requestID, datePosted) VALUES (?, ?, ?, ?, ?)';
+    const thesevalues= [type, description, attachmentFile, requestIDObject.requestID, datePosted];
+    const attachmentResults = await insertQuery(thisSTring, thesevalues);
+    res.send(requestID);
   } catch (error) {
     res.status(500).json({ error: 'Error inserting into table' });
   }
