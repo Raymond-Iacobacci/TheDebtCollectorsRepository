@@ -29,8 +29,8 @@ export default function RequestAttachments({ id }) {
         await getAttachments(id)
           .then(data => {
             console.log(data);
-            // setAttachmentList(data);
-            setAttachmentList([]);
+            setAttachmentList(data);
+            // setAttachmentList([]);
         });
         setLoading(false);
       } catch (error) {
@@ -77,8 +77,8 @@ export default function RequestAttachments({ id }) {
                     No attachments.
                   </Typography>
                 </Paper>
-              : attachmentList.map((attachment) => (
-                  <AttachmentItem key={attachment.id} attachment={attachment} />
+              : attachmentList.map((item) => (
+                  <AttachmentItem key={item.id} item={item} />
                 ))
               }
             </Stack>
@@ -95,8 +95,8 @@ RequestAttachments.propTypes = {
 
 // ----------------------------------------------------------------------
 
-function AttachmentItem({ attachment }) {
-  const { image, title, description, postedAt } = attachment;
+function AttachmentItem({ item }) {
+  const { attachment, title, description, datePosted } = item;
 
   const [popover, setPopover] = useState(null);
 
@@ -114,7 +114,7 @@ function AttachmentItem({ attachment }) {
         onClick={handleOpen}
         component="img"
         alt={title}
-        src={image}
+        src={`data:image/png;base64, ${attachment}`}
         sx={{
           width: 48,
           height: 48,
@@ -139,7 +139,7 @@ function AttachmentItem({ attachment }) {
           maxHeight: 'auto',
         }}
       >
-        <Box onClick={handleClose} component="img" alt={title} src={image} />
+        <Box onClick={handleClose} component="img" alt={title} src={`data:image/png;base64, ${attachment}`} />
       </Popover>
 
       <Box sx={{ minWidth: 240, flexGrow: 1 }}>
@@ -153,17 +153,17 @@ function AttachmentItem({ attachment }) {
       </Box>
 
       <Typography variant="caption" sx={{ pr: 1, flexShrink: 0, color: 'text.secondary' }}>
-        {fDateTime(postedAt)}
+        {fDateTime(datePosted)}
       </Typography>
     </Stack>
   );
 }
 
 AttachmentItem.propTypes = {
-  attachment: PropTypes.shape({
-    image: PropTypes.string,
+  item: PropTypes.shape({
+    attachment: PropTypes.string,
     title: PropTypes.string,
     description: PropTypes.string,
-    postedAt: PropTypes.string,
+    datePosted: PropTypes.string,
   }),
 };

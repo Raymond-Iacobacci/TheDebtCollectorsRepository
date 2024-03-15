@@ -1,7 +1,7 @@
 # Stage One
 FROM node:latest AS builder
 WORKDIR /app
-COPY package.json package-lock.json .env yarn.lock ./
+COPY package.json .env yarn.lock ./
 RUN yarn install
 COPY . .
 RUN yarn build
