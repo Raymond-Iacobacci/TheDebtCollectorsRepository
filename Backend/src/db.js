@@ -16,27 +16,8 @@ const uuidToString = (buffer) => {
     }
     return null;
 }
-  
-const selectQuery = (query) => {
-  return new Promise((resolve, reject) => {
-    pool.getConnection((err, connection) => {
-    if (err) {
-      reject(err);
-      return;
-    }
-    connection.query(query, (queryErr, results) => {
-      connection.release();
-      if (queryErr) {
-        reject(queryErr);
-        return;
-      }
-      resolve(results);
-      });
-    });
-  });
-};
 
-const insertQuery = (query, values) => {
+const executeQuery = (query, values = []) => {
   return new Promise((resolve, reject) => {
     pool.getConnection((err, connection) => {
       if (err) {
@@ -53,6 +34,14 @@ const insertQuery = (query, values) => {
       });
     });
   });
+};
+  
+const selectQuery = (query) => {
+  return executeQuery(query);
+};
+
+const insertQuery = (query, values) => {
+  return executeQuery(query, values);
 };
 
 module.exports = {pool, selectQuery, insertQuery, uuidToString};
