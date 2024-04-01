@@ -209,11 +209,6 @@ requestsRouter.post('/new', upload.single('attachment'), async (req, res) => {
     const requestID = uuidToString(requestIDObject.requestID);
     const attachmentFile = req.file.buffer; 
     const datePosted = getDate();
-    console.log(type);
-    console.log(description);
-    console.log(attachmentFile);
-    console.log(requestID);
-    console.log(datePosted);
     const thisSTring = 'INSERT INTO attachments (title, description, attachment, requestID, datePosted) VALUES (?, ?, ?, ?, ?)';
     const thesevalues= [type, description, attachmentFile, requestIDObject.requestID, datePosted];
     const attachmentResults = await insertQuery(thisSTring, thesevalues);
