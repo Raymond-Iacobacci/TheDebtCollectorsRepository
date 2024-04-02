@@ -5,7 +5,7 @@ const requestsRouter = require('./requests');
 require('dotenv').config({ path: '../.env' });
 const sendEmail = require('./sendEmail');
 const crypto = require('crypto');
-const { insertQuery } = require('./db');
+const { insertQuery, selectQuery } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -34,13 +34,39 @@ app.get('/send-email', (req, res) => {
 
 app.put('/update-profile-pic', async (req, res) => {
     try {
-        const tenantID = req.query['tenant-id'];
+        const tenantID = '0x' + req.query['tenant-id'];
         const profilePic = req.file.buffer;
         const query = 'UPDATE tenants SET profilePic = (?) WHERE tenantID = (?)';
         const values = [profilePic, tenantID];
         const results = await insertQuery(query, values);
     } catch (error) {
-        res.status(500).json({ error: 'Error inserting into table' });
+        res.status(500).json({ error: 'Error updating table' });
+    }
+});
+
+async function getAttributesByID(id, userType) {
+    const query = `SELECT email, firstName, lastName, profilePicture FROM ${userType}s where ${userType}ID = ${id};`;
+    const results = await selectQuery(query);
+    return results;
+}
+
+app.get('/get-tenant-attributes', async (req, res) => {
+    try {
+        const tenantID = '0x' + req.query['tenant-id'];
+        const attributes = await getAttributesByID(tenantID, 'tenant');
+        res.send(attributes);
+    } catch (error) {
+        res.status(500).json({ error: 'No tenantID found' });
+    }
+});
+
+app.get('/get-manager-attributes', async (req, res) => {
+    try {
+        const managerID = '0x' + req.query['manager-id'];
+        const attributes = await getAttributesByID(managerID, 'manager');
+        res.send(attributes);
+    } catch (error) {
+        res.status(500).json({ error: 'No managerID found' });
     }
 });
 
