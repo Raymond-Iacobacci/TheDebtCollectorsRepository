@@ -2,7 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
 const passport = require('passport');
-const {pool} = require('./db');
+const {pool, selectQuery, insertQuery} = require('./db');
 require('dotenv').config({ path: '../.env' });
 
 const authRouter = express.Router();
@@ -13,23 +13,17 @@ authRouter.use(session({ secret: 'your_secret_key', resave: false, saveUninitial
 authRouter.use(passport.initialize());
 authRouter.use(passport.session());
 
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'https://backend-kxfzqfz2rq-uc.a.run.app/auth/google/callback',
-  passReqToCallback: true
-},
-function(request, accessToken, refreshToken, profile, done) {
+// Function to handle authentication
+function handleAuthentication(userType, profile, done) {
+  const tableName = userType === 'tenant' ? 'tenants' : 'managers';
+
   pool.getConnection(function(err, connection) {
     if (err) {
       return done(err);
     }
 
-    console.log(profile.id);
-
-    connection.query('SELECT * FROM tenants WHERE email = ?', [profile.email], function(queryErr, results) {
+    connection.query(`SELECT * FROM ${tableName} WHERE email = ?`, [profile.email], function(queryErr, results) {
       if (queryErr) {
-        console.log("SELECT QUERY ERROR");
         connection.release();
         return done(queryErr);
       }
@@ -40,40 +34,48 @@ function(request, accessToken, refreshToken, profile, done) {
         return done(null, false);
       }
 
-      const tenant = results[0];
+      const user = results[0];
 
       // There is an account under the email, but no googleID has been created
-      if (!tenant.googleID) {
-        connection.query("UPDATE tenants SET googleID = ? WHERE email = ?", [profile.id, profile.email], function(queryErr, updateResults) {
+      if (!user.googleID) {
+        connection.query(`UPDATE ${tableName} SET googleID = ? WHERE email = ?`, [profile.id, profile.email], function(queryErr, updateResults) {
           connection.release();
           if (queryErr) {
-            console.log("UPDATE ERROR");
             console.error('Error executing update query:', queryErr);
             return done(queryErr);
           }
 
-          const user = {
-            id: tenant.id,
-            email: profile.email
-          };
-
           return done(null, user);
         });
       } else {
-        if (tenant.googleID === profile.id) {
-          console.log("AUTHENTICATION SUCCESSFUL");
-          const user = {
-            id: tenant.id,
-            email: profile.email
-          };
+        if (user.googleID === profile.id) {
           return done(null, user);
         } else {
-          console.log("NOT AUTHENTICATED");
           return done(null, false);
         }
       }
     });
   });
+}
+
+// Tenant login strategy
+passport.use('tenant-login', new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: 'https://backend-kxfzqfz2rq-uc.a.run.app/auth/google/callback/tenant',
+  passReqToCallback: true
+}, function(request, accessToken, refreshToken, profile, done) {
+  handleAuthentication('tenant', profile, done);
+}));
+
+// Manager login strategy
+passport.use('manager-login', new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: 'https://backend-kxfzqfz2rq-uc.a.run.app/auth/google/callback/manager',
+  passReqToCallback: true
+}, function(request, accessToken, refreshToken, profile, done) {
+  handleAuthentication('manager', profile, done);
 }));
 
 passport.serializeUser(function(user, done) {
@@ -84,7 +86,41 @@ passport.deserializeUser(function(obj, done) {
   done(null, obj);
 });
 
-authRouter.get('/login', passport.authenticate('google', { scope: ['profile', 'email'] }));
+authRouter.post('/create-tenant', async (req, res) => {
+  try{
+    const managerID = Buffer.from(req.query['manager-id'], 'hex');
+    const email = req.body.email;
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const address = req.body.address;
+
+    const query = `SELECT * FROM tenants where email = '${email}';`;
+
+    const results = await selectQuery(query);
+    
+    if(results.length != 0){
+      res.redirect(req.baseUrl + '/already-created');
+      return;
+    }
+    
+    const data = await insertQuery('INSERT INTO tenants (email, firstName, lastName, address, managerID) values (?, ?, ?, ?, ?)', [email, firstName, lastName, address, managerID]);
+    res.send(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Error inserting into table' });
+  }
+})
+
+authRouter.get('/tenant-login', passport.authenticate('tenant-login', { scope: ['profile', 'email'] }));
+
+authRouter.get('/manager-login', passport.authenticate('manager-login', { scope: ['profile', 'email'] }));
+
+authRouter.get('/google/callback/tenant', passport.authenticate('tenant-login', { failureRedirect: '/failure' }), (req, res) => {
+  res.redirect(req.baseUrl + '/success');
+});
+
+authRouter.get('/google/callback/manager', passport.authenticate('manager-login', { failureRedirect: '/failure' }), (req, res) => {
+  res.redirect(req.baseUrl + '/success');
+});
 
 authRouter.get('/logout', function(req, res, next){
   req.logout(function(err) {
@@ -93,16 +129,12 @@ authRouter.get('/logout', function(req, res, next){
   });
 });
 
+authRouter.get("/loggedout", (req, res) => {
+  res.send("You have succesfully logged out!");
+});
+
 authRouter.get("/success", (req, res) => {
     res.send("Authentication Succesful!");
-});
-
-authRouter.get('/google/callback', passport.authenticate('google', { failureRedirect: '/failure' }), (req, res) => {
-  res.redirect(req.baseUrl + '/success');
-});
-
-authRouter.get("/loggedout", (req, res) => {
-    res.send("You have succesfully logged out!");
 });
 
 authRouter.get("/failure", (req, res) => {
