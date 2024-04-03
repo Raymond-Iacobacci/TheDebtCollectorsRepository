@@ -22,42 +22,59 @@ passport.use(new GoogleStrategy({
 function(request, accessToken, refreshToken, profile, done) {
   pool.getConnection(function(err, connection) {
     if (err) {
-      console.error('Error getting database connection:', err);
       return done(err);
     }
-  
-    connection.query('SELECT * FROM tenants WHERE googleID = ?', [profile.id], function(queryErr, results) {
+
+    console.log(profile.id);
+
+    connection.query('SELECT * FROM tenants WHERE email = ?', [profile.email], function(queryErr, results) {
       if (queryErr) {
-        console.error('Error executing SELECT query:', queryErr);
+        console.log("SELECT QUERY ERROR");
         connection.release();
         return done(queryErr);
       }
-  
-      if (results.length > 0) {
-        console.log("USER WAS FOUND IN THE DATABASE!");
+
+      // There is no account under this email, NO authentication
+      if (results.length == 0) {
         connection.release();
-        return done(null, results[0]);
+        return done(null, false);
       }
 
-      connection.query("INSERT INTO tenants (email, firstName, lastName, address, unit, googleID) values (null, null, null, null, null, null);", function(queryErr, results) {
-        connection.release();
-        if (queryErr) {
-          console.error('Error executing INSERT query:', queryErr);
-          return done(queryErr);
+      const tenant = results[0];
+
+      // There is an account under the email, but no googleID has been created
+      if (!tenant.googleID) {
+        connection.query("UPDATE tenants SET googleID = ? WHERE email = ?", [profile.id, profile.email], function(queryErr, updateResults) {
+          connection.release();
+          if (queryErr) {
+            console.log("UPDATE ERROR");
+            console.error('Error executing update query:', queryErr);
+            return done(queryErr);
+          }
+
+          const user = {
+            id: tenant.id,
+            email: profile.email
+          };
+
+          return done(null, user);
+        });
+      } else {
+        if (tenant.googleID === profile.id) {
+          console.log("AUTHENTICATION SUCCESSFUL");
+          const user = {
+            id: tenant.id,
+            email: profile.email
+          };
+          return done(null, user);
+        } else {
+          console.log("NOT AUTHENTICATED");
+          return done(null, false);
         }
-
-        const newUser = {
-          id: results.insertId,
-          email: profile.email
-        };
-
-        console.log("USER WAS ADDED TO THE DATABASE!");
-        return done(null, newUser);
-      });
+      }
     });
   });
-})
-); 
+}));
 
 passport.serializeUser(function(user, done) {
   done(null, user);
@@ -80,8 +97,8 @@ authRouter.get("/success", (req, res) => {
     res.send("Authentication Succesful!");
 });
 
-authRouter.get('/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
-    res.redirect(req.baseUrl + '/success');
+authRouter.get('/google/callback', passport.authenticate('google', { failureRedirect: '/failure' }), (req, res) => {
+  res.redirect(req.baseUrl + '/success');
 });
 
 authRouter.get("/loggedout", (req, res) => {
