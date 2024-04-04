@@ -9,6 +9,8 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CircularProgress from '@mui/material/CircularProgress';
 
+import { usePathname } from 'src/routes/hooks';
+
 import { fDateTime } from 'src/utils/format-time';
 
 import Label from 'src/components/label';
@@ -20,6 +22,8 @@ import { newComment, getComments } from '../hooks/request-specifics'
 // ----------------------------------------------------------------------
 
 export default function RequestComments({ id }) {
+  const pathname = usePathname();
+
   const [loading, setLoading] = useState(true);
   const [commentList, setCommentList] = useState([]);
   const [commentField, setCommentField] = useState("");
@@ -43,8 +47,9 @@ export default function RequestComments({ id }) {
   }, [id]);
 
   const handleAddComment = async (event) => {
+    const user = (pathname.search("/manager") !== -1)?import.meta.env.VITE_TEST_MANAGER_ID:import.meta.env.VITE_TEST_TENANT_ID;
     if( commentField !== "" ) {
-      await newComment(id, import.meta.env.VITE_TEST_MANAGER_ID, commentField);
+      await newComment(id, user, commentField);
       setCommentField("");
       setCommentLabel("New comment");
       setValidate(true);

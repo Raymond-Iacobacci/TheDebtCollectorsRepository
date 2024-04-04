@@ -10,8 +10,8 @@ import { alpha } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import ListItemButton from '@mui/material/ListItemButton';
 
-import { usePathname } from 'src/routes/hooks';
-import { RouterLink } from 'src/routes/components';
+// import { RouterLink } from 'src/routes/components';
+import { useRouter, usePathname } from 'src/routes/hooks';
 
 import { useResponsive } from 'src/hooks/use-responsive';
 
@@ -155,13 +155,23 @@ Nav.propTypes = {
 
 function NavItem({ item }) {
   const pathname = usePathname();
+  const router = useRouter();
 
-  const active = (item.path === pathname) || (item.path.split('/')[1] === pathname.split('/')[1]);
+  const active = (`/manager${item.path}` === pathname) || (`/tenant${item.path}` === pathname) || (item.path.split('/')[1] === pathname.split('/')[2]);
+
+  const handleItemClick = () =>{
+    console.log(pathname)
+    const isManager = pathname.search("/manager");
+    if( isManager !== -1 ) {
+      router.replace(`/manager${item.path}`)
+    } else {
+      router.replace(`/tenant${item.path}`)
+    }
+  }
 
   return (
     <ListItemButton
-      component={RouterLink}
-      href={item.path}
+      onClick={handleItemClick}
       sx={{
         minHeight: 44,
         borderRadius: 0.75,

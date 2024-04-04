@@ -15,7 +15,25 @@ export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 export default function Router() {
   const routes = useRoutes([
+    // {
+    //   element: (
+    //     <DashboardLayout>
+    //       <Suspense>
+    //         <Outlet />
+    //       </Suspense>
+    //     </DashboardLayout>
+    //   ),
+    //   children: [
+    //     { element: <IndexPage />, index: true },
+    //     { path: 'requests', element: <RequestPage /> },
+    //     { path: 'requests/:requestID', element: <RequestDetailsPage /> },
+    //     // { path: 'notifications', element: <Page404 /> },
+    //     // { path: 'products', element: <ProductsPage /> },
+    //     // { path: 'blog', element: <BlogPage /> },
+    //   ],
+    // },
     {
+      path: "/",
       element: (
         <DashboardLayout>
           <Suspense>
@@ -24,12 +42,22 @@ export default function Router() {
         </DashboardLayout>
       ),
       children: [
-        { element: <IndexPage />, index: true },
-        { path: 'requests', element: <RequestPage /> },
-        { path: 'requests/:requestID', element: <RequestDetailsPage /> },
-        // { path: 'notifications', element: <Page404 /> },
-        // { path: 'products', element: <ProductsPage /> },
-        // { path: 'blog', element: <BlogPage /> },
+        { 
+          path: "tenant",
+          children: [
+            { element: <IndexPage />, index: true },
+            { path: 'requests', element: <RequestPage access="tenant"/> },
+            { path: 'requests/:requestID', element: <RequestDetailsPage /> },
+          ]
+        },
+        {
+          path: "manager",
+          children: [
+            { element: <IndexPage />, index: true },
+            { path: 'requests', element: <RequestPage access="manager"/> },
+            { path: 'requests/:requestID', element: <RequestDetailsPage /> },
+          ]
+        }
       ],
     },
     // {
