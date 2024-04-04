@@ -16,6 +16,7 @@ authRouter.use(passport.session());
 // Function to handle authentication
 function handleAuthentication(userType, profile, done) {
   const tableName = userType === 'tenant' ? 'tenants' : 'managers';
+  const uuidType = userType === 'tenant' ? 'tenantID' : 'managerID';
 
   pool.getConnection(function(err, connection) {
     if (err) {
@@ -35,6 +36,7 @@ function handleAuthentication(userType, profile, done) {
       }
 
       const user = results[0];
+      const uuid = user[uuidType].toString('hex').toUpperCase();
 
       // There is an account under the email, but no googleID has been created
       if (!user.googleID) {
@@ -45,11 +47,11 @@ function handleAuthentication(userType, profile, done) {
             return done(queryErr);
           }
 
-          return done(null, user);
+          return done(null, {user, uuid});
         });
       } else {
         if (user.googleID === profile.id) {
-          return done(null, user);
+          return done(null, {user, uuid});
         } else {
           return done(null, false);
         }
@@ -115,11 +117,11 @@ authRouter.get('/tenant-login', passport.authenticate('tenant-login', { scope: [
 authRouter.get('/manager-login', passport.authenticate('manager-login', { scope: ['profile', 'email'] }));
 
 authRouter.get('/google/callback/tenant', passport.authenticate('tenant-login', { failureRedirect: '/failure' }), (req, res) => {
-  res.redirect(req.baseUrl + '/success');
+  res.send(req.user.uuid);
 });
 
 authRouter.get('/google/callback/manager', passport.authenticate('manager-login', { failureRedirect: '/failure' }), (req, res) => {
-  res.redirect(req.baseUrl + '/success');
+  res.send(req.user.uuid);
 });
 
 authRouter.get('/logout', function(req, res, next){
