@@ -54,7 +54,7 @@ requestsRouter.get('/get-manager-view', async (req, res) => {
 requestsRouter.get('/get-tenant-view', async (req, res) => {
   try {
     const tenantID = '0x' + req.query['tenant-id'];
-    const requestResults = await selectQuery(`SELECT description, type, status, dateRequested FROM requests WHERE tenantID = ${tenantID};`);
+    const requestResults = await selectQuery(`SELECT requestID, description, type, status, dateRequested FROM requests WHERE tenantID = ${tenantID};`);
     const requests = []
     if(!requestResults){
       res.send('no requestID for this tenantID');
@@ -62,6 +62,7 @@ requestsRouter.get('/get-tenant-view', async (req, res) => {
     }
     for(const request of requestResults){
       requests.push({
+        requestID: request.requestID.toString('hex').toUpperCase(),
         description: request.description,
         type: request.type,
         status: request.status,
