@@ -45,9 +45,13 @@ app.put('/update-profile-pic', async (req, res) => {
 });
 
 async function getAttributesByID(id, userType) {
-    const query = `SELECT email, firstName, lastName, profilePicture FROM ${userType}s where ${userType}ID = ${id};`;
+    const query = `SELECT email, firstName, lastName FROM ${userType}s where ${userType}ID = ${id};`;
     const results = await selectQuery(query);
-    return results;
+    return {
+        firstName: results[0].firstName,
+        lastName: results[0].lastName,
+        email: results[0].email
+    };  
 }
 
 app.get('/get-tenant-attributes', async (req, res) => {
