@@ -124,6 +124,40 @@ authRouter.get('/google/callback/manager', passport.authenticate('manager-login'
   res.send(req.user.uuid);
 });
 
+authRouter.get('/verify-tenant', async (req, res) => {
+  const email = req.query.email;
+  try {
+    const tenant = await selectQuery(`SELECT tenantID FROM tenants WHERE email = '${email}';`);
+
+    if (!tenant || tenant.length === 0) {
+      res.status(404).send('Tenant not found');
+      return;
+    }
+
+    res.send(tenant[0].tenantID.toString('hex').toUpperCase());
+  } catch (error) {
+    console.error('Error verifying tenant:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+authRouter.get('/verify-manager', async (req, res) => {
+  const email = req.query.email;
+  try {
+    const tenant = await selectQuery(`SELECT managerID FROM managers WHERE email = '${email}';`);
+
+    if (!tenant || tenant.length === 0) {
+      res.status(404).send('Manager not found');
+      return;
+    }
+
+    res.send(tenant[0].tenantID.toString('hex').toUpperCase());
+  } catch (error) {
+    console.error('Error verifying Manager:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
 authRouter.get('/logout', function(req, res, next){
   req.logout(function(err) {
     if (err) { return next(err); }
