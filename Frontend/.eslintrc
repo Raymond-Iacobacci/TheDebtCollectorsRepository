@@ -130,7 +130,7 @@
       }
     ],
     "perfectionist/sort-imports": [
-      1,
+      0,
       {
         "order": "asc",
         "type": "line-length",

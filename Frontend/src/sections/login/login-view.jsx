@@ -9,26 +9,46 @@ import Button from '@mui/material/Button';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { alpha, useTheme } from '@mui/material/styles';
 
-import { useRouter } from 'src/routes/hooks';
+// import { useRouter } from 'src/routes/hooks';
 
 import { bgGradient } from 'src/theme/css';
 
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
+import { GoogleLogin } from '@react-oauth/google';
 
 // ----------------------------------------------------------------------
 
 export default function LoginView() {
   const theme = useTheme();
 
-  const router = useRouter();
+  // const router = useRouter();
 
-  const handleClick = () => {
-    router.push('/dashboard');
+  const handleClick = async () => {
+    const response = await
+     fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/auth/tenant-login`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+    if (response.ok) {
+      console.log("successful respnse");
+    }
+    
+    console.log(response.json());
+    console.log(response['./auth/userinfo.email']);
   };
-
+  const responseMessage = (response) => {
+    console.log(response);
+};
+const errorMessage = (error) => {
+    console.log(error);
+};
   const renderForm = (
     <Stack direction="row" spacing={2}>
+      <GoogleLogin onSuccess={responseMessage} onError={errorMessage} />
       <LoadingButton
         fullWidth
         size="large"
