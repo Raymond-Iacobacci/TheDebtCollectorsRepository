@@ -24,7 +24,6 @@ const executeQuery = (query, values = []) => {
         reject(err);
         return;
       }
-      console.log(query);
       connection.query(query, values, (queryErr, results) => {
         connection.release();
         if (queryErr) {

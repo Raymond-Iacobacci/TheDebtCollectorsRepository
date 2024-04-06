@@ -15,11 +15,6 @@ function getDate(){
 
 requestsRouter.get('/get-manager-view', async (req, res) => {
   try {
-
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Vary');
-
     const managerID = '0x' + req.query['manager-id'];
     const tenantResults = await selectQuery(`SELECT tenantID, firstName, lastName, address FROM tenants WHERE managerID = ${managerID};`);
     const requests = [];
@@ -31,6 +26,7 @@ requestsRouter.get('/get-manager-view', async (req, res) => {
 
     for (const tenant of tenantResults) {
       const requestResults = await selectQuery(`SELECT requestID, type, status FROM requests WHERE tenantID = ${uuidToString(tenant.tenantID)} ORDER BY dateRequested;`);
+      console.log(requestResults);
       if (!requestResults) {
         res.send('requestID not found for request').end();
         return;
@@ -77,11 +73,6 @@ requestsRouter.get('/get-tenant-view', async (req, res) => {
 
 requestsRouter.get('/specifics/header-info', async (req, res) => {
   try {
-
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Vary');
-
     const requestId = '0x' + req.query['request-id'];
     const requestResults = await selectQuery(`SELECT tenantID, description, status, type FROM requests where requestID = ${requestId};`);
     const request = requestResults[0];
@@ -113,11 +104,6 @@ requestsRouter.get('/specifics/header-info', async (req, res) => {
 
 requestsRouter.get('/specifics/comments', async (req, res) => {
   try {
-
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Vary');
-
     const requestID = '0x' + req.query['request-id'];
     const commentResults = await selectQuery(`SELECT commentID, userID, comment, datePosted FROM comments WHERE requestID = ${requestID} ORDER BY datePosted;`);
     const comments = [];
