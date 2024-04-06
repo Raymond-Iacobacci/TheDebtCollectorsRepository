@@ -88,30 +88,6 @@ passport.deserializeUser(function(obj, done) {
   done(null, obj);
 });
 
-authRouter.post('/create-tenant', async (req, res) => {
-  try{
-    const managerID = Buffer.from(req.query['manager-id'], 'hex');
-    const email = req.body.email;
-    const firstName = req.body.firstName;
-    const lastName = req.body.lastName;
-    const address = req.body.address;
-
-    const query = `SELECT * FROM tenants where email = '${email}';`;
-
-    const results = await selectQuery(query);
-    
-    if(results.length != 0){
-      res.redirect(req.baseUrl + '/already-created');
-      return;
-    }
-    
-    const data = await insertQuery('INSERT INTO tenants (email, firstName, lastName, address, managerID) values (?, ?, ?, ?, ?)', [email, firstName, lastName, address, managerID]);
-    res.send(data);
-  } catch (error) {
-    res.status(500).json({ error: 'Error inserting into table' });
-  }
-})
-
 authRouter.get('/tenant-login', passport.authenticate('tenant-login', { scope: ['profile', 'email'] }));
 
 authRouter.get('/manager-login', passport.authenticate('manager-login', { scope: ['profile', 'email'] }));
