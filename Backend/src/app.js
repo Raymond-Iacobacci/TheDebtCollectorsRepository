@@ -1,8 +1,11 @@
 const express = require('express');
 const cors = require('cors');
+
 const authRouter = require('./auth');
 const requestsRouter = require('./requests');
 const homeRouter = require('./home')
+const managerRouter = require('./manager')
+
 require('dotenv').config({ path: '../.env' });
 const sendEmail = require('./sendEmail');
 const crypto = require('crypto');
@@ -18,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/auth', authRouter);
 app.use('/requests', requestsRouter);
 app.use('/home', homeRouter);
+app.use('/manager', managerRouter);
 
 app.get('/send-email', (req, res) => {
     const emailToken = crypto.randomBytes(20).toString('hex');

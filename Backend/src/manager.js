@@ -1,6 +1,7 @@
 const express = require('express');
 const managerRouter = express.Router();
-const { selectQuery } = require('./db');
+const { selectQuery, insertQuery } = require('./db');
+const sendEmail = require('./sendEmail');
 
 managerRouter.use(express.json());
 
@@ -53,4 +54,30 @@ managerRouter.get('/get-pending-tenants', async (req, res) => {
     }
 });
 
+managerRouter.post('/create-tenant', async(req,res) => {
+    try{
+        const firstName = req.body.firstName;
+        const lastName = req.body.lastName;
+        const email = req.body.email;
+        const address = req.body.address;
+        const managerId = req.query['manager-id'];
+        const managerResult = await selectQuery(`SELECT firstName,lastName FROM managers where managerID = ${'0x' + managerId};`);
+        
+        // //const managerEmail = null;
+
+        // /**
+        //  * Send email notifying tenant of account creation.
+        //  */
+        const emailText = "You have been added as a new tenant to property " + address + " by " + managerResult[0].firstName + " " + managerResult[0].lastName;
+
+        sendEmail(email, "New Tenant", emailText );
+
+        const query = "INSERT INTO tenants (firstName, lastName, email, address, managerID) VALUES (?, ?, ?, ?, ?);";
+        const values = [firstName, lastName, email, address, Buffer.from(managerId,'hex')];
+        await insertQuery(query, values);
+        res.send(managerResult);
+    }catch(error){
+        res.status(500).json({ error: 'Error inserting into table' });
+    }
+});
 module.exports = managerRouter;
