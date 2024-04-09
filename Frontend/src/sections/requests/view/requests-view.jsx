@@ -24,6 +24,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 // import { requests } from 'src/_mock/request';
 
+import { usePathname } from 'src/routes/hooks';
+
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -39,6 +41,10 @@ import { getTenantRequests, getManagerRequests } from '../hooks/request-specific
 // ----------------------------------------------------------------------
 
 export default function RequestsView({ access }) {
+
+  const pathname = usePathname();
+  const uuid = pathname.split('/')[2];
+
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -60,12 +66,13 @@ export default function RequestsView({ access }) {
       try {
         setLoading(true);
         if (access === 'manager') {
-          await getManagerRequests().then((data) => {
+          await getManagerRequests(uuid).then((data) => {
             setRequests(data);
           });
         } else {
-          await getTenantRequests().then((data) => {
+          await getTenantRequests(uuid).then((data) => {
             setRequests(data);
+            console.log(data);
           });
         }
         setLoading(false);
@@ -75,7 +82,7 @@ export default function RequestsView({ access }) {
       }
     };
     fetchData();
-  }, [access]);
+  }, [access, uuid]);
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';

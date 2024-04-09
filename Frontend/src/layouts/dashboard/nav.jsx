@@ -156,16 +156,17 @@ Nav.propTypes = {
 function NavItem({ item }) {
   const pathname = usePathname();
   const router = useRouter();
+  const uuid = pathname.split('/')[2];
 
-  const active = (`/manager${item.path}` === pathname) || (`/tenant${item.path}` === pathname) || (item.path.split('/')[1] === pathname.split('/')[2]);
+  const active = (`/manager/${uuid}/${item.path}` === pathname) || (`/tenant/${uuid}/${item.path}` === pathname) || (item.path.split('/')[1] === pathname.split('/')[3]);
 
   const handleItemClick = () =>{
     console.log(pathname)
     const isManager = pathname.search("/manager");
     if( isManager !== -1 ) {
-      router.replace(`/manager${item.path}`)
+      router.replace(`/manager/${uuid}${item.path}`)
     } else {
-      router.replace(`/tenant${item.path}`)
+      router.replace(`/tenant/${uuid}${item.path}`)
     }
   }
 

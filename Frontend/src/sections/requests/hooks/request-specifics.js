@@ -1,14 +1,14 @@
 
 // ----------------------------------------------------------------------
 
-export async function getManagerRequests() {
-  return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/requests/get-manager-view?manager-id=${import.meta.env.VITE_TEST_MANAGER_ID}`)
+export async function getManagerRequests(uuid) {
+  return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/requests/get-manager-view?manager-id=${uuid}`)
     .then(res => res.json())
     .then(data => data);
 }
 
-export async function getTenantRequests() {
-  return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/requests/get-tenant-view?tenant-id=${import.meta.env.VITE_TEST_TENANT_ID}`)
+export async function getTenantRequests(uuid) {
+  return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/requests/get-tenant-view?tenant-id=${uuid}`)
     .then(res => res.json())
     .then(data => data);
 }
