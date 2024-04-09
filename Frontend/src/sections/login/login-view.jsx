@@ -1,12 +1,12 @@
-// import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 // import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
+// import Button from '@mui/material/Button';
 // import Typography from '@mui/material/Typography';
-import LoadingButton from '@mui/lab/LoadingButton';
+// import LoadingButton from '@mui/lab/LoadingButton';
 import { alpha, useTheme } from '@mui/material/styles';
 
 // import { useRouter } from 'src/routes/hooks';
@@ -14,7 +14,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { bgGradient } from 'src/theme/css';
 
 import Logo from 'src/components/logo';
-import Iconify from 'src/components/iconify';
+// import Iconify from 'src/components/iconify';
 import { GoogleLogin } from '@react-oauth/google';
 
 // ----------------------------------------------------------------------
@@ -22,55 +22,73 @@ import { GoogleLogin } from '@react-oauth/google';
 export default function LoginView() {
   const theme = useTheme();
 
+  const [credentials, setCredentials] = useState([]);
+  const [profile, setProfile] = useState([]);
+
   // const router = useRouter();
 
-  const handleClick = async () => {
-    const response = await
-     fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/auth/tenant-login`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    });
-    if (response.ok) {
-      console.log("successful respnse");
+  // const handleClick = async () => {
+  //   const response = await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/auth/tenant-login`, {
+  //     method: 'GET',
+  //     headers: {
+  //       Accept: 'application/json',
+  //       'Content-Type': 'application/json',
+  //     },
+  //   });
+  //   if (response.ok) {
+  //     console.log('successful respnse');
+  //   }
+
+  //   console.log(response.json());
+  //   console.log(response['./auth/userinfo.email']);
+  // };
+
+  useEffect(() => {
+    if (credentials.length !== 0) {
+      const validateCredentials = async () => {
+        try {
+          console.log("validate creds here")
+          await fetch(
+            `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${credentials.credential}`
+          )
+          .then(res => res.json())
+          .then((data) => {
+            console.log(data)
+            setProfile(data);
+            setCredentials([]);
+          });
+        } catch (error) {
+          console.log(`validateProfile API: ${error}`);
+        }
+      };
+      validateCredentials();
     }
-    
-    console.log(response.json());
-    console.log(response['./auth/userinfo.email']);
-  };
+    if( profile.length !== 0 ) {
+      const validateProfile = async () => {
+        try {
+          await fetch(
+            `${import.meta.env.VITE_MIDDLEWARE_URL}/auth/verify-manager?email=${profile.email}`
+          )
+          .then(res => res.json())
+          .then((data) => {
+            console.log(data);
+            setProfile([]);
+          });
+        } catch (error) {
+          console.log(`validateProfile API: ${error}`);
+        }
+      };
+      validateProfile();
+    }
+  }, [credentials, profile]);
+
   const responseMessage = (response) => {
     console.log(response);
-};
-const errorMessage = (error) => {
-    console.log(error);
-};
-  const renderForm = (
-    <Stack direction="row" spacing={2}>
-      <GoogleLogin onSuccess={responseMessage} onError={errorMessage} />
-      <LoadingButton
-        fullWidth
-        size="large"
-        type="submit"
-        variant="contained"
-        color="inherit"
-        onClick={handleClick}
-      >
-        Manager Login
-      </LoadingButton>
-      <LoadingButton
-        fullWidth
-        size="large"
-        type="submit"
-        variant="contained"
-        color="inherit"
-        onClick={handleClick}
-      >
-        Tenant Login
-      </LoadingButton>
-    </Stack>
-  );
+    setCredentials(response);
+  };
+  const errorMessage = (error) => {
+    console.log(`error: ${error}`);
+  };
 
   return (
     <Box
@@ -98,19 +116,7 @@ const errorMessage = (error) => {
             maxWidth: 420,
           }}
         >
-          <Stack direction="row" spacing={2}>
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:google-fill" color="#DF3E30" />
-            </Button>
-          </Stack>
-
-          {renderForm}
+          <GoogleLogin onSuccess={responseMessage} onError={errorMessage} />
         </Card>
       </Stack>
     </Box>
