@@ -9,7 +9,7 @@ import Stack from '@mui/material/Stack';
 // import LoadingButton from '@mui/lab/LoadingButton';
 import { alpha, useTheme } from '@mui/material/styles';
 
-// import { useRouter } from 'src/routes/hooks';
+import { useRouter } from 'src/routes/hooks';
 
 import { bgGradient } from 'src/theme/css';
 
@@ -22,26 +22,10 @@ import { GoogleLogin } from '@react-oauth/google';
 export default function LoginView() {
   const theme = useTheme();
 
+  const router = useRouter();
+
   const [credentials, setCredentials] = useState([]);
   const [profile, setProfile] = useState([]);
-
-  // const router = useRouter();
-
-  // const handleClick = async () => {
-  //   const response = await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/auth/tenant-login`, {
-  //     method: 'GET',
-  //     headers: {
-  //       Accept: 'application/json',
-  //       'Content-Type': 'application/json',
-  //     },
-  //   });
-  //   if (response.ok) {
-  //     console.log('successful respnse');
-  //   }
-
-  //   console.log(response.json());
-  //   console.log(response['./auth/userinfo.email']);
-  // };
 
   useEffect(() => {
     if (credentials.length !== 0) {
@@ -72,6 +56,11 @@ export default function LoginView() {
           .then(res => res.json())
           .then((data) => {
             console.log(data);
+            if( data.uuid ) {
+              router.replace(`/manager/${data.uuid}/`)
+            } else {
+              console.log("USER NOT VALID!");
+            }
             setProfile([]);
           });
         } catch (error) {
@@ -80,7 +69,7 @@ export default function LoginView() {
       };
       validateProfile();
     }
-  }, [credentials, profile]);
+  }, [credentials, profile, router]);
 
   const responseMessage = (response) => {
     console.log(response);
