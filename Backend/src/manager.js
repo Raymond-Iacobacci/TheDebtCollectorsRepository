@@ -5,21 +5,6 @@ const sendEmail = require('./sendEmail');
 
 managerRouter.use(express.json());
 
-managerRouter.get('/get-attributes', async (req, res) => {
-    try {
-        const managerID = '0x' + req.query['manager-id'];
-        const query = `SELECT email, firstName, lastName FROM managers where managerID = ${managerID};`;
-        const results = await selectQuery(query);
-        res.send({
-            firstName: results[0].firstName,
-            lastName: results[0].lastName,
-            email: results[0].email
-        });
-    } catch (error) {
-        res.status(500).json({ error: 'No managerID found' });
-    }
-});
-
 managerRouter.get('/get-pending-tenants', async (req, res) => {
     try {
         const managerID = '0x' + req.query['manager-id'];
