@@ -10,13 +10,6 @@ const pool = mysql.createPool({
     connectionLimit : 1000
   });
 
-const uuidToString = (buffer) => {
-    if(buffer){
-      return '0x' + buffer.toString('hex').toUpperCase();
-    }
-    return null;
-}
-
 const executeQuery = (query, values = []) => {
   return new Promise((resolve, reject) => {
     pool.getConnection((err, connection) => {
@@ -35,7 +28,7 @@ const executeQuery = (query, values = []) => {
     });
   });
 };
-  
+
 const selectQuery = (query) => {
   return executeQuery(query);
 };
@@ -44,4 +37,11 @@ const insertQuery = (query, values) => {
   return executeQuery(query, values);
 };
 
+const uuidToString = (buffer) => {
+  if(buffer){
+    return '0x' + buffer.toString('hex').toUpperCase();
+  }
+  return null;
+}
+  
 module.exports = {pool, selectQuery, insertQuery, uuidToString};
