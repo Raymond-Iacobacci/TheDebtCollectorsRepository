@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 
-const authRouter = require('./auth');
+const usersRouter = require('./users');
 const requestsRouter = require('./requests');
 const homeRouter = require('./home')
 const managerRouter = require('./manager')
@@ -18,7 +18,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/auth', authRouter);
+app.use('/users', usersRouter);
 app.use('/requests', requestsRouter);
 app.use('/home', homeRouter);
 app.use('/manager', managerRouter);
