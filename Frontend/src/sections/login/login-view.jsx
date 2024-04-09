@@ -7,20 +7,18 @@ import Stack from '@mui/material/Stack';
 // import Button from '@mui/material/Button';
 // import Typography from '@mui/material/Typography';
 // import LoadingButton from '@mui/lab/LoadingButton';
-import { alpha, useTheme } from '@mui/material/styles';
+// import { alpha, useTheme } from '@mui/material/styles';
 
 import { useRouter } from 'src/routes/hooks';
 
 import { bgGradient } from 'src/theme/css';
 
-import Logo from 'src/components/logo';
-// import Iconify from 'src/components/iconify';
 import { GoogleLogin } from '@react-oauth/google';
 
 // ----------------------------------------------------------------------
 
 export default function LoginView() {
-  const theme = useTheme();
+  // const theme = useTheme();
 
   const router = useRouter();
 
@@ -51,13 +49,14 @@ export default function LoginView() {
       const validateProfile = async () => {
         try {
           await fetch(
-            `${import.meta.env.VITE_MIDDLEWARE_URL}/auth/verify-manager?email=${profile.email}`
+            `${import.meta.env.VITE_MIDDLEWARE_URL}/users/verify-tenant?email=${profile.email}`
           )
           .then(res => res.json())
           .then((data) => {
             console.log(data);
             if( data.uuid ) {
-              router.replace(`/manager/${data.uuid}/`)
+              console.log(`/tenant/${data.uuid}/`)
+              router.replace(`/tenant/${data.uuid}/`)
             } else {
               console.log("USER NOT VALID!");
             }
@@ -83,19 +82,12 @@ export default function LoginView() {
     <Box
       sx={{
         ...bgGradient({
-          color: alpha(theme.palette.background.default, 0.9),
+          // color: alpha(theme.palette.background.default, 0.9),
           imgUrl: '/assets/background/overlay_4.jpg',
         }),
         height: 1,
       }}
     >
-      <Logo
-        sx={{
-          position: 'fixed',
-          top: { xs: 16, md: 24 },
-          left: { xs: 16, md: 24 },
-        }}
-      />
 
       <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
         <Card
