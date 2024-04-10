@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -27,6 +27,9 @@ import navConfig from './config-navigation';
 
 export default function Nav({ openNav, onCloseNav }) {
   const pathname = usePathname();
+  const uuid = pathname.split('/')[2];
+
+  const [name, setName] = useState("");
 
   const upLg = useResponsive('up', 'lg');
 
@@ -36,6 +39,23 @@ export default function Nav({ openNav, onCloseNav }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
+
+  useEffect(() => {
+    const getUserAttributes = async () => {
+      try {
+        await fetch(
+          `${import.meta.env.VITE_MIDDLEWARE_URL}/users/get-attributes?userID=${uuid}`
+        )
+        .then(res => res.json())
+        .then((data) => {
+          setName(`${data.firstName} ${data.lastName}`)
+        });
+      } catch (error) {
+        console.log(`get-attributes API: ${error}`);
+      }
+    };
+    getUserAttributes();
+  })
 
   const renderAccount = (
     <Box
@@ -53,7 +73,7 @@ export default function Nav({ openNav, onCloseNav }) {
       <Avatar src={account.photoURL} alt="photoURL" />
 
       <Box sx={{ ml: 2 }}>
-        <Typography variant="subtitle2">{account.displayName}</Typography>
+        <Typography variant="subtitle2">{name}</Typography>
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {account.role}

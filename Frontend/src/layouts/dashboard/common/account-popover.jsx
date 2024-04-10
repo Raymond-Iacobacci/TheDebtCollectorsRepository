@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -8,6 +8,8 @@ import { alpha } from '@mui/material/styles';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+
+import { usePathname } from 'src/routes/hooks';
 
 import { account } from 'src/_mock/account';
 
@@ -41,6 +43,30 @@ export default function AccountPopover() {
     setOpen(null);
   };
 
+  const pathname = usePathname();
+  const uuid = pathname.split('/')[2];
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    const getUserAttributes = async () => {
+      try {
+        await fetch(
+          `${import.meta.env.VITE_MIDDLEWARE_URL}/users/get-attributes?userID=${uuid}`
+        )
+        .then(res => res.json())
+        .then((data) => {
+          setName(`${data.firstName} ${data.lastName}`)
+          setEmail(data.email)
+          console.log(data);
+        });
+      } catch (error) {
+        console.log(`get-attributes API: ${error}`);
+      }
+    };
+    getUserAttributes();
+  })
+
   return (
     <>
       <IconButton
@@ -57,14 +83,14 @@ export default function AccountPopover() {
       >
         <Avatar
           src={account.photoURL}
-          alt={account.displayName}
+          alt={name}
           sx={{
             width: 36,
             height: 36,
             border: (theme) => `solid 2px ${theme.palette.background.default}`,
           }}
         >
-          {account.displayName.charAt(0).toUpperCase()}
+          {name.charAt(0).toUpperCase()}
         </Avatar>
       </IconButton>
 
@@ -85,10 +111,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            {name}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+            {email}
           </Typography>
         </Box>
 
