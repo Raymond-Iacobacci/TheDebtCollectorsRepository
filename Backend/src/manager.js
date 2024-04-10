@@ -47,22 +47,28 @@ managerRouter.post('/create-tenant', async(req,res) => {
         const address = req.body.address;
         const managerId = req.query['manager-id'];
         const managerResult = await selectQuery(`SELECT firstName,lastName FROM managers where managerID = ${'0x' + managerId};`);
-        
+
         // //const managerEmail = null;
 
         // /**
         //  * Send email notifying tenant of account creation.
         //  */
         const emailText = "You have been added as a new tenant to property " + address + " by " + managerResult[0].firstName + " " + managerResult[0].lastName;
-
-        sendEmail(email, "New Tenant", emailText );
+        const emailResults = sendEmail(email, "New Tenant", emailText, (error) =>{
+            if(error){
+                console.log('before');
+                throw new Error(error);
+            }
+            console.log('after');
+        });
 
         const query = "INSERT INTO tenants (firstName, lastName, email, address, managerID) VALUES (?, ?, ?, ?, ?);";
         const values = [firstName, lastName, email, address, Buffer.from(managerId,'hex')];
         await insertQuery(query, values);
-        res.send(managerResult);
+        res.send(emailResults);
     }catch(error){
-        res.status(500).json({ error: 'Error inserting into table' });
+        res.status(500).json({ error: error.message });
     }
 });
+
 module.exports = managerRouter;
