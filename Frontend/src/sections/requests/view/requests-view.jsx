@@ -151,7 +151,7 @@ export default function RequestsView({ access }) {
     formData.append('description', description);
     await fetch(
       `${import.meta.env.VITE_MIDDLEWARE_URL}/requests/new?tenant-id=${
-        import.meta.env.VITE_TEST_TENANT_ID
+        uuid
       }`,
       {
         method: 'POST',

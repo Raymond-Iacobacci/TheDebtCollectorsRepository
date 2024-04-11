@@ -23,6 +23,7 @@ import { newComment, getComments } from '../hooks/request-specifics'
 
 export default function RequestComments({ id }) {
   const pathname = usePathname();
+  const uuid = pathname.split('/')[2];
 
   const [loading, setLoading] = useState(true);
   const [commentList, setCommentList] = useState([]);
@@ -47,9 +48,8 @@ export default function RequestComments({ id }) {
   }, [id]);
 
   const handleAddComment = async (event) => {
-    const user = (pathname.search("/manager") !== -1)?import.meta.env.VITE_TEST_MANAGER_ID:import.meta.env.VITE_TEST_TENANT_ID;
     if( commentField !== "" ) {
-      await newComment(id, user, commentField);
+      await newComment(id, uuid, commentField);
       setCommentField("");
       setCommentLabel("New comment");
       setValidate(true);
