@@ -1,97 +1,111 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
+// import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import LoadingButton from '@mui/lab/LoadingButton';
-import { alpha, useTheme } from '@mui/material/styles';
-import InputAdornment from '@mui/material/InputAdornment';
+// import Typography from '@mui/material/Typography';
+// import LoadingButton from '@mui/lab/LoadingButton';
+// import { alpha, useTheme } from '@mui/material/styles';
 
 import { useRouter } from 'src/routes/hooks';
 
 import { bgGradient } from 'src/theme/css';
 
-import Logo from 'src/components/logo';
-import Iconify from 'src/components/iconify';
+import Button from '@mui/material/Button';
+
+import { useGoogleLogin } from '@react-oauth/google';
 
 // ----------------------------------------------------------------------
 
 export default function LoginView() {
-  const theme = useTheme();
+  // const theme = useTheme();
 
   const router = useRouter();
 
-  const [showPassword, setShowPassword] = useState(false);
+  const [credentials, setCredentials] = useState([]);
+  const [profile, setProfile] = useState([]);
+  const [loginType, setLoginType] = useState(null);
 
-  const handleClick = () => {
-    router.push('/dashboard');
-  };
+  useEffect(() => {
+    if (credentials.length !== 0) {
+      const validateCredentials = async () => {
+        try {
+          await fetch(
+            `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${credentials.access_token}`
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              console.log(data);
+              setProfile(data);
+              setCredentials([]);
+            });
+        } catch (error) {
+          console.log(`validateProfile API: ${error}`);
+        }
+      };
+      validateCredentials();
+    }
+    if (profile.length !== 0) {
+      const validateProfile = async () => {
+        try {
+          await fetch(
+            `${import.meta.env.VITE_MIDDLEWARE_URL}/users/verify-${loginType.toLowerCase()}?email=${
+              profile.email
+            }`
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              const { uuid } = data;
+              if (uuid) {
+                console.log(uuid);
+                router.push(`/${loginType.toLowerCase()}/${uuid}`);
+              } else {
+                console.log('USER NOT VALID!');
+              }
+              setProfile([]);
+            });
+        } catch (error) {
+          console.log(`validateProfile API: ${error}`);
+        }
+      };
+      validateProfile();
+    }
+  }, [credentials, profile, router, loginType]);
 
-  const renderForm = (
-    <>
-      <Stack spacing={3}>
-        <TextField name="email" label="Email address" />
+  const handleManagerLogin = useGoogleLogin({
+    onSuccess: (codeResponse) => {
+      setCredentials(codeResponse);
+      setLoginType('Manager');
+    },
+    onError: (error) => console.log('Manager Login Failed:', error),
+  });
 
-        <TextField
-          name="password"
-          label="Password"
-          type={showPassword ? 'text' : 'password'}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                  <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Stack>
-
-      <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
-        <Link variant="subtitle2" underline="hover">
-          Forgot password?
-        </Link>
-      </Stack>
-
-      <LoadingButton
-        fullWidth
-        size="large"
-        type="submit"
-        variant="contained"
-        color="inherit"
-        onClick={handleClick}
-      >
-        Login
-      </LoadingButton>
-    </>
-  );
+  const handleTenantLogin = useGoogleLogin({
+    onSuccess: (codeResponse) => {
+      setCredentials(codeResponse);
+      setLoginType('Tenant');
+    },
+    onError: (error) => console.log('Tenant Login Failed:', error),
+  });
 
   return (
     <Box
       sx={{
         ...bgGradient({
-          color: alpha(theme.palette.background.default, 0.9),
+          // color: alpha(theme.palette.background.default, 0.9),
           imgUrl: '/assets/background/overlay_4.jpg',
         }),
         height: 1,
       }}
     >
-      <Logo
-        sx={{
-          position: 'fixed',
-          top: { xs: 16, md: 24 },
-          left: { xs: 16, md: 24 },
-        }}
-      />
-
-      <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        justifyContent="center"
+        sx={{ height: 1 }}
+      >
         <Card
           sx={{
             p: 5,
@@ -99,54 +113,20 @@ export default function LoginView() {
             maxWidth: 420,
           }}
         >
-          <Typography variant="h4">Sign in to Minimal</Typography>
-
-          <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
-            Don’t have an account?
-            <Link variant="subtitle2" sx={{ ml: 0.5 }}>
-              Get started
-            </Link>
-          </Typography>
-
-          <Stack direction="row" spacing={2}>
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:google-fill" color="#DF3E30" />
+          <Stack
+            direction="row"
+            spacing={5}
+            alignItems="center"
+            justifyContent="center"
+            sx={{ height: 1 }}
+          >
+            <Button variant="contained" color="inherit" onClick={handleManagerLogin}>
+              Manager login
             </Button>
-
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:facebook-fill" color="#1877F2" />
-            </Button>
-
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:twitter-fill" color="#1C9CEA" />
+            <Button variant="contained" color="inherit" onClick={handleTenantLogin}>
+              Tenant login
             </Button>
           </Stack>
-
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              OR
-            </Typography>
-          </Divider>
-
-          {renderForm}
         </Card>
       </Stack>
     </Box>
