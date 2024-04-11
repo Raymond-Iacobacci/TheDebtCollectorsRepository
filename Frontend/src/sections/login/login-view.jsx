@@ -59,7 +59,7 @@ export default function LoginView() {
               const { uuid } = data;
               if (uuid) {
                 console.log(uuid);
-                router.push(`/${loginType.toLowerCase()}/${uuid}`);
+                router.push(`/${loginType.toLowerCase()}/${uuid}/`);
               } else {
                 console.log('USER NOT VALID!');
               }
