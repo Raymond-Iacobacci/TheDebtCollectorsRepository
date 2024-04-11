@@ -14,7 +14,6 @@ import { bgGradient } from 'src/theme/css';
 
 import Button from '@mui/material/Button';
 
-import Logo from 'src/components/logo';
 import { useGoogleLogin } from '@react-oauth/google';
 
 // ----------------------------------------------------------------------
@@ -51,7 +50,8 @@ export default function LoginView() {
       const validateProfile = async () => {
         try {
           await fetch(
-            `${import.meta.env.VITE_MIDDLEWARE_URL}/users/verify-${loginType.toLowerCase()}?email=${profile.email
+            `${import.meta.env.VITE_MIDDLEWARE_URL}/users/verify-${loginType.toLowerCase()}?email=${
+              profile.email
             }`
           )
             .then((res) => res.json())
@@ -99,8 +99,13 @@ export default function LoginView() {
         height: 1,
       }}
     >
-
-      <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        justifyContent="center"
+        sx={{ height: 1 }}
+      >
         <Card
           sx={{
             p: 5,
@@ -108,12 +113,20 @@ export default function LoginView() {
             maxWidth: 420,
           }}
         >
-          <Button variant="contained" color="inherit" onClick={handleManagerLogin}>
-            Manager login
-          </Button>
-          <Button variant="contained" color="inherit" onClick={handleTenantLogin}>
-            Tenant login
-          </Button>
+          <Stack
+            direction="row"
+            spacing={5}
+            alignItems="center"
+            justifyContent="center"
+            sx={{ height: 1 }}
+          >
+            <Button variant="contained" color="inherit" onClick={handleManagerLogin}>
+              Manager login
+            </Button>
+            <Button variant="contained" color="inherit" onClick={handleTenantLogin}>
+              Tenant login
+            </Button>
+          </Stack>
         </Card>
       </Stack>
     </Box>
