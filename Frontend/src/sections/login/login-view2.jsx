@@ -32,6 +32,7 @@ export default function LoginView() {
     if (credentials.length !== 0) {
       const validateCredentials = async () => {
         try {
+          console.log('validate creds here');
           await fetch(
             `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${credentials.access_token}`
           )
@@ -47,19 +48,29 @@ export default function LoginView() {
       };
       validateCredentials();
     }
+    console.log("This is the profile:");
+    console.log(profile);
+    console.log("This is the credential:");
+    console.log(credentials);
     if (profile.length !== 0) {
       const validateProfile = async () => {
         try {
-          await fetch(
-            `${import.meta.env.VITE_MIDDLEWARE_URL}/users/verify-${loginType.toLowerCase()}?email=${profile.email
-            }`
+          let verificationUrl;
+          if (loginType === 'Manager') {
+            verificationUrl = `${import.meta.env.VITE_MIDDLEWARE_URL}/auth/verify-manager?email=${profile.email}`;
+          } else if (loginType === 'Tenant') {
+            verificationUrl = `${import.meta.env.VITE_MIDDLEWARE_URL}/auth/verify-tenant?email=${profile.email}`;
+          }
+          await fetch( // TODO: change verification based off of button clicked
+            verificationUrl
           )
             .then((res) => res.json())
             .then((data) => {
-              const { uuid } = data;
-              if (uuid) {
-                console.log(uuid);
-                router.push(`/${loginType.toLowerCase()}/${uuid}`);
+              console.log(data);
+              console.log("The data has been printed");
+              if (data.uuid) {
+                console.log(data.uuid);
+                router.push(`/${loginType.toLowerCase()}/${data.uuid}/`);
               } else {
                 console.log('USER NOT VALID!');
               }
@@ -75,6 +86,7 @@ export default function LoginView() {
 
   const handleManagerLogin = useGoogleLogin({
     onSuccess: (codeResponse) => {
+      console.log('Manager Login:', codeResponse);
       setCredentials(codeResponse);
       setLoginType('Manager');
     },
@@ -83,6 +95,7 @@ export default function LoginView() {
 
   const handleTenantLogin = useGoogleLogin({
     onSuccess: (codeResponse) => {
+      console.log('Tenant Login:', codeResponse);
       setCredentials(codeResponse);
       setLoginType('Tenant');
     },
