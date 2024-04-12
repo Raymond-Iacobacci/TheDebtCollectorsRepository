@@ -9,8 +9,7 @@ import Typography from '@mui/material/Typography';
 
 export default function UserTableRow({
   id,
-  firstName,
-  lastName,
+  name,
   email,
   address,
 }) {
@@ -24,13 +23,13 @@ export default function UserTableRow({
         <TableCell component="th" scope="row" padding="none">
           <Stack direction="row" alignItems="center" spacing={2}>
             <Typography variant="subtitle2" noWrap>
-              {id}
+              {name}
             </Typography>
           </Stack>
         </TableCell>
         {/* What?? */}
 
-        <TableCell id="lastName">{lastName}</TableCell>
+        <TableCell id="Name">{name}</TableCell>
 
         <TableCell id="email">{email}</TableCell>
 
@@ -42,8 +41,7 @@ export default function UserTableRow({
 
 UserTableRow.propTypes = {
   id: PropTypes.any,
-  firstName: PropTypes.any,
-  lastName: PropTypes.any,
+  name: PropTypes.any,
   email: PropTypes.any,
   address: PropTypes.any,
 };

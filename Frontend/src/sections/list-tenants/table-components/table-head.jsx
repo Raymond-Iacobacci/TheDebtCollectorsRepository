@@ -35,7 +35,7 @@ export default function TenantTableHead({
             <TableSortLabel
               hideSortIcon
               active={orderBy === headCell.id}
-              direction={orderBy === headCell.firstName ? order : 'asc'}
+              direction={orderBy === headCell.name ? order : 'asc'}
               onClick={onSort(headCell.id)}
             >
               {headCell.label}
