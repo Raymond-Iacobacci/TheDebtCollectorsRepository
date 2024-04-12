@@ -57,6 +57,19 @@ export default function Nav({ openNav, onCloseNav }) {
     getUserAttributes();
   })
 
+  const accessMenus = (item) => {
+    if( item.access === 'all') {
+      return <NavItem key={item.title} item={item} />
+    }
+     if(pathname.split('/')[2] === 'manager' && item.access === 'manager') {
+      return <NavItem key={item.title} item={item} />
+    }
+     if(pathname.split('/')[2] === 'tenant' && item.access === 'tenant') {
+      return <NavItem key={item.title} item={item} />
+    }  
+    return <br/>
+  };
+
   const renderAccount = (
     <Box
       sx={{
@@ -85,10 +98,10 @@ export default function Nav({ openNav, onCloseNav }) {
   const renderMenu = (
     <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
       {navConfig.map((item) => (
-        <NavItem key={item.title} item={item} />
+        accessMenus(item)
       ))}
     </Stack>
-  );
+  ); 
 
   const renderLogo = (
     <Box
@@ -185,7 +198,7 @@ function NavItem({ item }) {
     const isManager = pathname.search("/manager");
     if( isManager !== -1 ) {
       console.log(`dashboard/manager/${uuid}${item.path}`)
-      router.replace(`dashboard/manager/${uuid}${item.path}`)
+      router.replace(`/dashboard/manager/${uuid}${item.path}`)
     } else {
       console.log(`/dashboard/tenant/${uuid}${item.path}`)
       router.replace(`/dashboard/tenant/${uuid}${item.path}`)

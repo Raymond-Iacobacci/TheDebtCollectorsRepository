@@ -13,11 +13,19 @@ const navConfig = [
     title: 'dashboard',
     path: '/',
     icon: icon('ic_analytics'),
+    access: 'all'
   },
   {
     title: 'requests',
     path: '/requests',
     icon: icon('ic_user'),
+    access: 'all'
+  },
+  {
+    title: 'Tenants',
+    path: '/list-tenants',
+    icon: icon('ic_lock'),
+    access: 'manager',
   },
   // {
   //   title: 'notifications',
