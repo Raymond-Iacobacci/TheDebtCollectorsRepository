@@ -106,6 +106,7 @@ export default function ListTenantView({ managerID }) {
             return <UserTableRow
                 key={row.email}
                 id={row.firstName + row.lastName}
+                email={row.email}
                 name={row.firstName + row.lastName}
                 address={row.address}
             />;
@@ -188,7 +189,7 @@ export default function ListTenantView({ managerID }) {
                                     onTenantSort={handleSort}
                                     headLabel={tableLabels}
                                 />
-                                <TableBody>
+                                <TableBody >
                                     {dataFiltered
                                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                         .map((row) => tableValues(row))}

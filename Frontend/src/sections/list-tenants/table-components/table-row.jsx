@@ -1,13 +1,15 @@
 import PropTypes from 'prop-types';
 
-import Stack from '@mui/material/Stack';
+// import Stack from '@mui/material/Stack';
+// import TableRow from '@mui/material/TableRow';
+// import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
-import Typography from '@mui/material/Typography';
+// import Typography from '@mui/material/Typography';
 
 // ----------------------------------------------------------------------
 
-export default function UserTableRow({
+export default function TenantTableRow({
   id,
   name,
   email,
@@ -19,27 +21,20 @@ export default function UserTableRow({
       tabIndex={-1}
       role="checkbox"
     >
-      <>
-        <TableCell component="th" scope="row" padding="none">
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Typography variant="subtitle2" noWrap>
-              {name}
-            </Typography>
-          </Stack>
-        </TableCell>
-        {/* What?? */}
-
-        <TableCell id="Name">{name}</TableCell>
+      
+        <TableCell id="id">{}</TableCell>
 
         <TableCell id="email">{email}</TableCell>
+        
+        <TableCell id="name">{name}</TableCell>
 
         <TableCell id="address">{address}</TableCell>
-      </>
+      
     </TableRow>
   );
 }
 
-UserTableRow.propTypes = {
+TenantTableRow.propTypes = {
   id: PropTypes.any,
   name: PropTypes.any,
   email: PropTypes.any,
