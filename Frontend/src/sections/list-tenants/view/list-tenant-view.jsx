@@ -173,7 +173,7 @@ export default function ListTenantView({ managerID }) {
                     </Grid>
                 </Dialog>
                 <Box sx={{ marginTop: '20px', padding: '20px', backgroundColor: '#f5f5f5' }}>
-                    <h2>Current Tenants</h2>
+                    <h2>Tenants</h2>
                 </Box>
 
                 <Card>
