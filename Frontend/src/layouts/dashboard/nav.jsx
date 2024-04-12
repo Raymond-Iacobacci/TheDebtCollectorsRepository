@@ -184,8 +184,8 @@ function NavItem({ item }) {
     console.log(pathname)
     const isManager = pathname.search("/manager");
     if( isManager !== -1 ) {
-      console.log(`dashboard/tenant/${uuid}${item.path}`)
-      router.replace(`dashboard/tenant/${uuid}${item.path}`)
+      console.log(`dashboard/manager/${uuid}${item.path}`)
+      router.replace(`dashboard/manager/${uuid}${item.path}`)
     } else {
       console.log(`/dashboard/tenant/${uuid}${item.path}`)
       router.replace(`/dashboard/tenant/${uuid}${item.path}`)
