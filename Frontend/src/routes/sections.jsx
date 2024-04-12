@@ -18,7 +18,7 @@ export const LandingPage = lazy(() => import('src/pages/landing'))
 export default function Router() {
   const routes = useRoutes([
     {
-      path: "/",
+      path: "dashboard",
       element: (
         <DashboardLayout>
           <Suspense>
@@ -46,11 +46,7 @@ export default function Router() {
       ],
     },
     {
-      path: 'landing',
-      element: <LandingPage />
-    },
-    {
-      path: 'login',
+      path: '/',
       element: <LoginPage />,
     },
     {

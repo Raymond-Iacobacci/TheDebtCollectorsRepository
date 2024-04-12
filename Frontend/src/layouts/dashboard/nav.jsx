@@ -27,7 +27,7 @@ import navConfig from './config-navigation';
 
 export default function Nav({ openNav, onCloseNav }) {
   const pathname = usePathname();
-  const uuid = pathname.split('/')[2];
+  const uuid = pathname.split('/')[3];
 
   const [name, setName] = useState("");
 
@@ -176,17 +176,19 @@ Nav.propTypes = {
 function NavItem({ item }) {
   const pathname = usePathname();
   const router = useRouter();
-  const uuid = pathname.split('/')[2];
+  const uuid = pathname.split('/')[3];
 
-  const active = (`/manager/${uuid}/${item.path}` === pathname) || (`/tenant/${uuid}/${item.path}` === pathname) || (item.path.split('/')[1] === pathname.split('/')[3]);
+  const active = (`/dashboard/manager/${uuid}/${item.path}/` === pathname) || (`/dashboard/tenant/${uuid}/${item.path}/` === pathname) || (item.path.split('/')[1] === pathname.split('/')[4]);
 
   const handleItemClick = () =>{
     console.log(pathname)
     const isManager = pathname.search("/manager");
     if( isManager !== -1 ) {
-      router.replace(`/manager/${uuid}${item.path}`)
+      console.log(`dashboard/tenant/${uuid}${item.path}`)
+      router.replace(`dashboard/tenant/${uuid}${item.path}`)
     } else {
-      router.replace(`/tenant/${uuid}${item.path}`)
+      console.log(`/dashboard/tenant/${uuid}${item.path}`)
+      router.replace(`/dashboard/tenant/${uuid}${item.path}`)
     }
   }
 

@@ -44,7 +44,7 @@ export default function AccountPopover() {
   };
 
   const pathname = usePathname();
-  const uuid = pathname.split('/')[2];
+  const uuid = pathname.split('/')[3];
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 

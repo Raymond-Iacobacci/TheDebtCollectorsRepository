@@ -23,7 +23,7 @@ import { newComment, getComments } from '../hooks/request-specifics'
 
 export default function RequestComments({ id }) {
   const pathname = usePathname();
-  const uuid = pathname.split('/')[2];
+  const uuid = pathname.split('/')[3];
 
   const [loading, setLoading] = useState(true);
   const [commentList, setCommentList] = useState([]);

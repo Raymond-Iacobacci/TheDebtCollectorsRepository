@@ -43,7 +43,7 @@ import { getTenantRequests, getManagerRequests } from '../hooks/request-specific
 export default function RequestsView({ access }) {
 
   const pathname = usePathname();
-  const uuid = pathname.split('/')[2];
+  const uuid = pathname.split('/')[3];
 
   const [page, setPage] = useState(0);
 
