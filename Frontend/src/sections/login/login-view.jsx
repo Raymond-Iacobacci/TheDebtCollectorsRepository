@@ -23,6 +23,7 @@ export default function LoginView() {
 
   const router = useRouter();
 
+  const [token, setToken] = useState('');
   const [credentials, setCredentials] = useState([]);
   const [profile, setProfile] = useState([]);
   const [loginType, setLoginType] = useState(null);
@@ -32,7 +33,7 @@ export default function LoginView() {
       const validateCredentials = async () => {
         try {
           await fetch(
-            `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${credentials.access_token}`
+            `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token}`
           )
             .then((res) => res.json())
             .then((data) => {
@@ -71,11 +72,12 @@ export default function LoginView() {
       };
       validateProfile();
     }
-  }, [credentials, profile, router, loginType]);
+  }, [credentials, profile, router, loginType, token]);
 
   const handleManagerLogin = useGoogleLogin({
     onSuccess: (codeResponse) => {
       setCredentials(codeResponse);
+      setToken(credentials.access_token);
       setLoginType('Manager');
     },
     onError: (error) => console.log('Manager Login Failed:', error),
@@ -84,6 +86,7 @@ export default function LoginView() {
   const handleTenantLogin = useGoogleLogin({
     onSuccess: (codeResponse) => {
       setCredentials(codeResponse);
+      setToken(credentials.access_token);
       setLoginType('Tenant');
     },
     onError: (error) => console.log('Tenant Login Failed:', error),

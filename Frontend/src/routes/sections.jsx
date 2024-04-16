@@ -35,7 +35,7 @@ export default function Router() {
         { 
           path: "tenant/:userID",
           children: [
-            { element: <IndexPage />, index: true },
+            { path: 'main', element: <IndexPage /> },
             { path: 'requests', element: <RequestPage access="tenant"/> },
             { path: 'requests/:requestID', element: <RequestDetailsPage /> },
           ]
@@ -43,10 +43,10 @@ export default function Router() {
         {
           path: "manager/:userID",
           children: [
-            { element: <IndexPage />, index: true },
+            { path: 'main', element: <IndexPage /> },
             { path: 'requests', element: <RequestPage access="manager"/> },
             { path: 'requests/:requestID', element: <RequestDetailsPage /> },
-            {path: 'list-tenants',element: <ListTenant managerID={userID} /> }
+            { path: 'list-tenants', element: <ListTenant managerID={userID} /> }
           ]
         }
       ],
