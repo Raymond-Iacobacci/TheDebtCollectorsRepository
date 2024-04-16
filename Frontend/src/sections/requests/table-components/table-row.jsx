@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
 import { useRouter } from 'src/routes/hooks';
+import { useSearchParams } from "react-router-dom";
 
 import { fDate } from 'src/utils/format-time';
 
@@ -32,11 +33,13 @@ export default function UserTableRow({
 }) {
 
   const router = useRouter();
+  const [ searchParams ] = useSearchParams();
+  const token = searchParams.get("session");
 
   const handleRowClick = () =>{
     const selection = window.getSelection()
     if(selection.type !== "Range") {
-      router.push(id)
+      router.push(`${id}?session=${token}`)
     }
   }
 
