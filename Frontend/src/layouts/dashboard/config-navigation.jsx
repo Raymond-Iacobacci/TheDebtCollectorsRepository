@@ -27,6 +27,12 @@ const navConfig = [
     icon: icon('ic_lock'),
     access: 'manager',
   },
+  {
+    title: 'Payment',
+    path: '/payments',
+    icon: icon('ic_lock'),
+    access: 'tenant',
+  },
   // {
   //   title: 'notifications',
   //   path: '/notifications',
