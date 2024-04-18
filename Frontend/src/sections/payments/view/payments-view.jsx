@@ -38,8 +38,6 @@ export default function PaymentsView({ tenantID }) {
                     .then((data) => {
                         setPayments(data);
                     });
-                // const result = await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/get-payments?tenant-id=${tenantID}`);
-                // console.log(result.json());
             } catch (error) {
                 console.log(`HeaderInfo API: ${error}`);
             }
@@ -64,8 +62,12 @@ export default function PaymentsView({ tenantID }) {
     });
     const tableValues = (row) => {
         console.log('this is the payment ID', row.paymentsID);
+        const temp = <PaymentTableRow key={row.paymentsID} tenantID={tenantID} paymentsID={row.paymentsID} type={row.type} time={row.time} amount={row.amount}/>
+        console.log(`This is the temp:`);
+        console.log(temp);
+        // setPayments(temp[0]);
         return (
-            <PaymentTableRow key={row.paymentsID} type={row.type} time={row.time} amount={row.amount} />
+            temp
         );
     };
     const handleChangeRowsPerPage = (event) => {
