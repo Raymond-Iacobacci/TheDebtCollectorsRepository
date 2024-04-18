@@ -105,23 +105,6 @@ managerRouter.post('/create-payment', async(req, res) =>{
 
 });
 
-//Tenants that have paid and not paid. 
-// SELECT tenantID, due_date FROM paymentsDue;
-// SELECT tenantID, date_payment from paymentsMade;
-// for tenant in tenantID: if currentTime < dueDate (if due_date - 4 < date_payment < due_date: return paid ; else return notPaid;)
-
-
-
-
-// Check Payments:
-// SELECT tenantID, due_date, date_payment from payments; --> rows
-// for row in rows: if date_payment == NULL and due_date > currentDate > due_date - 4: return warning and not paid; if date_payment == NULL and currentDate > due_date; return late and not paid; if date_payment != NULL: return paid;
-
-// Handle Payment:
-// SELECT tenantID, due_date, date_payment from payments; --> rows
-// if paymentType == 'rent': rows.due_date += 1 month, rows.date_payment = currentDate, return paid; else: rows.date_payment = currentDate, return paid;
-
-// SELECT tenantID, due_date, date_payment from payments WHERE date_payment is not NULL;
 
 
 
