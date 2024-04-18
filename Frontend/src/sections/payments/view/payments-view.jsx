@@ -1,12 +1,183 @@
+import PropTypes from 'prop-types';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import Table from '@mui/material/Table';
+import Dialog from '@mui/material/Dialog';
+// import Button from '@mui/material/Button';
+import Grid from '@mui/material/Unstable_Grid2';
+import TextField from '@mui/material/TextField';
+import Container from '@mui/material/Container';
+import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
-import PropTypes from 'prop-types'
+import TableContainer from '@mui/material/TableContainer';
+import TablePagination from '@mui/material/TablePagination';
+import { useState, useEffect } from 'react';
+import Scrollbar from 'src/components/scrollbar';
+import PaymentTableRow from '../table-components/table-row';
+import PaymentTableHead from '../table-components/table-head';
+import TableEmptyRows from '../table-components/table-empty-rows';
+import { emptyRows, applyFilter, getComparator } from '../hooks/utils';
 
-export default function PaymentsView({tenantID}){
+export default function PaymentsView({ tenantID }) {
+    const [open, setOpen] = useState(false);
+    const [dueDate, setDueDate] = useState('');
+    const [amount, setAmount] = useState('');
+    const [task, setTask] = useState('');
+    const [payments, setPayments] = useState([]);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [orderBy, setOrderBy] = useState('');
+    const [order, setOrder] = useState('asc');
+    const [filterName] = useState('');
+
+    useEffect(() => {
+        const fetchPayments = async () => {
+            try {
+                fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/get-payments?tenant-id=${tenantID}`)
+                    .then((res) => res.json())
+                    .then((data) => {
+                        setPayments(data);
+                    });
+                // const result = await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/get-payments?tenant-id=${tenantID}`);
+                // console.log(result.json());
+            } catch (error) {
+                console.log(`HeaderInfo API: ${error}`);
+            }
+        };
+        fetchPayments();
+    }, [tenantID]);
+    // *** May warrant deletion *** //
+    const handleClose = () => {
+        setOpen(false);
+    };
+    // const openPopup = () => {
+    //     setOpen(true);
+    // };
+    const dataFiltered = applyFilter({
+        inputData: payments,
+        comparator: getComparator(order, orderBy),
+        filterName,
+    });
+    const tableValues = (row) => {
+        console.log(row.paymentID);
+        return (
+            <PaymentTableRow key={row.paymentID} id={row.dueDate} email={row.amount} name={row.task} />
+        );
+    };
+    const handleChangeRowsPerPage = (event) => {
+        setPage(0);
+        setRowsPerPage(parseInt(event.target.value, 10));
+    };
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+    const tableLabels = [
+        { id: 'task', label: 'Task Name' },
+        { id: 'dueDate', label: 'Due Date' },
+        { id: 'amount', label: 'Amount Due' },
+    ];
+    const handleSort = (event, id) => {
+        const isAsc = orderBy === id && order === 'asc';
+        if (id !== '') {
+            setOrder(isAsc ? 'desc' : 'asc');
+            setOrderBy(id);
+        }
+    };
+    // const handleFilterByName = (event) => {
+    //     setPage(0);
+    //     setFilterName(event.target.value);
+    // };
+    // const payBill = async () => {
+    //     await fetch (
+    //         `${impo}`
+    //     )
+    // }
+    // payBill needs to be implemented with APIs
     return (
-        <Typography variant="h4">Payments</Typography>
+        <Container>
+            <Dialog open={open} onClose={handleClose} sx={{ textAlign: 'center' }}>
+                <div>
+                    <Typography variant="h4">Payments</Typography>
+                </div>
+                <Grid container justifyContent="center">
+                    <Grid>
+                        <Box sx={{ padding: '20px' }}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    value={task}
+                                    label="Job"
+                                    onChange={(e) => setTask(e.target.value)}
+                                    sx={{ marginBottom: '10px' }}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    value={amount}
+                                    label="Cost"
+                                    onChange={(e) => setAmount(e.target.value)}
+                                    sx={{ marginBottom: '10px' }}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    value={dueDate}
+                                    label="Payment Deadline"
+                                    onChange={(e) => setDueDate(e.target.value)}
+                                    sx={{ marginBottom: '10px' }}
+                                />
+                            </Grid>
+                            {/* <Grid item xs={12} sx={{ marginTop: '20px' }}>
+                                    <Button component="label" variant="contained" onClick={payBill}>
+                                        Submit
+                                    </Button>
+                                </Grid> */}
+                        </Box>
+                    </Grid>
+                </Grid>
+            </Dialog>
+            <Card>
+                <Scrollbar>
+                    <TableContainer sx={{ overflow: 'unset' }}>
+                        <Table sx={{ minWidth: 800 }}>
+                            <PaymentTableHead
+                                order={order}
+                                orderBy={orderBy}
+                                rowCount={payments.length}
+                                onPaymentSort={handleSort}
+                                headLabel={tableLabels}
+                            />
+                            <TableBody>
+                                {dataFiltered
+                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    .map((row) => tableValues(row))}
 
+                                <TableEmptyRows
+                                    height={77}
+                                    emptyRows={emptyRows(page, rowsPerPage, payments.length)}
+                                />
+
+                                {/* {filterName !== '' && dataFiltered.length === 0 && (
+                                    <TableNoData query={filterName} />
+                                )} */}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Scrollbar>
+
+                <TablePagination
+                    page={page}
+                    component="div"
+                    count={payments.length}
+                    rowsPerPage={rowsPerPage}
+                    onPageChange={handleChangePage}
+                    rowsPerPageOptions={[5, 10, 25]}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+            </Card>
+        </Container>
     );
 }
 PaymentsView.propTypes = {
+    // paymentID: PropTypes.string,
     tenantID: PropTypes.string,
 };
