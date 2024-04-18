@@ -20,9 +20,9 @@ import { emptyRows, applyFilter, getComparator } from '../hooks/utils';
 
 export default function PaymentsView({ tenantID }) {
     const [open, setOpen] = useState(false);
-    const [dueDate, setDueDate] = useState('');
+    const [time, setTime] = useState('');
     const [amount, setAmount] = useState('');
-    const [task, setTask] = useState('');
+    const [type, setType] = useState('');
     const [payments, setPayments] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -53,15 +53,19 @@ export default function PaymentsView({ tenantID }) {
     // const openPopup = () => {
     //     setOpen(true);
     // };
+    // function removePayment(paymentID){
+    //     payments.filter(payment => payment.paymentsID === paymentID);
+        
+    // }
     const dataFiltered = applyFilter({
         inputData: payments,
         comparator: getComparator(order, orderBy),
         filterName,
     });
     const tableValues = (row) => {
-        console.log(row.paymentID);
+        console.log('this is the payment ID', row.paymentsID);
         return (
-            <PaymentTableRow key={row.paymentID} id={row.dueDate} email={row.amount} name={row.task} />
+            <PaymentTableRow key={row.paymentsID} type={row.type} time={row.time} amount={row.amount} />
         );
     };
     const handleChangeRowsPerPage = (event) => {
@@ -72,9 +76,10 @@ export default function PaymentsView({ tenantID }) {
         setPage(newPage);
     };
     const tableLabels = [
-        { id: 'task', label: 'Task Name' },
-        { id: 'dueDate', label: 'Due Date' },
+        { id: 'type', label: 'Task Name' },
+        { id: 'time', label: 'Due Date' },
         { id: 'amount', label: 'Amount Due' },
+        { id: 'action', label: ''},
     ];
     const handleSort = (event, id) => {
         const isAsc = orderBy === id && order === 'asc';
@@ -104,9 +109,9 @@ export default function PaymentsView({ tenantID }) {
                         <Box sx={{ padding: '20px' }}>
                             <Grid item xs={12}>
                                 <TextField
-                                    value={task}
+                                    value={type}
                                     label="Job"
-                                    onChange={(e) => setTask(e.target.value)}
+                                    onChange={(e) => setType(e.target.value)}
                                     sx={{ marginBottom: '10px' }}
                                 />
                             </Grid>
@@ -120,9 +125,9 @@ export default function PaymentsView({ tenantID }) {
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
-                                    value={dueDate}
+                                    value={time}
                                     label="Payment Deadline"
-                                    onChange={(e) => setDueDate(e.target.value)}
+                                    onChange={(e) => setTime(e.target.value)}
                                     sx={{ marginBottom: '10px' }}
                                 />
                             </Grid>
