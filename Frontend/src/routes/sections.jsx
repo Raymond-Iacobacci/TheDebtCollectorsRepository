@@ -9,6 +9,7 @@ export const IndexPage = lazy(() => import('src/pages/app'));
 // export const BlogPage = lazy(() => import('src/pages/blog'));
 export const RequestPage = lazy(() => import('src/pages/requests'));
 export const RequestDetailsPage = lazy(() => import('src/pages/request-details'));
+export const Payments = lazy(() => import('src/pages/payments'));
 export const ListTenant = lazy(() => import('src/pages/list-tenants'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 // export const ProductsPage = lazy(() => import('src/pages/products'));
@@ -38,6 +39,7 @@ export default function Router() {
             { element: <IndexPage />, index: true },
             { path: 'requests', element: <RequestPage access="tenant"/> },
             { path: 'requests/:requestID', element: <RequestDetailsPage /> },
+            {path: 'payments', element: <Payments tenantID={userID}/>},
           ]
         },
         {
