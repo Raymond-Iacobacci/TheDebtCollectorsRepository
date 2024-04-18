@@ -44,4 +44,4 @@ const uuidToString = (buffer) => {
   return null;
 }
   
-module.exports = {pool, selectQuery, insertQuery, uuidToString};
+module.exports = {pool, selectQuery, insertQuery, executeQuery, uuidToString};

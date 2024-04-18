@@ -5,6 +5,7 @@ const usersRouter = require('./users');
 const requestsRouter = require('./requests');
 const homeRouter = require('./home')
 const managerRouter = require('./manager')
+const tenantRouter = require('./tenant');
 
 require('dotenv').config({ path: '../.env' });
 const sendEmail = require('./sendEmail');
@@ -22,6 +23,7 @@ app.use('/users', usersRouter);
 app.use('/requests', requestsRouter);
 app.use('/home', homeRouter);
 app.use('/manager', managerRouter);
+app.use('/tenant', tenantRouter);
 
 app.get('/send-email', (req, res) => {
     const emailToken = crypto.randomBytes(20).toString('hex');
