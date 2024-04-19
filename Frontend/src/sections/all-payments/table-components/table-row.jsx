@@ -1,19 +1,15 @@
 import PropTypes from 'prop-types';
-
-// import Stack from '@mui/material/Stack';
-// import TableRow from '@mui/material/TableRow';
-// import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
-// import Typography from '@mui/material/Typography';
 
 // ----------------------------------------------------------------------
 
-export default function TenantTableRow({
-  id,
+export default function PaymentTableRow({
+  paymentsID,
   name,
-  email,
-  address,
+  type,
+  time,
+  amount,
 }) {
   return (
     <TableRow
@@ -21,22 +17,19 @@ export default function TenantTableRow({
       tabIndex={-1}
       role="checkbox"
     >
-      
-        <TableCell id="id">{}</TableCell>
-
-        <TableCell id="email">{email}</TableCell>
-        
-        <TableCell id="name">{name}</TableCell>
-
-        <TableCell id="address">{address}</TableCell>
-      
+      <TableCell>{name}</TableCell>
+      <TableCell>{paymentsID}</TableCell>
+      <TableCell>{type}</TableCell>
+      <TableCell>{time}</TableCell>
+      <TableCell>{amount}</TableCell>
     </TableRow>
   );
 }
 
-TenantTableRow.propTypes = {
-  id: PropTypes.any,
+PaymentTableRow.propTypes = {
+  paymentsID: PropTypes.any,
   name: PropTypes.any,
-  email: PropTypes.any,
-  address: PropTypes.any,
+  time: PropTypes.any,
+  amount: PropTypes.any,
+  type: PropTypes.any,
 };

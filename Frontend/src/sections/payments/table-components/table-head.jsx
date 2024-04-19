@@ -24,7 +24,7 @@ export default function PaymentTableHead({
         {headLabel.map((headCell) => {
           // Print headCell.id to console
           console.log(`This is the head cell id: ${headCell.id}`);
-          
+          // TODO: fix the ordering
           return (
             <TableCell
               key={headCell.id}

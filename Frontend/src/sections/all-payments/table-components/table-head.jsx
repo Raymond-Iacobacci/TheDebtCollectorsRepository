@@ -10,7 +10,7 @@ import { visuallyHidden } from '../hooks/utils';
 
 // ----------------------------------------------------------------------
 
-export default function TenantTableHead({
+export default function PaymentTableHead({
   order,
   orderBy,
   headLabel,
@@ -29,17 +29,17 @@ export default function TenantTableHead({
           <TableCell
             key={headCell.id}
             align={headCell.align || 'left'}
-            sortDirection={orderBy === headCell.id ? order : false}
+            sortDirection={orderBy === headCell.paymentID ? order : false}
             sx={{ width: headCell.width, minWidth: headCell.minWidth }}
           >
             <TableSortLabel
               hideSortIcon
-              active={orderBy === headCell.id}
+              active={orderBy === headCell.paymentID}
               direction={orderBy === headCell.name ? order : 'asc'}
-              onClick={onSort(headCell.id)}
+              onClick={onSort(headCell.paymentID)}
             >
               {headCell.label}
-              {orderBy === headCell.id ? (
+              {orderBy === headCell.paymentID ? (
                 <Box sx={{ ...visuallyHidden }}>
                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
                 </Box>
@@ -52,7 +52,7 @@ export default function TenantTableHead({
   );
 }
 
-TenantTableHead.propTypes = {
+PaymentTableHead.propTypes = {
   order: PropTypes.oneOf(['asc', 'desc']),
   orderBy: PropTypes.string,
   headLabel: PropTypes.array,

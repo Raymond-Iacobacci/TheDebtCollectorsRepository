@@ -18,7 +18,7 @@ import PaymentTableHead from '../table-components/table-head';
 import TableEmptyRows from '../table-components/table-empty-rows';
 import { emptyRows, applyFilter, getComparator } from '../hooks/utils';
 
-export default function PaymentsView({ tenantID }) {
+export default function AllPaymentsView({ managerID }) {
     const [open, setOpen] = useState(false);
     const [time, setTime] = useState('');
     const [amount, setAmount] = useState('');
@@ -47,7 +47,7 @@ export default function PaymentsView({ tenantID }) {
     }, [managerID]);
 
     const tableValues = (row) => {
-        const temp = <PaymentTableRow key={row.paymentsID} tenantID={tenantID} paymentsID={row.paymentsID} type={row.type} time={row.time} amount={row.amount}name={`${row.firstName} ${row.lastName}`} />
+        const temp = <PaymentTableRow key={row.paymentsID} id={row.firstName + row.lastName} tenantID={tenantID} paymentsID={row.paymentsID} type={row.type} time={row.time} amount={row.amount} name={`${row.firstName} ${row.lastName}`} />
         console.log(`This is the temp:`);
         console.log(temp);
         // setPayments(temp[0]);
@@ -87,8 +87,9 @@ export default function PaymentsView({ tenantID }) {
         );
         handleClose();
     };
-
-
+    const openPopup = () => {
+        setOpen(true);
+    };
     const handleSort = (event, id) => {
         const isAsc = orderBy === id && order === 'asc';
         if (id !== '') {
@@ -193,7 +194,7 @@ export default function PaymentsView({ tenantID }) {
 
                                 <TableEmptyRows
                                     height={77}
-                                    emptyRows={emptyRows(page, rowsPerPage, tenants.length)}
+                                    emptyRows={emptyRows(page, rowsPerPage, payments.length)}
                                 />
 
                                 {filterName !== '' && dataFiltered.length === 0 && (
@@ -218,6 +219,6 @@ export default function PaymentsView({ tenantID }) {
     );
 }
 
-PaymentsView.propTypes = {
+AllPaymentsView.propTypes = {
     managerID: PropTypes.string,
 };

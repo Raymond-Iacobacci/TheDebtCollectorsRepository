@@ -1,1 +1,1 @@
-export { default as ListTenantView } from 'src/sections/list-tenants/view/list-tenant-view';
+export { default as AllPaymentsView } from 'src/sections/all-payments/view/all-payments-view';
