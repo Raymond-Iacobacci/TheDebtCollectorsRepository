@@ -17,6 +17,7 @@ export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 export const LandingPage = lazy(() => import('src/pages/landing'));
 export const PaymentsHistory = lazy(() => import ('src/pages/payments-history'));
+export const AllPaymentsView = lazy(() => import ('src/pages/all-payments'));
 
 // ----------------------------------------------------------------------
 
@@ -50,7 +51,8 @@ export default function Router() {
             { element: <IndexPage />, index: true },
             { path: 'requests', element: <RequestPage access="manager"/> },
             { path: 'requests/:requestID', element: <RequestDetailsPage /> },
-            {path: 'list-tenants',element: <ListTenant managerID={userID} /> }
+            {path: 'list-tenants',element: <ListTenant managerID={userID} /> },
+            {path: 'all-payments-view', element: <AllPaymentsView managerID={userID}/>}
           ]
         }
       ],

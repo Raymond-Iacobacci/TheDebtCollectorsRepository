@@ -19,15 +19,45 @@ import TablePagination from '@mui/material/TablePagination';
 
 import Scrollbar from 'src/components/scrollbar';
 import Iconify from 'src/components/iconify';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
 
 import TableNoData from '../table-components/table-no-data';
-import UserTableRow from '../table-components/table-row';
+// import UserTableRow from '../table-components/table-row';
 import TenantTableHead from '../table-components/table-head';
 import UserTableToolbar from '../table-components/table-toolbar';
 import TableEmptyRows from '../table-components/table-empty-rows';
 import { emptyRows, applyFilter, getComparator } from '../hooks/utils';
 
+function TenantTableRow({ id, name, email, address, onClick }) {
+
+    return (
+        <TableRow hover tabIndex={-1} role="checkbox" onClick={onClick}>
+            <TableCell id="id">{ }</TableCell>
+
+            <TableCell id="email">{email}</TableCell>
+
+            <TableCell id="name">{name}</TableCell>
+
+            <TableCell id="address">{address}</TableCell>
+        </TableRow>
+    );
+}
+
+TenantTableRow.propTypes = {
+    id: PropTypes.any,
+    name: PropTypes.any,
+    email: PropTypes.any,
+    address: PropTypes.any,
+    onClick: PropTypes.func,
+};
+
 export default function ListTenantView({ managerID }) {
+    // const [selectedTenant, setSelectedTenant] = useState(null);
+    const [paymentAmount, setPaymentAmount] = useState('');
+
+    const [tenantRow, setTenantRow] = useState(null);
+    const [openPayment, setOpenPayment] = useState(false);
     const [open, setOpen] = useState(false);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -41,6 +71,8 @@ export default function ListTenantView({ managerID }) {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [page, setPage] = useState(0);
     const [rent, setRent] = useState('');
+    const [type, setType] = useState('');
+    // const [dueDate, setDueDate] = useState('');
 
     useEffect(() => {
         console.log('this is the manager ID:', managerID);
@@ -49,7 +81,6 @@ export default function ListTenantView({ managerID }) {
                 fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/get-tenants?manager-id=${managerID}`)
                     .then((res) => res.json())
                     .then((data) => {
-                        console.log('THIS S DATA', data);
                         setTenants(data);
                     });
             } catch (error) {
@@ -59,12 +90,47 @@ export default function ListTenantView({ managerID }) {
         fetchTenants();
     }, [managerID]);
 
+    // const handleDueDateChange = (event) => {
+    //     setDueDate(event.target.value);
+    // };
+    const handleTypeChange = (event) => {
+        setType(event.target.value);
+    }
+    const handlePaymentAmountChange = (event) => {
+        setPaymentAmount(event.target.value);
+    };
+    // const handlePaymentSubmit = () => {
+    //     // some stuff here
+    //     handlePopupClose();
+    // }
     const openPopup = () => {
         setOpen(true);
     };
     const handleClose = () => {
         setOpen(false);
     };
+    const handlePaymentSubmit = async () => {
+        // Should call an API here
+        console.log(tenantRow.email);
+        console.log(type);
+        console.log(paymentAmount);
+        await fetch(
+            `${import.meta.env.VITE_MIDDLEWARE_URL}/manager/create-payment?manager-id=${managerID}`,
+            {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: `${tenantRow.email}`,
+                    type: `${type}`,
+                    amount: `${paymentAmount}`,
+                }),
+            }
+        );
+        setOpenPayment(false);
+    }
     const handleFilterByName = (event) => {
         setPage(0);
         setFilterName(event.target.value);
@@ -108,15 +174,28 @@ export default function ListTenantView({ managerID }) {
         console.log('this is the row', row);
         const fullName = `${row.firstName} ${row.lastName}`;
         return (
-            <UserTableRow
+            <TenantTableRow
                 key={row.email}
                 id={row.firstName + row.lastName}
                 email={row.email}
                 name={fullName}
                 address={row.address}
                 rent={row.rent}
+                onClick={() => handleRowClick(row)}
             />
         );
+    };
+    const handleRowClick = async (tenant) => {
+        // setSelectedTenant(tenant);
+        setTenantRow(tenant);
+        setOpenPayment(true);
+
+    };
+    const handlePaymentClose = () => {
+        // setSelectedTenant('');
+        // setDueDate('');
+        setPaymentAmount('');
+        setOpenPayment(false);
     };
     const dataFiltered = applyFilter({
         inputData: tenants,
@@ -142,6 +221,29 @@ export default function ListTenantView({ managerID }) {
                     Create Tenant
                 </Button>
             </Stack>
+            <Dialog open={openPayment} onClose={handlePaymentClose} sx={{ textAlign: 'center' }}>
+                <DialogTitle id="alert-dialog-title">Fill Payment Details</DialogTitle>
+                <Box sx={{ padding: '20px' }}>
+                    <TextField
+                        value={type}
+                        label="Type"
+                        onChange={handleTypeChange}
+                        sx={{ marginBottom: '10px' }}
+                    />
+                    <TextField
+                        value={paymentAmount}
+                        label="Payment Amount"
+                        onChange={handlePaymentAmountChange}
+                        sx={{ marginBottom: '10px' }}
+                    />
+                    <Button
+                        variant="contained"
+                        onClick={handlePaymentSubmit}
+                    >
+                        Create Payment
+                    </Button>
+                </Box>
+            </Dialog>
             <Dialog open={open} onClose={handleClose} sx={{ textAlign: 'center' }}>
                 <Grid container justifyContent="center">
                     <Grid>
@@ -184,11 +286,7 @@ export default function ListTenantView({ managerID }) {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField
-                                    value={rent}
-                                    label="Rent"
-                                    onChange={(e) => setRent(e.target.value)}
-                                />
+                                <TextField value={rent} label="Rent" onChange={(e) => setRent(e.target.value)} />
                             </Grid>
                             <Grid item xs={12} sx={{ marginTop: '20px' }}>
                                 <Button component="label" variant="contained" onClick={createTenant}>

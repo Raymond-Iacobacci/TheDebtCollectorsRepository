@@ -3,6 +3,8 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
 import Dialog from '@mui/material/Dialog';
+// import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
 // import Button from '@mui/material/Button';
 import Grid from '@mui/material/Unstable_Grid2';
 import TextField from '@mui/material/TextField';
@@ -13,9 +15,14 @@ import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import { useState, useEffect } from 'react';
 import Scrollbar from 'src/components/scrollbar';
+
+// import Iconify from 'src/components/iconify';
+
+import TableNoData from '../table-components/table-no-data';
 import PaymentTableRow from '../table-components/table-row';
 import PaymentTableHead from '../table-components/table-head';
 import TableEmptyRows from '../table-components/table-empty-rows';
+import UserTableToolbar from '../table-components/table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../hooks/utils';
 
 export default function AllPaymentsView({ managerID }) {
@@ -28,13 +35,18 @@ export default function AllPaymentsView({ managerID }) {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [orderBy, setOrderBy] = useState('');
     const [order, setOrder] = useState('asc');
-    const [filterName] = useState('');
-
+    const [tenantID] = useState('');
+    // const [tenants] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [filterName, setFilterName] = useState('');
 
     useEffect(() => {
         const fetchPayments = async () => {
             try {
-                fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/get-payments?manager-id=${managerID}`)
+                fetch(
+                    `${import.meta.env.VITE_MIDDLEWARE_URL}/manager/get-tenant-payments?manager-id=${managerID}`
+                )
                     .then((res) => res.json())
                     .then((data) => {
                         setPayments(data);
@@ -45,15 +57,28 @@ export default function AllPaymentsView({ managerID }) {
         };
         fetchPayments();
     }, [managerID]);
-
+    const handleFilterByName = (event) => {
+        setPage(0);
+        setFilterName(event.target.value);
+    };
+    // TODO: address
     const tableValues = (row) => {
-        const temp = <PaymentTableRow key={row.paymentsID} id={row.firstName + row.lastName} tenantID={tenantID} paymentsID={row.paymentsID} type={row.type} time={row.time} amount={row.amount} name={`${row.firstName} ${row.lastName}`} />
+        const temp = (
+            <PaymentTableRow
+                key={row.paymentsID}
+                id={`${row.firstName} ${row.lastName}`}
+                tenantID={row.tenantID}
+                paymentsID={row.paymentsID}
+                type={row.type}
+                time={row.time}
+                amount={row.amount}
+                name={`${row.firstName} ${row.lastName}`}
+            />
+        );
         console.log(`This is the temp:`);
         console.log(temp);
         // setPayments(temp[0]);
-        return (
-            temp
-        );
+        return temp;
     };
     const handleChangeRowsPerPage = (event) => {
         setPage(0);
@@ -70,26 +95,23 @@ export default function AllPaymentsView({ managerID }) {
         { id: 'action', label: '' },
     ];
     const createPayment = async () => {
-        await fetch(
-            `${import.meta.env.VITE_MIDDLEWARE_URL}/manager/create-payment`,
-            {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    tenantID: `${tenantID}`,
-                    type: `${type}`,
-                    amount: `${amount}`,
-                }),
-            }
-        );
+        await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/create-payment`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tenantID: `${tenantID}`,
+                type: `${type}`,
+                amount: `${amount}`,
+            }),
+        });
         handleClose();
     };
-    const openPopup = () => {
-        setOpen(true);
-    };
+    // const openPopup = () => {
+    //     setOpen(true);
+    // };
     const handleSort = (event, id) => {
         const isAsc = orderBy === id && order === 'asc';
         if (id !== '') {
@@ -97,16 +119,19 @@ export default function AllPaymentsView({ managerID }) {
             setOrderBy(id);
         }
     };
+    const handleClose = () => {
+        setOpen(false);
+    };
 
     const dataFiltered = applyFilter({
-        inputData: tenants,
+        inputData: payments,
         comparator: getComparator(order, orderBy),
         filterName,
     });
 
     return (
         <Container>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+            {/* <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                 <Typography variant="h4">Tenants</Typography>
                 <Button
                     variant="contained"
@@ -116,7 +141,7 @@ export default function AllPaymentsView({ managerID }) {
                 >
                     Create Payment
                 </Button>
-            </Stack>
+            </Stack> */}
             <Dialog open={open} onClose={handleClose} sx={{ textAlign: 'center' }}>
                 <div>
                     <Typography variant="h4">Payments</Typography>
@@ -143,7 +168,7 @@ export default function AllPaymentsView({ managerID }) {
                             <Grid item xs={12}>
                                 <TextField
                                     value={type}
-                                    label="Job"
+                                    label="Task"
                                     onChange={(e) => setType(e.target.value)}
                                     sx={{ marginBottom: '10px' }}
                                 />

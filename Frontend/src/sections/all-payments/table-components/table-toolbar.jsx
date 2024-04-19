@@ -11,7 +11,7 @@ import Iconify from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
-export default function TenantTableToolbar({ numSelected, filterName, onFilterName }) {
+export default function PaymentTableToolbar({ numSelected, filterName, onFilterName }) {
   return (
     <Toolbar
       sx={{
@@ -62,7 +62,7 @@ export default function TenantTableToolbar({ numSelected, filterName, onFilterNa
   );
 }
 
-TenantTableToolbar.propTypes = {
+PaymentTableToolbar.propTypes = {
   numSelected: PropTypes.number,
   filterName: PropTypes.string,
   onFilterName: PropTypes.func,
