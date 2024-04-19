@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
 import Dialog from '@mui/material/Dialog';
-// import Stack from '@mui/material/Stack';
+import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 // import Button from '@mui/material/Button';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -131,17 +131,9 @@ export default function AllPaymentsView({ managerID }) {
 
     return (
         <Container>
-            {/* <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-                <Typography variant="h4">Tenants</Typography>
-                <Button
-                    variant="contained"
-                    color="inherit"
-                    startIcon={<Iconify icon="eva:plus-fill" />}
-                    onClick={openPopup}
-                >
-                    Create Payment
-                </Button>
-            </Stack> */}
+            <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+                <Typography variant="h4">Payments</Typography>
+            </Stack>
             <Dialog open={open} onClose={handleClose} sx={{ textAlign: 'center' }}>
                 <div>
                     <Typography variant="h4">Payments</Typography>

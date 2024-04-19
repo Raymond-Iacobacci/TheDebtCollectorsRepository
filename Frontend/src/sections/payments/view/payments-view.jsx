@@ -4,6 +4,7 @@ import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
 import Dialog from '@mui/material/Dialog';
 // import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Unstable_Grid2';
 import TextField from '@mui/material/TextField';
 import Container from '@mui/material/Container';
@@ -53,7 +54,7 @@ export default function PaymentsView({ tenantID }) {
     // };
     // function removePayment(paymentID){
     //     payments.filter(payment => payment.paymentsID === paymentID);
-        
+
     // }
     const dataFiltered = applyFilter({
         inputData: payments,
@@ -62,7 +63,7 @@ export default function PaymentsView({ tenantID }) {
     });
     const tableValues = (row) => {
         console.log('this is the payment ID', row.paymentsID);
-        const temp = <PaymentTableRow key={row.paymentsID} tenantID={tenantID} paymentsID={row.paymentsID} type={row.type} time={row.time} amount={row.amount}/>
+        const temp = <PaymentTableRow key={row.paymentsID} tenantID={tenantID} paymentsID={row.paymentsID} type={row.type} time={row.time} amount={row.amount} />
         console.log(`This is the temp:`);
         console.log(temp);
         // setPayments(temp[0]);
@@ -81,7 +82,7 @@ export default function PaymentsView({ tenantID }) {
         { id: 'type', label: 'Task Name' },
         { id: 'time', label: 'Due Date' },
         { id: 'amount', label: 'Amount Due' },
-        { id: 'action', label: ''},
+        { id: 'action', label: '' },
     ];
     const handleSort = (event, id) => {
         const isAsc = orderBy === id && order === 'asc';
@@ -102,6 +103,9 @@ export default function PaymentsView({ tenantID }) {
     // payBill needs to be implemented with APIs
     return (
         <Container>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+                <Typography variant="h4">Pending Payments</Typography>
+            </Stack>
             <Dialog open={open} onClose={handleClose} sx={{ textAlign: 'center' }}>
                 <div>
                     <Typography variant="h4">Payments</Typography>

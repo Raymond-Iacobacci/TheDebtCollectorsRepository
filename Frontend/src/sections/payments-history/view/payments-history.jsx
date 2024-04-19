@@ -4,6 +4,7 @@ import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
 import Dialog from '@mui/material/Dialog';
 // import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Unstable_Grid2';
 import TextField from '@mui/material/TextField';
 import Container from '@mui/material/Container';
@@ -55,7 +56,7 @@ export default function PaymentsHistoryView({ tenantID }) {
     });
     const tableValues = (row) => {
         console.log('this is the payment ID', row.paymentsID);
-        const temp = <PaymentTableRow key={row.paymentsID} tenantID={tenantID} paymentsID={row.paymentsID} type={row.type} time={row.time} amount={row.amount}/>
+        const temp = <PaymentTableRow key={row.paymentsID} tenantID={tenantID} paymentsID={row.paymentsID} type={row.type} time={row.time} amount={row.amount} />
         console.log(`This is the temp:`);
         console.log(temp);
         // setPayments(temp[0]);
@@ -74,7 +75,7 @@ export default function PaymentsHistoryView({ tenantID }) {
         { id: 'type', label: 'Task Name' },
         { id: 'time', label: 'Date Paid' },
         { id: 'amount', label: 'Amount Paid' },
-        { id: 'action', label: ''},
+        { id: 'action', label: '' },
     ];
     const handleSort = (event, id) => {
         const isAsc = orderBy === id && order === 'asc';
@@ -85,6 +86,9 @@ export default function PaymentsHistoryView({ tenantID }) {
     };
     return (
         <Container>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+                <Typography variant="h4">Payments</Typography>
+            </Stack>
             <Dialog open={open} onClose={handleClose} sx={{ textAlign: 'center' }}>
                 <div>
                     <Typography variant="h4">Payments</Typography>
