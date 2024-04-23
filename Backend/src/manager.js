@@ -1,43 +1,41 @@
 const express = require('express');
 const managerRouter = express.Router();
-const { selectQuery, insertQuery } = require('./db');
-const sendEmail = require('./sendEmail');
+const { selectQuery, insertQuery, uuidToString } = require('./db');
+const { sendMessage } = require('./sendMessage')
 
 managerRouter.use(express.json());
 
-managerRouter.get('/get-pending-tenants', async (req, res) => {
-    try {
+const intervalMinutes = 1;
+const interval = intervalMinutes * 60000;
+const i = 10000
+const timerID = setInterval(fillRentPayments, interval);
+
+async function fillRentPayments(){  
+    const tenantPayments = await selectQuery(`SELECT * FROM tenants where rents IS NOT NULL`);
+    for (const payment of tenantPayments) {
+        const { rents, type, tenantID } = payment;
+        const time = getDate();
+        await insertQuery("INSERT INTO paymentsDue (time, amount, type, tenantID) VALUES (?, ?, ?, ?)", [time, rents, 'Rent', tenantID]);
+    }
+    console.log(tenantPayments);
+}
+
+managerRouter.get('/get-tenant-payments', async(req, res) => {
+    try{
         const managerID = '0x' + req.query['manager-id'];
-        const managerResults = await selectQuery(`SELECT managerEmail from managers where managerID = ${managerID};`);
-        const pendingTenants = [];
-
-        if (!managerResults) {
-            res.send('managerID not found').end();
-            return;
+        const tenantsQuery = await selectQuery(`SELECT firstName, lastName, address, amount, type, p.tenantID, time FROM paymentsDue p INNER JOIN tenants t ON p.tenantID = t.tenantID WHERE t.managerID =${managerID};`);
+        for(let tenant of tenantsQuery){
+            tenant.tenantID = tenant.tenantID.toString('hex').toUpperCase();
         }
-
-        const manager = managerResults[0];
-        const managerEmail = manager.email;
-
-        const pendingTenantsObjects = await selectQuery(`SELECT tenantEmail, firstName, lastName from pendingTenants where managerEmail = ${managerEmail};`);
-
-        if (!pendingTenantsObjects) {
-            res.send('No pending tenants found').end();
-            return;
-        }
-
-        for(const pendingTenant of pendingTenantsObjects){
-            pendingTenants.push({
-                tenantEmail: pendingTenant.tenantEmail,
-                firstName: pendingTenant.firstName,
-                lastName: pendingTenant.lastName
-              });
-        }
-        res.send(pendingTenants);
-    } catch (error) {
-        res.status(500).json({ error: 'Error retrieving data' });
+        res.send(tenantsQuery);
+    }catch(error){
+        res.status(500).json({ error: error.message });
     }
 });
+function getDate(){
+    const moment = require('moment-timezone');
+    return moment().tz('America/Los_Angeles').format();
+}
 
 managerRouter.post('/create-tenant', async(req,res) => {
     try{
@@ -45,30 +43,76 @@ managerRouter.post('/create-tenant', async(req,res) => {
         const lastName = req.body.lastName;
         const email = req.body.email;
         const address = req.body.address;
+        const monthlyRent = req.body.monthlyRent;
+        const monthlyUtilites = req.body.monthlyUtilities;
         const managerId = req.query['manager-id'];
         const managerResult = await selectQuery(`SELECT firstName,lastName FROM managers where managerID = ${'0x' + managerId};`);
 
-        // //const managerEmail = null;
+        const currentDate = getDate();
+        //const timestamp = currentDate.getTime();
 
-        // /**
-        //  * Send email notifying tenant of account creation.
-        //  */
-        const emailText = "You have been added as a new tenant to property " + address + " by " + managerResult[0].firstName + " " + managerResult[0].lastName;
-        const emailResults = sendEmail(email, "New Tenant", emailText, (error) =>{
-            if(error){
-                console.log('before');
-                throw new Error(error);
-            }
-            console.log('after');
-        });
-
-        const query = "INSERT INTO tenants (firstName, lastName, email, address, managerID) VALUES (?, ?, ?, ?, ?);";
-        const values = [firstName, lastName, email, address, Buffer.from(managerId,'hex')];
+        const query = "INSERT INTO tenants (firstName, lastName, email, address, managerID, rents, utilities) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        const values = [firstName, lastName, email, address, Buffer.from(managerId,'hex'), monthlyRent, monthlyUtilites];
         await insertQuery(query, values);
-        res.send(emailResults);
+
+        const phoneNumber = '+19169456130';
+        const message = `Hello ${firstName} ${lastName} welcome to the DebtCollectors.`;
+    
+        sendMessage(phoneNumber, message)
+            .then(() => {
+                res.json({ message: 'SMS sent successfully' });
+            })
+            .catch(err => {
+                res.status(500).json({ message: err });
+            });
+
     }catch(error){
         res.status(500).json({ error: error.message });
     }
 });
+
+managerRouter.post('/create-payment', async(req, res) =>{
+    try{
+        const email = req.body.email;
+        const type = req.body.type;
+        const amount = req.body.amount;
+        const currentDate = getDate();
+        const tenantID = await selectQuery(`SELECT tenantID from tenants where email='${email}'`);
+        const query = "INSERT INTO paymentsDue (type, time, amount, tenantID) VALUES (?, ?, ?, ?)";
+        const values = [type, currentDate, amount, tenantID[0].tenantID ];
+        await insertQuery(query, values);
+
+        const phoneNumber = '+14087096202';
+        const message = `Hello you have $${amount} due by ${currentDate}`;
+        
+        sendMessage(phoneNumber, message)
+        .then(() => {
+            res.json({ message: 'SMS sent successfully' });
+        })
+        .catch(err => {
+            res.status(500).json({ message: err });
+        });
+    }catch(error){
+        res.status(500).json({error: error.message});
+    }
+});
+
+managerRouter.get('/get-tenants', async(req,res) => {
+    try{
+        const managerID = req.query['manager-id'];
+        const tenantsList = await selectQuery(`SELECT firstName, lastName, email, address from tenants where managerID = ${'0x' + managerID}`);
+        const formattedData = tenantsList.map(row => ({
+            firstName: row.firstName,
+            lastName: row.lastName,
+            email: row.email,
+            address: row.address
+          }));
+        res.send(formattedData);  
+    }catch(error){
+        res.status(500).json({error: error.message});
+    }
+   
+});
+
 
 module.exports = managerRouter;

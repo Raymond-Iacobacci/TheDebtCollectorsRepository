@@ -5,10 +5,9 @@ const usersRouter = require('./users');
 const requestsRouter = require('./requests');
 const homeRouter = require('./home')
 const managerRouter = require('./manager')
+const tenantRouter = require('./tenant');
 
 require('dotenv').config({ path: '../.env' });
-const sendEmail = require('./sendEmail');
-const crypto = require('crypto');
 const { insertQuery } = require('./db');
 
 const app = express();
@@ -22,21 +21,7 @@ app.use('/users', usersRouter);
 app.use('/requests', requestsRouter);
 app.use('/home', homeRouter);
 app.use('/manager', managerRouter);
-
-app.get('/send-email', (req, res) => {
-    const emailToken = crypto.randomBytes(20).toString('hex');
-    const oauthLink = `https://thedebtcollectorstest-kxfzqfz2rq-uc.a.run.app/auth/login?oauth_token=${emailToken}`;
-    const subject = 'Create a DebtCollectors Account';
-    const text = "Your manager has invited you to create a DebtCollectors Account:\n\n" + "Link: " + oauthLink;
-
-    sendEmail('ajay.talanki@gmail.com', subject, text, (err) => {
-        if (err) {
-            res.status(500).json({ message: 'Failed to send email' });
-        } else {
-            res.json({ message: 'Email sent successfully' });
-        }
-    });
-});
+app.use('/tenant', tenantRouter);
 
 app.put('/update-profile-pic', async (req, res) => {
     try {
