@@ -3,8 +3,9 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
 import Dialog from '@mui/material/Dialog';
-// import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+// import Button from '@mui/material/Button';
 import Grid from '@mui/material/Unstable_Grid2';
 import TextField from '@mui/material/TextField';
 import Container from '@mui/material/Container';
@@ -14,12 +15,17 @@ import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import { useState, useEffect } from 'react';
 import Scrollbar from 'src/components/scrollbar';
+
+// import Iconify from 'src/components/iconify';
+
+import TableNoData from '../table-components/table-no-data';
 import PaymentTableRow from '../table-components/table-row';
 import PaymentTableHead from '../table-components/table-head';
 import TableEmptyRows from '../table-components/table-empty-rows';
+import UserTableToolbar from '../table-components/table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../hooks/utils';
 
-export default function PaymentsView({ tenantID }) {
+export default function AllPaymentsView({ managerID }) {
     const [open, setOpen] = useState(false);
     const [time, setTime] = useState('');
     const [amount, setAmount] = useState('');
@@ -29,12 +35,18 @@ export default function PaymentsView({ tenantID }) {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [orderBy, setOrderBy] = useState('');
     const [order, setOrder] = useState('asc');
-    const [filterName] = useState('');
+    const [tenantID] = useState('');
+    // const [tenants] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [filterName, setFilterName] = useState('');
 
     useEffect(() => {
         const fetchPayments = async () => {
             try {
-                fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/get-payments?tenant-id=${tenantID}`)
+                fetch(
+                    `${import.meta.env.VITE_MIDDLEWARE_URL}/manager/get-tenant-payments?manager-id=${managerID}`
+                )
                     .then((res) => res.json())
                     .then((data) => {
                         setPayments(data);
@@ -44,32 +56,29 @@ export default function PaymentsView({ tenantID }) {
             }
         };
         fetchPayments();
-    }, [tenantID]);
-    // *** May warrant deletion *** //
-    const handleClose = () => {
-        setOpen(false);
+    }, [managerID]);
+    const handleFilterByName = (event) => {
+        setPage(0);
+        setFilterName(event.target.value);
     };
-    // const openPopup = () => {
-    //     setOpen(true);
-    // };
-    // function removePayment(paymentID){
-    //     payments.filter(payment => payment.paymentsID === paymentID);
-
-    // }
-    const dataFiltered = applyFilter({
-        inputData: payments,
-        comparator: getComparator(order, orderBy),
-        filterName,
-    });
+    // TODO: address
     const tableValues = (row) => {
-        console.log('this is the payment ID', row.paymentsID);
-        const temp = <PaymentTableRow key={row.paymentsID} tenantID={tenantID} paymentsID={row.paymentsID} type={row.type} time={row.time} amount={row.amount} />
+        const temp = (
+            <PaymentTableRow
+                key={row.paymentsID}
+                id={`${row.firstName} ${row.lastName}`}
+                tenantID={row.tenantID}
+                paymentsID={row.paymentsID}
+                type={row.type}
+                time={row.time}
+                amount={row.amount}
+                name={`${row.firstName} ${row.lastName}`}
+            />
+        );
         console.log(`This is the temp:`);
         console.log(temp);
         // setPayments(temp[0]);
-        return (
-            temp
-        );
+        return temp;
     };
     const handleChangeRowsPerPage = (event) => {
         setPage(0);
@@ -79,11 +88,30 @@ export default function PaymentsView({ tenantID }) {
         setPage(newPage);
     };
     const tableLabels = [
+        { id: 'tenant', label: 'Tenant Name' },
         { id: 'type', label: 'Task Name' },
         { id: 'time', label: 'Due Date' },
         { id: 'amount', label: 'Amount Due' },
         { id: 'action', label: '' },
     ];
+    const createPayment = async () => {
+        await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/create-payment`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tenantID: `${tenantID}`,
+                type: `${type}`,
+                amount: `${amount}`,
+            }),
+        });
+        handleClose();
+    };
+    // const openPopup = () => {
+    //     setOpen(true);
+    // };
     const handleSort = (event, id) => {
         const isAsc = orderBy === id && order === 'asc';
         if (id !== '') {
@@ -91,20 +119,20 @@ export default function PaymentsView({ tenantID }) {
             setOrderBy(id);
         }
     };
-    // const handleFilterByName = (event) => {
-    //     setPage(0);
-    //     setFilterName(event.target.value);
-    // };
-    // const payBill = async () => {
-    //     await fetch (
-    //         `${impo}`
-    //     )
-    // }
-    // payBill needs to be implemented with APIs
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const dataFiltered = applyFilter({
+        inputData: payments,
+        comparator: getComparator(order, orderBy),
+        filterName,
+    });
+
     return (
         <Container>
             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-                <Typography variant="h4">Pending Payments</Typography>
+                <Typography variant="h4">Payments</Typography>
             </Stack>
             <Dialog open={open} onClose={handleClose} sx={{ textAlign: 'center' }}>
                 <div>
@@ -115,8 +143,24 @@ export default function PaymentsView({ tenantID }) {
                         <Box sx={{ padding: '20px' }}>
                             <Grid item xs={12}>
                                 <TextField
+                                    value={firstName}
+                                    label="First Name"
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                    sx={{ marginBottom: '10px' }}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    value={lastName}
+                                    label="Last Name"
+                                    onChange={(e) => setLastName(e.target.value)}
+                                    sx={{ marginBottom: '10px' }}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
                                     value={type}
-                                    label="Job"
+                                    label="Task"
                                     onChange={(e) => setType(e.target.value)}
                                     sx={{ marginBottom: '10px' }}
                                 />
@@ -137,16 +181,19 @@ export default function PaymentsView({ tenantID }) {
                                     sx={{ marginBottom: '10px' }}
                                 />
                             </Grid>
-                            {/* <Grid item xs={12} sx={{ marginTop: '20px' }}>
-                                    <Button component="label" variant="contained" onClick={payBill}>
-                                        Submit
-                                    </Button>
-                                </Grid> */}
+                            <Grid item xs={12} sx={{ marginTop: '20px' }}>
+                                <Button component="label" variant="contained" onClick={createPayment}>
+                                    Submit
+                                </Button>
+                            </Grid>
                         </Box>
                     </Grid>
                 </Grid>
             </Dialog>
+
             <Card>
+                <UserTableToolbar filterName={filterName} onFilterName={handleFilterByName} />
+
                 <Scrollbar>
                     <TableContainer sx={{ overflow: 'unset' }}>
                         <Table sx={{ minWidth: 800 }}>
@@ -154,7 +201,7 @@ export default function PaymentsView({ tenantID }) {
                                 order={order}
                                 orderBy={orderBy}
                                 rowCount={payments.length}
-                                onPaymentSort={handleSort}
+                                onTenantSort={handleSort}
                                 headLabel={tableLabels}
                             />
                             <TableBody>
@@ -167,9 +214,9 @@ export default function PaymentsView({ tenantID }) {
                                     emptyRows={emptyRows(page, rowsPerPage, payments.length)}
                                 />
 
-                                {/* {filterName !== '' && dataFiltered.length === 0 && (
+                                {filterName !== '' && dataFiltered.length === 0 && (
                                     <TableNoData query={filterName} />
-                                )} */}
+                                )}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -188,7 +235,7 @@ export default function PaymentsView({ tenantID }) {
         </Container>
     );
 }
-PaymentsView.propTypes = {
-    // paymentID: PropTypes.string,
-    tenantID: PropTypes.string,
+
+AllPaymentsView.propTypes = {
+    managerID: PropTypes.string,
 };

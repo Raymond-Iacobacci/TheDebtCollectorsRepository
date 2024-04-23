@@ -19,7 +19,7 @@ import PaymentTableHead from '../table-components/table-head';
 import TableEmptyRows from '../table-components/table-empty-rows';
 import { emptyRows, applyFilter, getComparator } from '../hooks/utils';
 
-export default function PaymentsView({ tenantID }) {
+export default function PaymentsHistoryView({ tenantID }) {
     const [open, setOpen] = useState(false);
     const [time, setTime] = useState('');
     const [amount, setAmount] = useState('');
@@ -34,7 +34,7 @@ export default function PaymentsView({ tenantID }) {
     useEffect(() => {
         const fetchPayments = async () => {
             try {
-                fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/get-payments?tenant-id=${tenantID}`)
+                fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/get-payment-history?tenant-id=${tenantID}`)
                     .then((res) => res.json())
                     .then((data) => {
                         setPayments(data);
@@ -49,13 +49,6 @@ export default function PaymentsView({ tenantID }) {
     const handleClose = () => {
         setOpen(false);
     };
-    // const openPopup = () => {
-    //     setOpen(true);
-    // };
-    // function removePayment(paymentID){
-    //     payments.filter(payment => payment.paymentsID === paymentID);
-
-    // }
     const dataFiltered = applyFilter({
         inputData: payments,
         comparator: getComparator(order, orderBy),
@@ -80,8 +73,8 @@ export default function PaymentsView({ tenantID }) {
     };
     const tableLabels = [
         { id: 'type', label: 'Task Name' },
-        { id: 'time', label: 'Due Date' },
-        { id: 'amount', label: 'Amount Due' },
+        { id: 'time', label: 'Date Paid' },
+        { id: 'amount', label: 'Amount Paid' },
         { id: 'action', label: '' },
     ];
     const handleSort = (event, id) => {
@@ -91,20 +84,10 @@ export default function PaymentsView({ tenantID }) {
             setOrderBy(id);
         }
     };
-    // const handleFilterByName = (event) => {
-    //     setPage(0);
-    //     setFilterName(event.target.value);
-    // };
-    // const payBill = async () => {
-    //     await fetch (
-    //         `${impo}`
-    //     )
-    // }
-    // payBill needs to be implemented with APIs
     return (
         <Container>
             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-                <Typography variant="h4">Pending Payments</Typography>
+                <Typography variant="h4">Payments</Typography>
             </Stack>
             <Dialog open={open} onClose={handleClose} sx={{ textAlign: 'center' }}>
                 <div>
@@ -137,11 +120,6 @@ export default function PaymentsView({ tenantID }) {
                                     sx={{ marginBottom: '10px' }}
                                 />
                             </Grid>
-                            {/* <Grid item xs={12} sx={{ marginTop: '20px' }}>
-                                    <Button component="label" variant="contained" onClick={payBill}>
-                                        Submit
-                                    </Button>
-                                </Grid> */}
                         </Box>
                     </Grid>
                 </Grid>
@@ -167,9 +145,6 @@ export default function PaymentsView({ tenantID }) {
                                     emptyRows={emptyRows(page, rowsPerPage, payments.length)}
                                 />
 
-                                {/* {filterName !== '' && dataFiltered.length === 0 && (
-                                    <TableNoData query={filterName} />
-                                )} */}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -188,7 +163,7 @@ export default function PaymentsView({ tenantID }) {
         </Container>
     );
 }
-PaymentsView.propTypes = {
+PaymentsHistoryView.propTypes = {
     // paymentID: PropTypes.string,
     tenantID: PropTypes.string,
 };

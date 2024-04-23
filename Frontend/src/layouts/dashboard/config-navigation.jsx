@@ -1,7 +1,6 @@
 // import Iconify from 'src/components/iconify';
 import SvgColor from 'src/components/svg-color';
 
-
 // ----------------------------------------------------------------------
 
 const icon = (name) => (
@@ -13,13 +12,13 @@ const navConfig = [
     title: 'dashboard',
     path: '/',
     icon: icon('ic_analytics'),
-    access: 'all'
+    access: 'all',
   },
   {
     title: 'requests',
     path: '/requests',
     icon: icon('ic_user'),
-    access: 'all'
+    access: 'all',
   },
   {
     title: 'Tenants',
@@ -28,11 +27,13 @@ const navConfig = [
     access: 'manager',
   },
   {
-    title: 'Payment',
+    title: 'Make Payments',
     path: '/payments',
     icon: icon('ic_lock'),
     access: 'tenant',
   },
+  { title: 'Payment History', path: '/payments-history', icon: icon('ic_lock'), access: 'tenant' },
+  { title: 'Pending Payments', path: '/all-payments-view', icon: icon('ic_lock'), access: 'manager' },
   // {
   //   title: 'notifications',
   //   path: '/notifications',

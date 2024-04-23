@@ -1,0 +1,1 @@
+export { default as PaymentsHistoryView } from './payments-history';
