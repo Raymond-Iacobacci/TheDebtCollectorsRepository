@@ -32,8 +32,23 @@ const navConfig = [
     icon: icon('ic_lock'),
     access: 'tenant',
   },
-  { title: 'Payment History', path: '/payments-history', icon: icon('ic_lock'), access: 'tenant' },
-  { title: 'Pending Payments', path: '/all-payments-view', icon: icon('ic_lock'), access: 'manager' },
+  { title: 'Payment History', 
+    path: '/payments-history', 
+    icon: icon('ic_lock'),
+     access: 'tenant' 
+  },
+  {
+    title: 'Expenses',
+    path: '/expenses',
+    icon: icon('ic_cart'),
+    access: 'manager',
+  },
+  {
+    title: 'Pending Payments',
+    path: '/all-payments-view',
+    icon: icon('ic_lock'),
+    access: 'manager',
+  },
   // {
   //   title: 'notifications',
   //   path: '/notifications',
