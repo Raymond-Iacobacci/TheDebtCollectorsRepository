@@ -9,7 +9,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
-import { usePathname } from 'src/routes/hooks';
+import { useRouter, usePathname } from 'src/routes/hooks';
 
 import { account } from 'src/_mock/account';
 
@@ -33,7 +33,16 @@ const MENU_OPTIONS = [
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
+
+  const router = useRouter();
   const [open, setOpen] = useState(null);
+
+  const pathname = usePathname();
+  const uuid = pathname.split('/')[3];
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  const [logout, setLogout] = useState(false);
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -41,12 +50,31 @@ export default function AccountPopover() {
 
   const handleClose = () => {
     setOpen(null);
+    setLogout(true);
   };
 
-  const pathname = usePathname();
-  const uuid = pathname.split('/')[3];
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  useEffect( () => {
+    if(logout) {
+      console.log("logout called")
+      const deleteCookie = async () => {
+        try {
+          await fetch(
+            `${import.meta.env.VITE_MIDDLEWARE_URL}/users/remove-token?userID=${uuid}`, {
+              method: 'PUT'
+            }
+          )
+          .then((data) => {
+            console.log(data);
+            router.replace('/');
+            setLogout(false);
+          });
+        } catch (error) {
+          console.log(`deleteCookie API: ${error}`);
+        }
+      };
+      deleteCookie();
+    }
+  }, [logout, uuid, router]);
 
   useEffect(() => {
     const getUserAttributes = async () => {

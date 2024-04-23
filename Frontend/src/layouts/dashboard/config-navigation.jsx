@@ -10,7 +10,7 @@ const icon = (name) => (
 const navConfig = [
   {
     title: 'dashboard',
-    path: '/',
+    path: '/main',
     icon: icon('ic_analytics'),
     access: 'all',
   },
