@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
+import Input from '@mui/material/Input';
 import Dialog from '@mui/material/Dialog';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
@@ -18,10 +19,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import FormControl from '@mui/material/FormControl';
 import DialogActions from '@mui/material/DialogActions';
 import TableContainer from '@mui/material/TableContainer';
+import InputAdornment from '@mui/material/InputAdornment';
 import TablePagination from '@mui/material/TablePagination';
 import CircularProgress from '@mui/material/CircularProgress';
-
-// import { requests } from 'src/_mock/request';
 
 import { usePathname } from 'src/routes/hooks';
 
@@ -30,17 +30,16 @@ import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
 import TableNoData from '../table-components/table-no-data';
-import RequestTableRow from '../table-components/table-row';
-import RequestTableHead from '../table-components/table-head';
+import ExpenseTableRow from '../table-components/table-row';
+import ExpenseTableHead from '../table-components/table-head';
 import UserTableToolbar from '../table-components/table-toolbar';
 import TableEmptyRows from '../table-components/table-empty-rows';
 import { emptyRows, applyFilter, getComparator } from '../hooks/utils';
-import { getManagerRequests } from '../hooks/request-specifics';
+import { addExpense, getRequests, getExpenses } from '../hooks/expense-specifics';
 
 // ----------------------------------------------------------------------
 
 export default function ExpensesView() {
-
   const pathname = usePathname();
   const uuid = pathname.split('/')[3];
 
@@ -55,6 +54,7 @@ export default function ExpensesView() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const [loading, setLoading] = useState(true);
+  const [expenses, setExpenses] = useState([]);
   const [requests, setRequests] = useState([]);
   const [errorMsg, setError] = useState('');
 
@@ -64,23 +64,17 @@ export default function ExpensesView() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        await getManagerRequests(uuid).then((data) => {
+        await getExpenses(uuid).then((data) => {
+          console.log(data);
+          setExpenses(data);
+        });
+        await getRequests(uuid).then((data) => {
           setRequests(data);
         });
-        // if (access === 'manager') {
-        //   await getManagerRequests(uuid).then((data) => {
-        //     setRequests(data);
-        //   });
-        // } else {
-        //   await getTenantRequests(uuid).then((data) => {
-        //     setRequests(data);
-        //     console.log(data);
-        //   });
-        // }
         setLoading(false);
       } catch (error) {
         setError(error.message);
-        console.log(`HeaderInfo API: ${error}`);
+        console.log(`Expenses API: ${error}`);
       }
     };
     fetchData();
@@ -109,7 +103,7 @@ export default function ExpensesView() {
   };
 
   const dataFiltered = applyFilter({
-    inputData: requests,
+    inputData: expenses,
     comparator: getComparator(order, orderBy),
     filterName,
   });
@@ -117,10 +111,11 @@ export default function ExpensesView() {
   const notFound = !dataFiltered.length && !!filterName;
 
   // Dialog popup
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [requestType, setRequestType] = useState('');
-  const [description, setDescription] = useState('');
-  const [imageFile, setImageFile] = useState(null);
+  const [expenseType, setExpenseType] = useState('');
+  const [description, setExpenseDescription] = useState('');
+  const [amount, setExpenseAmount] = useState('');
+  const [expenseRequest, setExpenseRequest] = useState(null);
+  // const [expenseRequestLabel, setExpenseRequestLabel] = useState('');
 
   const handleOpenRequestPopup = () => {
     setRequestPopup(true);
@@ -130,41 +125,24 @@ export default function ExpensesView() {
     setRequestPopup(false);
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setImageFile(file);
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setSelectedImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleChange = (event) => {
+    setExpenseType(event.target.value);
   };
 
-  const handleChange = (event) => {
-    setRequestType(event.target.value);
-  };
+  const handleExpenseRequestChange = (event) => {
+    console.log(event.target.value)
+    setExpenseRequest(event.target.value);
+  }
 
   const handleSubmitRequest = async () => {
-    const formData = new FormData();
-    formData.append('attachment', imageFile);
-    formData.append('type', requestType);
-    formData.append('description', description);
-    await fetch(
-      `${import.meta.env.VITE_MIDDLEWARE_URL}/requests/new?tenant-id=${
-        uuid
-      }`,
-      {
-        method: 'POST',
-        body: formData, // Convert data to JSON string
-      }
-    ).then((data) => {
+    if (expenseType !== 'Maintenance Request') setExpenseRequest(null);
+    await addExpense(uuid, amount, expenseType, expenseRequest, description).then((data) => {
       if (data.ok) {
         console.log('Data posted successfully');
-        setDescription('');
-        setSelectedImage(null);
-        setRequestType();
+        setExpenseDescription('');
+        setExpenseType('');
+        setExpenseAmount('');
+        setExpenseRequest(null);
       } else {
         console.log('Error posting data to backend');
       }
@@ -172,55 +150,36 @@ export default function ExpensesView() {
     handleOpenRequestPopup(false);
   };
 
-  // const tableLabels = (access === 'manager')? 
-  // [
-  //   { id: 'name', label: 'Name' },
-  //   { id: 'address', label: 'Address' },
-  //   { id: 'type', label: 'Type' },
-  //   { id: 'status', label: 'Status' },
-  // ]:[
-  //   { id: 'type', label: 'Type' },
-  //   { id: 'description', label: 'Description' },
-  //   { id: 'date', label: 'Date Requested' },
-  //   { id: 'status', label: 'Status' },
-  // ]
+  const tableLabels = [
+    { id: 'type', label: 'Type' },
+    { id: 'amount', label: 'Amount' },
+    { id: 'description', label: 'Description' },
+    { id: 'date', label: 'Date' },
+  ];
 
-  const tableValues = (row) =>
-    // if( access === 'manager') {
-    //   return <RequestTableRow
-    //     key={row.requestID}
-    //     id={row.requestID}
-    //     avatarUrl={row.avatarUrl}
-    //     name={row.name}
-    //     address={row.address}
-    //     type={row.type}
-    //     status={row.status}
-    //     access={access}
-    //   />
-    // }
-    <RequestTableRow
-      key={row.requestID}
-      id={row.requestID}
-      avatarUrl={row.avatarUrl}
+  const tableValues = (row) => (
+    <ExpenseTableRow
+      key={row.expenseID}
       type={row.type}
+      amount={row.amount}
       description={row.description}
-      date={row.dateRequested}
-      status={row.status}
-      // access={access}
+      date={row.datePosted}
+      request={row.requestID}
     />
+  );
 
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Requests</Typography>
+        <Typography variant="h4">Expenses</Typography>
         <Button
-            variant="contained"
-            color="inherit"
-            startIcon={<Iconify icon="eva:plus-fill" />}
-            onClick={handleOpenRequestPopup}
-          >
-            New Request
-          </Button>
+          variant="contained"
+          color="inherit"
+          startIcon={<Iconify icon="eva:plus-fill" />}
+          onClick={handleOpenRequestPopup}
+        >
+          New Expense
+        </Button>
       </Stack>
 
       <Card>
@@ -229,17 +188,12 @@ export default function ExpensesView() {
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
-              <RequestTableHead
+              <ExpenseTableHead
                 order={order}
                 orderBy={orderBy}
-                rowCount={requests.length}
+                rowCount={expenses.length}
                 onRequestSort={handleSort}
-                headLabel={[
-                  { id: 'name', label: 'Name' },
-                  { id: 'address', label: 'Address' },
-                  { id: 'type', label: 'Type' },
-                  { id: 'status', label: 'Status' },
-                ]}
+                headLabel={tableLabels}
               />
               {loading ? (
                 <Stack direction="column" alignItems="center" spacing={3} sx={{ p: 3 }}>
@@ -261,13 +215,11 @@ export default function ExpensesView() {
                 <TableBody>
                   {dataFiltered
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => (
-                      tableValues(row)
-                    ))}
+                    .map((row) => tableValues(row))}
 
                   <TableEmptyRows
                     height={77}
-                    emptyRows={emptyRows(page, rowsPerPage, requests.length)}
+                    emptyRows={emptyRows(page, rowsPerPage, expenses.length)}
                   />
 
                   {notFound && <TableNoData query={filterName} />}
@@ -280,7 +232,7 @@ export default function ExpensesView() {
         <TablePagination
           page={page}
           component="div"
-          count={requests.length}
+          count={expenses.length}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}
@@ -296,8 +248,56 @@ export default function ExpensesView() {
         fullWidth
         maxWidth="lg"
       >
-        <DialogTitle id="alert-dialog-title">Maintenance request</DialogTitle>
+        <DialogTitle id="alert-dialog-title">Add Expense</DialogTitle>
         <Grid container>
+          <Grid>
+            <FormControl sx={{ m: 1, minWidth: 150 }} size="medium">
+              <InputLabel id="demo-select-small-label">Expense Type</InputLabel>
+              <Select
+                labelId="demo-select-small-label"
+                id="demo-select-small"
+                value={expenseType}
+                label="Expense Type"
+                onChange={handleChange}
+                SelectProps={{ MenuProps: { sx: { maxHeight: 150 } } }}
+              >
+                <MenuItem value="Maintenance Request">Maintenance Request</MenuItem>
+                <MenuItem value="Wages">Wages</MenuItem>
+                <MenuItem value="Mortgage Interest">Mortgage Interest</MenuItem>
+                <MenuItem value="Utilities">Utilities</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl sx={{ m: 1 }}>
+              <InputLabel>Amount</InputLabel>
+              <Input
+                onChange={(e) => {
+                  setExpenseAmount(e.target.value);
+                }}
+                startAdornment={<InputAdornment position="start">$</InputAdornment>}
+              />
+            </FormControl>
+
+            {expenseType === 'Maintenance Request' ? (
+              <FormControl sx={{ m: 1, minWidth: 150 }} size="medium">
+                <InputLabel id="demo-select-small-label">Request</InputLabel>
+                <Select
+                  labelId="demo-select-small-label"
+                  id="demo-select-small"
+                  value={expenseRequest}
+                  label="Expense Type"
+                  onChange={handleExpenseRequestChange}
+                  SelectProps={{ MenuProps: { sx: { maxHeight: 150 } } }}
+                >
+                  {requests.map((req) => (
+                    <MenuItem value={req.requestID}>{`${req.type} for ${req.name}`}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <div />
+            )}
+          </Grid>
           <Grid>
             <Box
               component="form"
@@ -314,56 +314,13 @@ export default function ExpensesView() {
                 variant="outlined"
                 multiline
                 onChange={(e) => {
-                  setDescription(e.target.value);
+                  setExpenseDescription(e.target.value);
                 }}
               />
             </Box>
           </Grid>
           <Grid>
-            <FormControl sx={{ m: 1, minWidth: 150 }} size="medium">
-              <InputLabel id="demo-select-small-label">Request Type</InputLabel>
-              <Select
-                labelId="demo-select-small-label"
-                id="demo-select-small"
-                value={requestType}
-                label="Request Type"
-                onChange={handleChange}
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value="Leakage">Leakage</MenuItem>
-                <MenuItem value="Electrical">Electrical</MenuItem>
-                <MenuItem value="Kitchen">Kitchen</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid>
             <DialogActions>
-              <Grid>
-                {selectedImage && (
-                  <div>
-                    <h2>Selected Image</h2>
-                    <img
-                      src={selectedImage}
-                      alt="Uploaded"
-                      style={{
-                        maxWidth: '50%',
-                        maxHeight: '50%',
-                        display: 'block',
-                        margin: 'auto',
-                      }}
-                    />
-                  </div>
-                )}
-              </Grid>
-              <Grid>
-                <Button component="label" variant="contained">
-                  Upload image
-                  <input type="file" style={{ display: 'none' }} onChange={handleFileChange} />
-                </Button>
-              </Grid>
-
               <Button onClick={handleSubmitRequest} autoFocus>
                 Submit
               </Button>

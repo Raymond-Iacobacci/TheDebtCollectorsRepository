@@ -86,7 +86,6 @@ export default function AccountPopover() {
         .then((data) => {
           setName(`${data.firstName} ${data.lastName}`)
           setEmail(data.email)
-          console.log(data);
         });
       } catch (error) {
         console.log(`get-attributes API: ${error}`);
