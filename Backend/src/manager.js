@@ -121,5 +121,4 @@ managerRouter.get('/get-tenants', async(req,res) => {
    
 });
 
-
 module.exports = managerRouter;

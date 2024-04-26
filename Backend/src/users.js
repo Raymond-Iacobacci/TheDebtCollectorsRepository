@@ -6,10 +6,21 @@ const usersRouter = express.Router();
 usersRouter.use(express.json());
 usersRouter.use(express.urlencoded({ extended: true }));
 
+async function getUserType(userID) {
+  const tenantResults = await selectQuery(`SELECT tenantID FROM tenants WHERE tenantID = ${userID};`);
+  if (tenantResults.length > 0) {
+      return 'tenant';
+  }
+  const managerResults = await selectQuery(`SELECT managerID FROM managers WHERE managerID = ${userID};`);
+  if (managerResults.length > 0) {
+      return 'manager';
+  }
+  return null; 
+}
+
 async function verifyUser(tableName, userID, email, token, res) {
   try {
     const user = await selectQuery(`SELECT ${userID} FROM ${tableName} WHERE email = '${email}';`);
-
     if (!user || user.length === 0) {
       res.status(404).send({ err: "User not found." });
       return;
@@ -25,7 +36,7 @@ usersRouter.put('/login-tenant', async (req, res) => {
   const email = req.query['email'];
   const token = req.body['token'];
   await verifyUser('tenants', 'tenantID', email, token, res);
-});6
+});
 
 usersRouter.put('/login-manager', async (req, res) => {
   const email = req.query['email'];
@@ -35,42 +46,27 @@ usersRouter.put('/login-manager', async (req, res) => {
 
 usersRouter.get('/get-attributes', async (req, res) => {
   const userID = '0x' + req.query['userID'];
-  const userResults = await selectQuery(`SELECT firstName, lastName, email FROM tenants WHERE tenantID = ${userID};`);
-  let user = userResults[0];
-  if(!user){
-    const userResults = await selectQuery(`SELECT firstName, lastName, email FROM managers WHERE managerID = ${userID};`);
-    user = userResults[0];
-    if(!user){
-      res.status(404).send({ err: "User not found." });
-      return;
-    }
+  const userType = await getUserType(userID);
+  if(userType === null){
+    res.status(404).send({ err: "User not found." });
+    return;
   }
-  res.send({
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email
-  })
+  const user = await selectQuery(`SELECT firstName, lastName, email FROM ${userType}s WHERE ${userType}ID = ${userID};`);
+  res.send(user[0]);
 });
 
 usersRouter.get('/verify-token', async (req, res) => {
   const userID = '0x' + req.query['userID'];
   const frontendToken = req.query['token'];
-  let backendToken;
 
-  const tenantTokenResult = await selectQuery(`SELECT token FROM tenants WHERE tenantID = ${userID};`);
-  if (tenantTokenResult.length > 0) {
-    backendToken = tenantTokenResult[0].token;
-  } else {
-    const managerTokenResult = await selectQuery(`SELECT token FROM managers WHERE managerID = ${userID};`);
-    if (managerTokenResult.length > 0) {
-      backendToken = managerTokenResult[0].token;
-    }
-  }
-
-  if (!backendToken) {
+  const userType = await getUserType(userID);
+  if(userType === null){
     res.status(404).send({ err: "User not found." });
     return;
   }
+
+  queryResults = await selectQuery(`SELECT token FROM ${userType}s WHERE ${userType}ID = ${userID};`);
+  const backendToken = queryResults[0].token;
 
   if (frontendToken === backendToken) {
     res.sendStatus(200);
@@ -81,31 +77,14 @@ usersRouter.get('/verify-token', async (req, res) => {
 
 usersRouter.put('/remove-token', async (req, res) => {
   const userID = '0x' + req.query['userID'];
-  let backendToken;
-  let userType;
+  const userType = await getUserType(userID);
 
-  const tenantTokenResult = await selectQuery(`SELECT token FROM tenants WHERE tenantID = ${userID};`);
-  if (tenantTokenResult.length > 0) {
-    backendToken = tenantTokenResult[0].token;
-    userType = 'tenant';
-  } else {
-    const managerTokenResult = await selectQuery(`SELECT token FROM managers WHERE managerID = ${userID};`);
-    if (managerTokenResult.length > 0) {
-      backendToken = managerTokenResult[0].token;
-      userType = 'manager';
-    }
-  }
-
-  if (!backendToken) {
+  if(userType === null){
     res.status(404).send({ err: "User not found." });
     return;
   }
 
-  if (userType === 'tenant') {
-    await selectQuery(`UPDATE tenants SET token = NULL WHERE tenantID = ${userID};`);
-  } else if (userType === 'manager') {
-    await selectQuery(`UPDATE managers SET token = NULL WHERE managerID = ${userID};`);
-  }
+  await selectQuery(`UPDATE ${userType}s SET token = NULL WHERE ${userType}ID = ${userID};`);
   res.sendStatus(200);
 });
 
