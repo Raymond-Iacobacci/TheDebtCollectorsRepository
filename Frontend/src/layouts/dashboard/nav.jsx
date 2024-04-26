@@ -96,9 +96,9 @@ export default function Nav({ openNav, onCloseNav }) {
     </Box>
   );
 
-  const renderMenu = (
+  const renderMenu = (access) => (
     <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
-      {navConfig.map((item) => (
+      {navConfig(access).map((item) => (
         accessMenus(item)
       ))}
     </Stack>
@@ -141,7 +141,7 @@ export default function Nav({ openNav, onCloseNav }) {
 
       {renderAccount}
 
-      {renderMenu}
+      {pathname.includes('/manager') ? renderMenu('manager') : renderMenu('tenant')}
     </Scrollbar>
   );
 

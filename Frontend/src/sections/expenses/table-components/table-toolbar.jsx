@@ -33,7 +33,7 @@ export default function RequestTableToolbar({ numSelected, filterName, onFilterN
         <OutlinedInput
           value={filterName}
           onChange={onFilterName}
-          placeholder="Search request..."
+          placeholder="Search expenses..."
           startAdornment={
             <InputAdornment position="start">
               <Iconify
