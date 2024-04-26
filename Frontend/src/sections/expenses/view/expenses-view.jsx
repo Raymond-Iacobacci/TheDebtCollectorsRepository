@@ -143,11 +143,12 @@ export default function ExpensesView() {
         setExpenseType('');
         setExpenseAmount('');
         setExpenseRequest(null);
-      } else {
+        setRequestPopup(false);
+      } else {  
         console.log('Error posting data to backend');
       }
     });
-    handleOpenRequestPopup(false);
+    handleCloseRequestPopup();
   };
 
   const tableLabels = [
