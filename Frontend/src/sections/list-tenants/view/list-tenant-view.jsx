@@ -72,6 +72,7 @@ export default function ListTenantView({ managerID }) {
     const [page, setPage] = useState(0);
     const [rent, setRent] = useState('');
     const [type, setType] = useState('');
+    const [time, setTime] = useState('');
     // const [dueDate, setDueDate] = useState('');
 
     useEffect(() => {
@@ -88,7 +89,7 @@ export default function ListTenantView({ managerID }) {
             }
         };
         fetchTenants();
-    }, [managerID]);
+    }, [managerID, tenants.length]);
 
     // const handleDueDateChange = (event) => {
     //     setDueDate(event.target.value);
@@ -109,6 +110,9 @@ export default function ListTenantView({ managerID }) {
     const handleClose = () => {
         setOpen(false);
     };
+    const handleTimeChange = (event) => {
+        setTime(event.target.value);
+    }
     const handlePaymentSubmit = async () => {
         // Should call an API here
         console.log(tenantRow.email);
@@ -126,6 +130,7 @@ export default function ListTenantView({ managerID }) {
                     email: `${tenantRow.email}`,
                     type: `${type}`,
                     amount: `${paymentAmount}`,
+                    time: `${time}`,
                 }),
             }
         );
@@ -234,6 +239,12 @@ export default function ListTenantView({ managerID }) {
                         value={paymentAmount}
                         label="Payment Amount"
                         onChange={handlePaymentAmountChange}
+                        sx={{ marginBottom: '10px' }}
+                    />
+                    <TextField
+                        value={time}
+                        label="MM-DD-YYYY"
+                        onChange={handleTimeChange}
                         sx={{ marginBottom: '10px' }}
                     />
                     <Button

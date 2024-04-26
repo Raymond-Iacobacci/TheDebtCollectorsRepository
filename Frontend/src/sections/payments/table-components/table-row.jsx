@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 
 // ----------------------------------------------------------------------
 
-export default function PaymentTableRow({ tenantID, paymentsID, type, time, amount }) {
+export default function PaymentTableRow({ tenantID, paymentsID, type, time, amount, late }) {
   const [isVisible, setIsVisible] = useState(true);
   const handlePay = async () => {
     setIsVisible(false); // Set isVisible to false to trigger the exit animation
@@ -42,6 +42,7 @@ export default function PaymentTableRow({ tenantID, paymentsID, type, time, amou
       <TableCell>{type}</TableCell>
       <TableCell>{time}</TableCell>
       <TableCell>{amount}</TableCell>
+      <TableCell>{late}</TableCell>
       <TableCell>
         <Button variant="contained" onClick={handlePay}>
           Pay
@@ -57,4 +58,5 @@ PaymentTableRow.propTypes = {
   time: PropTypes.any,
   amount: PropTypes.any,
   type: PropTypes.any,
+  late: PropTypes.any,
 };

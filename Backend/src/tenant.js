@@ -8,9 +8,9 @@ tenantRouter.get('/get-payments', async(req, res) =>{
     try {
         tenantID = req.query['tenant-id'];
     
-        paymentsDue = await selectQuery(`SELECT paymentsID, time, amount, type FROM paymentsDue WHERE tenantID=${'0x' + tenantID}`);
+        paymentsDue = await selectQuery(`SELECT paymentsID, time, amount, type, late FROM paymentsDue WHERE tenantID=${'0x' + tenantID}`);
         const result = [];
-        paymentsDue.forEach(function(payment){
+        paymentsDue.forEach(async function(payment){
             const moment = require('moment-timezone');
             // console.log(moment().tz('America/Los_Angeles').format());
 
@@ -19,10 +19,25 @@ tenantRouter.get('/get-payments', async(req, res) =>{
             const currMonth = currTime.month()+1;
             const currDay = currTime.date();
 
-            const month = Number(payment.time.split("T")[0].split("-")[1]);
-            const day = Number(payment.time.split("T")[0].split("-")[2]);
+            const month = Number(payment.time.split("-")[0]);
+            const day = Number(payment.time.split("-")[1]);
+            const year = Number(payment.time.split('-')[2]);
+            const formattedDAta = moment().hour(0).day(day.toString().padStart(2, '0'))
+            .month(month.toString().padStart(2, '0')).year(year);
             if(currMonth == month){
                 if(currDay <= day){
+                    payment.time = `${month}-${day}-${year}`
+                    result.push(payment);
+
+                } else if (formattedDate.diff(currTime, 'days', true) > 5 && payment.late === "NOT LATE") {
+                    payment.time = `${month}-${day}-${year}`
+                    payment.late = "LATE";
+                    result.push(payment);
+                    await executeQuery(`UPDATE paymentsDue SET late="LATE" WHERE paymentsID=${payment.paymentsID}`);
+                    const query = "INSERT INTO paymentsDue (type, time, amount, tenantID) VALUES (?, ?, ?, ?)";
+                    const values = [`Late Fee: ${payment.type}`, currTime.format('MM-DD-YYYY'), 50, Buffer.from(tenantID, 'hex')];
+                    await insertQuery(query, values);
+                } else {
                     result.push(payment);
                 }
             }

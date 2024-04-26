@@ -82,6 +82,7 @@ export default function PaymentsView({ tenantID }) {
         { id: 'type', label: 'Task Name' },
         { id: 'time', label: 'Due Date' },
         { id: 'amount', label: 'Amount Due' },
+        { id: 'late', label: 'Late'},
         { id: 'action', label: '' },
     ];
     const handleSort = (event, id) => {

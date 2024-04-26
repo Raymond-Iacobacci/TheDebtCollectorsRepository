@@ -10,16 +10,16 @@ const interval = intervalMinutes * 60000;
 const i = 10000
 const timerID = setInterval(fillRentPayments, interval);
 
-async function fillRentPayments(){  
-    const tenantPayments = await selectQuery(`SELECT * FROM tenants where rents IS NOT NULL`);
-    for (const payment of tenantPayments) {
-        const { rents, type, tenantID } = payment;
-        const time = getDate();
-        await insertQuery("INSERT INTO paymentsDue (time, amount, type, tenantID) VALUES (?, ?, ?, ?)", [time, rents, 'Rent', tenantID]);
-    }
-    console.log(tenantPayments);
-}
-
+// async function fillRentPayments(){  
+//     const tenantPayments = await selectQuery(`SELECT * FROM tenants where rents IS NOT NULL`);
+//     for (const payment of tenantPayments) {
+//         const { rents, type, tenantID } = payment;
+//         const time = getDate();
+//         await insertQuery("INSERT INTO paymentsDue (time, amount, type, tenantID) VALUES (?, ?, ?, ?)", [time, rents, 'Rent', tenantID]);
+//     }
+//     console.log(tenantPayments);
+// }
+// *** TODO: THIS CODE IS IRRELEVANT *** //
 managerRouter.get('/get-tenant-payments', async(req, res) => {
     try{
         const managerID = '0x' + req.query['manager-id'];
@@ -36,6 +36,13 @@ function getDate(){
     const moment = require('moment-timezone');
     return moment().tz('America/Los_Angeles').format();
 }
+function getDatePayment(dateString) {
+    const moment = require('moment-timezone');
+    const parts = dateString.split('-');
+    let formattedDate = parts[2] + '-' + parths[0].padStart(2, '0') + '-' + parts[1].padStart(2, '0');
+    return moment(formattedDate).tf('America/Los_Angeles').format("MM-DD-YYYY"); // TODO: ISSUE
+}
+
 
 managerRouter.post('/create-tenant', async(req,res) => {
     try{
@@ -55,7 +62,7 @@ managerRouter.post('/create-tenant', async(req,res) => {
         const values = [firstName, lastName, email, address, Buffer.from(managerId,'hex'), monthlyRent, monthlyUtilites];
         await insertQuery(query, values);
 
-        const phoneNumber = '+19169456130';
+        const phoneNumber = '+16502962105';
         const message = `Hello ${firstName} ${lastName} welcome to the DebtCollectors.`;
     
         sendMessage(phoneNumber, message)
@@ -76,13 +83,13 @@ managerRouter.post('/create-payment', async(req, res) =>{
         const email = req.body.email;
         const type = req.body.type;
         const amount = req.body.amount;
-        const currentDate = getDate();
+        const currentDate = getDatePayment(req.body.time);
         const tenantID = await selectQuery(`SELECT tenantID from tenants where email='${email}'`);
         const query = "INSERT INTO paymentsDue (type, time, amount, tenantID) VALUES (?, ?, ?, ?)";
         const values = [type, currentDate, amount, tenantID[0].tenantID ];
         await insertQuery(query, values);
 
-        const phoneNumber = '+14087096202';
+        const phoneNumber = '+16502962105';
         const message = `Hello you have $${amount} due by ${currentDate}`;
         
         sendMessage(phoneNumber, message)
