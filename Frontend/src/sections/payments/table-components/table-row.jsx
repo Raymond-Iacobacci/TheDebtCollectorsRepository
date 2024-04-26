@@ -30,7 +30,6 @@ export default function PaymentTableRow({ tenantID, paymentsID, type, time, amou
       console.log();
     }
   };
-
   return (
     <TableRow
       hover
@@ -38,7 +37,7 @@ export default function PaymentTableRow({ tenantID, paymentsID, type, time, amou
       role="checkbox"
       style={{ display: isVisible ? 'table-row' : 'none', transition: 'opacity 0.5s ease-in-out' }}
     >
-      <TableCell>{paymentsID}</TableCell>
+      <TableCell/>
       <TableCell>{type}</TableCell>
       <TableCell>{time}</TableCell>
       <TableCell>{amount}</TableCell>

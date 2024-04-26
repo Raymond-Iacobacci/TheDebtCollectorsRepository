@@ -7,8 +7,8 @@ managerRouter.use(express.json());
 
 const intervalMinutes = 1;
 const interval = intervalMinutes * 60000;
-const i = 10000
-const timerID = setInterval(fillRentPayments, interval);
+// const i = 10000
+// const timerID = setInterval(fillRentPayments, interval);
 
 // async function fillRentPayments(){  
 //     const tenantPayments = await selectQuery(`SELECT * FROM tenants where rents IS NOT NULL`);
@@ -32,6 +32,7 @@ managerRouter.get('/get-tenant-payments', async(req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 function getDate(){
     const moment = require('moment-timezone');
     return moment().tz('America/Los_Angeles').format();
@@ -42,7 +43,6 @@ function getDatePayment(dateString) {
     let formattedDate = parts[2] + '-' + parths[0].padStart(2, '0') + '-' + parts[1].padStart(2, '0');
     return moment(formattedDate).tf('America/Los_Angeles').format("MM-DD-YYYY"); // TODO: ISSUE
 }
-
 
 managerRouter.post('/create-tenant', async(req,res) => {
     try{

@@ -44,7 +44,7 @@ export default function PaymentsView({ tenantID }) {
             }
         };
         fetchPayments();
-    }, [tenantID]);
+    }, [tenantID, payments.length]);
     // *** May warrant deletion *** //
     const handleClose = () => {
         setOpen(false);
@@ -63,7 +63,7 @@ export default function PaymentsView({ tenantID }) {
     });
     const tableValues = (row) => {
         console.log('this is the payment ID', row.paymentsID);
-        const temp = <PaymentTableRow key={row.paymentsID} tenantID={tenantID} paymentsID={row.paymentsID} type={row.type} time={row.time} amount={row.amount} />
+        const temp = <PaymentTableRow key={row.paymentsID} tenantID={tenantID} paymentsID={row.paymentsID} type={row.type} time={row.time} amount={row.amount} late={row.late}/>
         console.log(`This is the temp:`);
         console.log(temp);
         // setPayments(temp[0]);

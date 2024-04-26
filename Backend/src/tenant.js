@@ -1,5 +1,5 @@
 const express = require('express');
-const { selectQuery, insertQuery, executeQuery } = require('./db');
+const { selectQuery, insertQuery } = require('./db');
 const tenantRouter = express.Router();
 
 tenantRouter.use(express.json());
@@ -12,35 +12,43 @@ tenantRouter.get('/get-payments', async(req, res) =>{
         const result = [];
         paymentsDue.forEach(async function(payment){
             const moment = require('moment-timezone');
-            // console.log(moment().tz('America/Los_Angeles').format());
-
             const currTime = moment().tz('America/Los_Angeles');
 
             const currMonth = currTime.month()+1;
             const currDay = currTime.date();
 
-            const month = Number(payment.time.split("-")[0]);
-            const day = Number(payment.time.split("-")[1]);
-            const year = Number(payment.time.split('-')[2]);
-            const formattedDAta = moment().hour(0).day(day.toString().padStart(2, '0'))
-            .month(month.toString().padStart(2, '0')).year(year);
-            if(currMonth == month){
-                if(currDay <= day){
-                    payment.time = `${month}-${day}-${year}`
-                    result.push(payment);
+            const date = new Date(moment()); // Create a Date object from the string
 
-                } else if (formattedDate.diff(currTime, 'days', true) > 5 && payment.late === "NOT LATE") {
-                    payment.time = `${month}-${day}-${year}`
-                    payment.late = "LATE";
-                    result.push(payment);
-                    await executeQuery(`UPDATE paymentsDue SET late="LATE" WHERE paymentsID=${payment.paymentsID}`);
-                    const query = "INSERT INTO paymentsDue (type, time, amount, tenantID) VALUES (?, ?, ?, ?)";
-                    const values = [`Late Fee: ${payment.type}`, currTime.format('MM-DD-YYYY'), 50, Buffer.from(tenantID, 'hex')];
-                    await insertQuery(query, values);
-                } else {
-                    result.push(payment);
-                }
+            // Get the month, day, and year from the Date object
+            const _month = String(date.getMonth() + 1).padStart(2, '0'); // Add 1 because getMonth() returns a zero-based index
+            const _day = String(date.getDate()).padStart(2, '0');
+            const _year = date.getFullYear();
+            const formattedDate = `${_year}-${_month}-${_day}`;
+            if (payment.time > formattedDate){
+                // payment.time = `${month}-${day}-${year}`
+                payment.late = "NOT LATE"
+                result.push(payment);
+            } else{
+                payment.late = "LATE"
+                result.push(payment)
             }
+            // if(currMonth == month){
+            //     if(currDay <= day){
+            //         payment.time = `${month}-${day}-${year}`
+            //         result.push(payment);
+            //     } else if (formattedDate.diff(currTime, 'days', true) > 5 && payment.late === "NOT LATE") {
+            //         payment.time  = `${month}-${day}-${year}`;
+            //         payment.late = "LATE";
+            //         result.push(payment);
+            //         await selectQuery(`UPDATE paymentsDue SET late='LATE' WHERE paymentsID=${payment.paymentsID}`);
+            //         const query = "INSERT INTO paymentsDue (type, time, amount, tenantID) VALUES (?, ?, ?, ?)";
+            //         const values = [`Late Fee: ${payment.type}`, currTime.format('MM-DD-YYYY'), 50, Buffer.from(tenantID,'hex')];
+            //         const returnVal = await insertQuery(query, values);
+
+            //     } else {
+            //         result.push(payment);
+            //     }
+            // }
 
         });
         res.send(result);
@@ -49,6 +57,7 @@ tenantRouter.get('/get-payments', async(req, res) =>{
         res.status(500).json({ error: error });
     }
 });
+
 tenantRouter.post('/make-payment', async(req, res)=>{
     try{
         const tenantID = req.query['tenant-id'];
