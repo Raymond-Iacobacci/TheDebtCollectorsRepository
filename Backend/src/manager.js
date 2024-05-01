@@ -208,19 +208,19 @@ managerRouter.post("/create-payment", async (req, res) => {
         // console.log(chargeBalance[0].amount-paymentBalance[0].amount)
         let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0);
          balance = Number(amount) + balance;
-        console.log(`BALANCE: ${balance}`);
         const query = "INSERT INTO paymentsLedger (type, description, time, amount, tenantID, balance) VALUES (?, ?, ?, ?, ?, ?)";
         const values = [charge, description, currentDate, amount, tenantID[0].tenantID, balance];
         await insertQuery(query, values);
         
-        const message = `Hello ${firstName} ${lastName} welcome to the DebtCollectors.`;
-        sendEmail(email, 'Test Subject', message)
-            .then(data => {
-                res.send('Email sent successfully:');
-            })
-            .catch(error => {
-                res.send('Error sending email:');
-            });
+        // const message = `Hello ${firstName} ${lastName} welcome to the DebtCollectors.`;
+        // sendEmail(email, 'Test Subject', message)
+        //     .then(data => {
+        //         res.send('Email sent successfully:');
+        //     })
+        //     .catch(error => {
+        //         res.send('Error sending email:');
+        //     });
+        res.send(currentDate);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
