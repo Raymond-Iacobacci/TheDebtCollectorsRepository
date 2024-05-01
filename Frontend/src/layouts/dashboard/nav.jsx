@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import ListItemButton from '@mui/material/ListItemButton';
 
 // import { RouterLink } from 'src/routes/components';
+import { useSearchParams } from "react-router-dom";
 import { useRouter, usePathname } from 'src/routes/hooks';
 
 import { useResponsive } from 'src/hooks/use-responsive';
@@ -95,9 +96,9 @@ export default function Nav({ openNav, onCloseNav }) {
     </Box>
   );
 
-  const renderMenu = (
+  const renderMenu = (access) => (
     <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
-      {navConfig.map((item) => (
+      {navConfig(access).map((item) => (
         accessMenus(item)
       ))}
     </Stack>
@@ -140,7 +141,7 @@ export default function Nav({ openNav, onCloseNav }) {
 
       {renderAccount}
 
-      {renderMenu}
+      {pathname.includes('/manager') ? renderMenu('manager') : renderMenu('tenant')}
     </Scrollbar>
   );
 
@@ -191,17 +192,20 @@ function NavItem({ item }) {
   const router = useRouter();
   const uuid = pathname.split('/')[3];
 
+  const [searchParams ] = useSearchParams();
+  const token = searchParams.get("session");
+
   const active = (`/dashboard/manager/${uuid}/${item.path}/` === pathname) || (`/dashboard/tenant/${uuid}/${item.path}/` === pathname) || (item.path.split('/')[1] === pathname.split('/')[4]);
 
   const handleItemClick = () =>{
     console.log(pathname)
     const isManager = pathname.search("/manager");
     if( isManager !== -1 ) {
-      console.log(`dashboard/manager/${uuid}${item.path}`)
-      router.replace(`/dashboard/manager/${uuid}${item.path}`)
+      console.log(`dashboard/manager/${uuid}${item.path}?session=${token}`)
+      router.replace(`/dashboard/manager/${uuid}${item.path}?session=${token}`)
     } else {
-      console.log(`/dashboard/tenant/${uuid}${item.path}`)
-      router.replace(`/dashboard/tenant/${uuid}${item.path}`)
+      console.log(`/dashboard/tenant/${uuid}${item.path}?session=${token}`)
+      router.replace(`/dashboard/tenant/${uuid}${item.path}?session=${token}`)
     }
   }
 

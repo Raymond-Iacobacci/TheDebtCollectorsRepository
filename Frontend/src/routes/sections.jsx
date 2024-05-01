@@ -9,21 +9,25 @@ export const IndexPage = lazy(() => import('src/pages/app'));
 // export const BlogPage = lazy(() => import('src/pages/blog'));
 export const RequestPage = lazy(() => import('src/pages/requests'));
 export const RequestDetailsPage = lazy(() => import('src/pages/request-details'));
+export const Payments = lazy(() => import('src/pages/payments'));
 export const ListTenant = lazy(() => import('src/pages/list-tenants'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 // export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
-export const LandingPage = lazy(() => import('src/pages/landing'))
+// export const LandingPage = lazy(() => import('src/pages/landing'));
+export const PaymentsHistory = lazy(() => import('src/pages/payments-history'));
+export const AllPaymentsView = lazy(() => import('src/pages/all-payments'));
+export const Expenses = lazy(() => import('src/pages/expenses'));
 
 // ----------------------------------------------------------------------
 
 export default function Router() {
   const pathname = usePathname();
-  const userID = pathname.split("/")[3]
+  const userID = pathname.split('/')[3];
   const routes = useRoutes([
     {
-      path: "dashboard",
+      path: 'dashboard',
       element: (
         <DashboardLayout>
           <Suspense>
@@ -32,23 +36,27 @@ export default function Router() {
         </DashboardLayout>
       ),
       children: [
-        { 
-          path: "tenant/:userID",
+        {
+          path: 'tenant/:userID',
           children: [
-            { element: <IndexPage />, index: true },
-            { path: 'requests', element: <RequestPage access="tenant"/> },
+            { path: 'main', element: <IndexPage /> },
+            { path: 'requests', element: <RequestPage access="tenant" /> },
             { path: 'requests/:requestID', element: <RequestDetailsPage /> },
-          ]
+            { path: 'payments', element: <Payments tenantID={userID} /> },
+            { path: 'payments-history', element: <PaymentsHistory tenantID={userID} /> },
+          ],
         },
         {
-          path: "manager/:userID",
+          path: 'manager/:userID',
           children: [
-            { element: <IndexPage />, index: true },
-            { path: 'requests', element: <RequestPage access="manager"/> },
+            { path: 'main', element: <IndexPage /> },
+            { path: 'requests', element: <RequestPage access="manager" /> },
             { path: 'requests/:requestID', element: <RequestDetailsPage /> },
-            {path: 'list-tenants',element: <ListTenant managerID={userID} /> }
-          ]
-        }
+            { path: 'list-tenants', element: <ListTenant managerID={userID} /> },
+            { path: 'all-payments-view', element: <AllPaymentsView managerID={userID} /> },
+            { path: 'expenses', element: <Expenses access="manager" /> },
+          ],
+        },
       ],
     },
     {

@@ -23,6 +23,7 @@ export default function LoginView() {
 
   const router = useRouter();
 
+  const [newToken, setToken] = useState('');
   const [credentials, setCredentials] = useState([]);
   const [profile, setProfile] = useState([]);
   const [loginType, setLoginType] = useState(null);
@@ -38,6 +39,7 @@ export default function LoginView() {
             .then((data) => {
               console.log(data);
               setProfile(data);
+              setToken(credentials.access_token);
               setCredentials([]);
             });
         } catch (error) {
@@ -50,18 +52,26 @@ export default function LoginView() {
       const validateProfile = async () => {
         try {
           await fetch(
-            `${import.meta.env.VITE_MIDDLEWARE_URL}/users/verify-${loginType.toLowerCase()}?email=${
+            `${import.meta.env.VITE_MIDDLEWARE_URL}/users/login-${loginType.toLowerCase()}?email=${
               profile.email
-            }`
-          )
+            }`, {
+              method: 'PUT',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                token: newToken
+              })
+            })
             .then((res) => res.json())
             .then((data) => {
               const { uuid } = data;
               if (uuid) {
                 console.log(uuid);
-                router.push(`/dashboard/${loginType.toLowerCase()}/${uuid}/`);
+                router.push(`/dashboard/${loginType.toLowerCase()}/${uuid}/main?session=${newToken}`);
               } else {
-                console.log('USER NOT VALID!');
+                router.replace('/404')
               }
               setProfile([]);
             });
@@ -71,7 +81,7 @@ export default function LoginView() {
       };
       validateProfile();
     }
-  }, [credentials, profile, router, loginType]);
+  }, [credentials, profile, router, loginType, newToken]);
 
   const handleManagerLogin = useGoogleLogin({
     onSuccess: (codeResponse) => {
