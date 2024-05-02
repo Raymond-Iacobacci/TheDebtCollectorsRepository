@@ -62,6 +62,12 @@ async function generateReportData(managerID) {
     )
   `);
     reportData.pendingRent = pendingRent[0].pendingRent || 0;
+
+
+
+
+
+
     const totalPaidUtilities = await selectQuery(`
     SELECT SUM(amount) AS totalPaidUtilities
     FROM paymentsMade
@@ -92,6 +98,14 @@ async function generateReportData(managerID) {
     )
   `);
     reportData.pendingUtilities = pendingUtilities[0].pendingUtilities || 0;
+  
+    console.log("Right before");
+    const totalExpenses = await selectQuery(`
+    SELECT SUM(amount) AS totalExpenses
+    FROM expenses;
+  `);
+    reportData.expenses = totalExpenses[0].totalExpenses || 0;
+
     const totalPaidUpkeep = await selectQuery(`
     SELECT SUM(amount) AS totalPaidUpkeep
     FROM paymentsMade
@@ -101,6 +115,9 @@ async function generateReportData(managerID) {
       WHERE managerID = ${managerID}
     )
   `);
+
+
+
     reportData.paidUpkeep = totalPaidUpkeep[0].totalPaidUpkeep || 0;
     const overdueUpkeep = await selectQuery(`
   SELECT SUM(amount) AS overdueUpkeep
