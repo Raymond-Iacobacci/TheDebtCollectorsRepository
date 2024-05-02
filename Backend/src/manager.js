@@ -1,3 +1,4 @@
+
 const express = require("express");
 const managerRouter = express.Router();
 const { selectQuery, insertQuery, uuidToString } = require("./db");
@@ -39,52 +40,64 @@ async function generateReportData(managerID) {
   const reportData = {};
   console.log(`This is the managerID: ${managerID}`);
   const totalPaidRent = await selectQuery(
-    `SELECT SUM(amount) AS totalPaidRent FROM paymentsMade WHERE type = 'Rent' AND tenantID IN (SELECT tenantID FROM tenants WHERE managerID = ${managerID})`
+    `select SUM(amount) as amount from (select type, description, amount from paymentsLedger p INNER JOIN (select tenantID from tenants where managerID = ${managerID}) AS t where t
+.tenantID = p.tenantID) AS final where final.type='Payment' and final.description='Rent'`
   );
-  reportData.paid_rent = totalPaidRent[0].totalPaidRent || 0;
+  console.log(totalPaidRent);
+  reportData.paid_rent = totalPaidRent[0].amount || 0;
 
 
-  const utilities = await selectQuery(`
-    SELECT SUM(amount) AS utilities
-    FROM paymentsMade
-    WHERE type IN ('Utilities')
-  `);
-  reportData.expenses_utilities = utilities[0].utilities || 0;
+  const totalPaidUtilities = await selectQuery(
+    `select SUM(amount) as amount from (select type, description, amount from paymentsLedger p INNER JOIN (select tenantID from tenants where managerID = ${managerID}) AS t where t
+.tenantID = p.tenantID) AS final where final.type='Payment' and final.description='Utilities'`);
+  reportData.income_utilities = totalPaidUtilities[0].amount || 0;
+
+
+  const totalPaidOther = await selectQuery(
+    `select SUM(amount) as amount from (select type, description, amount from paymentsLedger p INNER JOIN (select tenantID from tenants where managerID = ${managerID}) AS t where t
+.tenantID = p.tenantID) AS final where final.type='Payment' and final.description='Other'`);
+reportData.income_other = totalPaidOther[0].amount || 0;
+
 
 
   const other = await selectQuery(`
     SELECT SUM(amount) AS other
-    FROM expenses
+    FROM expenses WHERE description IN ('Other') and managerID = ${managerID}
   `);
 
   reportData.expenses_other = other[0].other || 0;
 
-// ------------------
+  // ------------------
 
   const maintenance = await selectQuery(`
   SELECT SUM(amount) AS maintenance
   FROM expenses
-  WHERE type IN ('Maintenance Request')
+  WHERE description IN ('Maintenance Request') and managerID = ${managerID}
   `);
   reportData.expenses_maintenance = maintenance[0].maintenance || 0;
 
   const wages = await selectQuery(`
   SELECT SUM(amount) AS wages
   FROM expenses
-  WHERE type IN ('Wages')
+  WHERE description IN ('Wages') and managerID = ${managerID}
   `);
   reportData.expenses_wages = wages[0].wages || 0;
 
   const mortgage = await selectQuery(`
   SELECT SUM(amount) AS mortgage
   FROM expenses
-  WHERE type IN ('Mortgage Interest')
+  WHERE description IN ('Mortgage Interest') and managerID = ${managerID}
   `);
   reportData.expenses_mortgage = mortgage[0].mortgage || 0;
 
+  const utilities = await selectQuery(`
+    SELECT SUM(amount) AS utilities
+    FROM expenses
+    WHERE description IN ('Utilities') and managerID = ${managerID}
+  `);
+  reportData.expenses_utilities = utilities[0].utilities || 0;
 
-
-// -----------------------
+  // -----------------------
 
   return reportData;
 }
