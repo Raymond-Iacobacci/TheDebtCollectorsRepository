@@ -30,11 +30,14 @@ export default function PaymentsHistoryView({ tenantID }) {
     const [orderBy, setOrderBy] = useState('');
     const [order, setOrder] = useState('asc');
     const [filterName] = useState('');
+    const [description, setDescription] = useState('');
 
     useEffect(() => {
         const fetchPayments = async () => {
             try {
-                fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/get-payment-history?tenant-id=${tenantID}`)
+                // type, time, amount, balance, description
+                // fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/get-payment-history?tenant-id=${tenantID}`)
+                fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/get-ledger?tenant-id=${tenantID}`)
                     .then((res) => res.json())
                     .then((data) => {
                         setPayments(data);
@@ -55,11 +58,7 @@ export default function PaymentsHistoryView({ tenantID }) {
         filterName,
     });
     const tableValues = (row) => {
-        console.log('this is the payment ID', row.paymentsID);
-        const temp = <PaymentTableRow key={row.paymentsID} tenantID={tenantID} paymentsID={row.paymentsID} type={row.type} time={row.time} amount={row.amount} />
-        console.log(`This is the temp:`);
-        console.log(temp);
-        // setPayments(temp[0]);
+        const temp = <PaymentTableRow key={row.paymentsID} tenantID={tenantID} type={row.type} time={row.time} amount={row.amount} balance={row.balance} description={row.description} />
         return (
             temp
         );
@@ -72,10 +71,12 @@ export default function PaymentsHistoryView({ tenantID }) {
         setPage(newPage);
     };
     const tableLabels = [
-        { id: 'type', label: 'Task Name' },
-        { id: 'time', label: 'Date Paid' },
-        { id: 'amount', label: 'Amount Paid' },
-        { id: 'action', label: '' },
+        // { id: 'type', label: '' },
+        { id: 'description', label: 'Memo' }, // Including charge/payment and description
+        { id: 'time', label: 'Date' },
+        { id: 'amount', label: 'Amount' },
+        { id: 'balance', label: 'Balance' },
+        // Charge or Payment
     ];
     const handleSort = (event, id) => {
         const isAsc = orderBy === id && order === 'asc';
@@ -96,29 +97,38 @@ export default function PaymentsHistoryView({ tenantID }) {
                 <Grid container justifyContent="center">
                     <Grid>
                         <Box sx={{ padding: '20px' }}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    value={type}
-                                    label="Job"
-                                    onChange={(e) => setType(e.target.value)}
-                                    sx={{ marginBottom: '10px' }}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    value={amount}
-                                    label="Cost"
-                                    onChange={(e) => setAmount(e.target.value)}
-                                    sx={{ marginBottom: '10px' }}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    value={time}
-                                    label="Payment Deadline"
-                                    onChange={(e) => setTime(e.target.value)}
-                                    sx={{ marginBottom: '10px' }}
-                                />
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        value={type}
+                                        label="Type"
+                                        onChange={(e) => setType(e.target.value)}
+                                        sx={{ marginBottom: '10px' }}
+                                    />
+                                    <TextField
+                                        value={description}
+                                        label="Description"
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        sx={{ marginBottom: '10px' }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        value={amount}
+                                        label="Cost"
+                                        onChange={(e) => setAmount(e.target.value)}
+                                        sx={{ marginBottom: '10px' }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        value={time}
+                                        label="Date"
+                                        onChange={(e) => setTime(e.target.value)}
+                                        sx={{ marginBottom: '10px' }}
+                                    />
+                                </Grid>
+                                {/* Add in box to display description underneath the code type */}
                             </Grid>
                         </Box>
                     </Grid>
