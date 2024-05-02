@@ -12,41 +12,41 @@ const navConfig = (access) => {
       {
         title: 'dashboard',
         path: '/main',
-        icon: icon('ic_analytics'),
+        icon: icon('ic_user'),
         access: 'all',
       },
       {
         title: 'requests',
         path: '/requests',
-        icon: icon('ic_user'),
+        icon: icon('ic_blog'),
         access: 'all',
       },
       {
         title: 'Make Payments',
         path: '/payments',
-        icon: icon('ic_lock'),
+        icon: icon('ic_cart'),
         access: 'tenant',
       },
       {
         title: 'Payment History',
         path: '/payments-history',
-        icon: icon('ic_lock'),
+        icon: icon('ic_cart'),
         access: 'tenant',
       },
     ];
-  } 
+  }
   if (access === 'manager') {
     return [
       {
         title: 'dashboard',
         path: '/main',
-        icon: icon('ic_analytics'),
+        icon: icon('ic_user'),
         access: 'all',
       },
       {
         title: 'requests',
         path: '/requests',
-        icon: icon('ic_user'),
+        icon: icon('ic_blog'),
         access: 'all',
       },
       {
@@ -64,13 +64,18 @@ const navConfig = (access) => {
       {
         title: 'Pending Payments',
         path: '/all-payments-view',
-        icon: icon('ic_lock'),
+        icon: icon('ic_cart'),
+        access: 'manager',
+      },
+      {
+        title: 'Reports',
+        path: '/report',
+        icon: icon('ic_analytics'),
         access: 'manager',
       },
     ];
   }
   return [];
 };
-
 
 export default navConfig;
