@@ -41,7 +41,6 @@ import { getTenantRequests, getManagerRequests } from '../hooks/request-specific
 // ----------------------------------------------------------------------
 
 export default function RequestsView({ access }) {
-
   const pathname = usePathname();
   const uuid = pathname.split('/')[3];
 
@@ -149,15 +148,11 @@ export default function RequestsView({ access }) {
     formData.append('attachment', imageFile);
     formData.append('type', requestType);
     formData.append('description', description);
-    await fetch(
-      `${import.meta.env.VITE_MIDDLEWARE_URL}/requests/new?tenant-id=${
-        uuid
-      }`,
-      {
-        method: 'POST',
-        body: formData, // Convert data to JSON string
-      }
-    ).then((data) => {
+    console.log(`This is the formData: ${formData}`);
+    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/requests/new?tenant-id=${uuid}`, {
+      method: 'POST',
+      body: formData, // Convert data to JSON string
+    }).then((data) => {
       if (data.ok) {
         console.log('Data posted successfully');
         setDescription('');
@@ -170,43 +165,49 @@ export default function RequestsView({ access }) {
     handleOpenRequestPopup(false);
   };
 
-  const tableLabels = (access === 'manager')? 
-  [
-    { id: 'name', label: 'Name' },
-    { id: 'address', label: 'Address' },
-    { id: 'type', label: 'Type' },
-    { id: 'status', label: 'Status' },
-  ]:[
-    { id: 'type', label: 'Type' },
-    { id: 'description', label: 'Description' },
-    { id: 'date', label: 'Date Requested' },
-    { id: 'status', label: 'Status' },
-  ]
+  const tableLabels =
+    access === 'manager'
+      ? [
+        { id: 'name', label: 'Name' },
+        { id: 'address', label: 'Address' },
+        { id: 'type', label: 'Type' },
+        { id: 'status', label: 'Status' },
+      ]
+      : [
+        { id: 'type', label: 'Type' },
+        { id: 'description', label: 'Description' },
+        { id: 'date', label: 'Date Requested' },
+        { id: 'status', label: 'Status' },
+      ];
 
   const tableValues = (row) => {
-    if( access === 'manager') {
-      return <RequestTableRow
+    if (access === 'manager') {
+      return (
+        <RequestTableRow
+          key={row.requestID}
+          id={row.requestID}
+          avatarUrl={row.avatarUrl}
+          name={row.name}
+          address={row.address}
+          type={row.type}
+          status={row.status}
+          access={access}
+        />
+      );
+    }
+    return (
+      <RequestTableRow
         key={row.requestID}
         id={row.requestID}
         avatarUrl={row.avatarUrl}
-        name={row.name}
-        address={row.address}
         type={row.type}
+        description={row.description}
+        date={row.dateRequested}
         status={row.status}
         access={access}
       />
-    }
-    return <RequestTableRow
-      key={row.requestID}
-      id={row.requestID}
-      avatarUrl={row.avatarUrl}
-      type={row.type}
-      description={row.description}
-      date={row.dateRequested}
-      status={row.status}
-      access={access}
-    />
-  }
+    );
+  };
 
   return (
     <Container>
@@ -259,9 +260,7 @@ export default function RequestsView({ access }) {
                 <TableBody>
                   {dataFiltered
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => (
-                      tableValues(row)
-                    ))}
+                    .map((row) => tableValues(row))}
 
                   <TableEmptyRows
                     height={77}

@@ -3,27 +3,34 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
 import Dialog from '@mui/material/Dialog';
-// import Button from '@mui/material/Button';
+import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Unstable_Grid2';
 import TextField from '@mui/material/TextField';
 import Container from '@mui/material/Container';
+import DialogActions from '@mui/material/DialogActions';
 import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
+import DialogTitle from '@mui/material/DialogTitle';
 import { useState, useEffect } from 'react';
+
+import { usePathname } from 'src/routes/hooks';
+
 import Scrollbar from 'src/components/scrollbar';
+import Iconify from 'src/components/iconify';
 import PaymentTableRow from '../table-components/table-row';
 import PaymentTableHead from '../table-components/table-head';
 import TableEmptyRows from '../table-components/table-empty-rows';
 import { emptyRows, applyFilter, getComparator } from '../hooks/utils';
 
+
 export default function PaymentsHistoryView({ tenantID }) {
     const [open, setOpen] = useState(false);
-    const [time, setTime] = useState('');
+    const pathname = usePathname();
+    const uuid = pathname.split('/')[3];
     const [amount, setAmount] = useState('');
-    const [type, setType] = useState('');
     const [payments, setPayments] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -36,7 +43,6 @@ export default function PaymentsHistoryView({ tenantID }) {
         const fetchPayments = async () => {
             try {
                 // type, time, amount, balance, description
-                // fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/get-payment-history?tenant-id=${tenantID}`)
                 fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/get-ledger?tenant-id=${tenantID}`)
                     .then((res) => res.json())
                     .then((data) => {
@@ -48,10 +54,17 @@ export default function PaymentsHistoryView({ tenantID }) {
         };
         fetchPayments();
     }, [tenantID]);
-    // *** May warrant deletion *** //
+    
     const handleClose = () => {
         setOpen(false);
     };
+    // const handleChange = (event) => {
+    //     setRequestType(event.target.value);
+    //   };
+    const handleOpen = () => {
+        setOpen(true);
+    };
+    
     const dataFiltered = applyFilter({
         inputData: payments,
         comparator: getComparator(order, orderBy),
@@ -85,56 +98,44 @@ export default function PaymentsHistoryView({ tenantID }) {
             setOrderBy(id);
         }
     };
+    // todo: change API
+    const handleSubmit = async () => {
+        await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/make-payment?tenant-id=${uuid}`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                amount: `${amount}`,
+                description: `${description}`
+            }),
+        }).then((data) => {
+            if (data.ok) {
+                setAmount('');
+                setDescription('');
+            } else {
+                console.log('Error posting data to backend');
+            }
+        });
+        handleClose();
+    }
+    // TODO: access control via tenant-manager split
     return (
         <Container>
             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                 <Typography variant="h4">Payments</Typography>
+                <Button
+                    variant="contained"
+                    color="inherit"
+                    startIcon={<Iconify icon="eva:plus-fill" />}
+                    onClick={handleOpen}
+                >
+                    Make Payment
+                </Button>
             </Stack>
-            <Dialog open={open} onClose={handleClose} sx={{ textAlign: 'center' }}>
-                <div>
-                    <Typography variant="h4">Payments</Typography>
-                </div>
-                <Grid container justifyContent="center">
-                    <Grid>
-                        <Box sx={{ padding: '20px' }}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        value={type}
-                                        label="Type"
-                                        onChange={(e) => setType(e.target.value)}
-                                        sx={{ marginBottom: '10px' }}
-                                    />
-                                    <TextField
-                                        value={description}
-                                        label="Description"
-                                        onChange={(e) => setDescription(e.target.value)}
-                                        sx={{ marginBottom: '10px' }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField
-                                        value={amount}
-                                        label="Cost"
-                                        onChange={(e) => setAmount(e.target.value)}
-                                        sx={{ marginBottom: '10px' }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        value={time}
-                                        label="Date"
-                                        onChange={(e) => setTime(e.target.value)}
-                                        sx={{ marginBottom: '10px' }}
-                                    />
-                                </Grid>
-                                {/* Add in box to display description underneath the code type */}
-                            </Grid>
-                        </Box>
-                    </Grid>
-                </Grid>
-            </Dialog>
             <Card>
+
                 <Scrollbar>
                     <TableContainer sx={{ overflow: 'unset' }}>
                         <Table sx={{ minWidth: 800 }}>
@@ -149,7 +150,6 @@ export default function PaymentsHistoryView({ tenantID }) {
                                 {dataFiltered
                                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((row) => tableValues(row))}
-
                                 <TableEmptyRows
                                     height={77}
                                     emptyRows={emptyRows(page, rowsPerPage, payments.length)}
@@ -170,6 +170,58 @@ export default function PaymentsHistoryView({ tenantID }) {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </Card>
+
+            {/* Needs to be edited to new entry slot */}
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                fullWidth
+                maxWidth="md"
+            >
+                <DialogTitle id="alert-dialog-title" sx={{ textAlign: 'center' }}>Balance</DialogTitle>
+                <Grid container sx={{ textAlign: 'center' }}>
+                    <Grid>
+                        <Box
+                            component="form"
+                            sx={{
+                                '& > :not(style)': { m: 1, width: '100ch' },
+                            }}
+                            noValidate
+                            autoComplete="off"
+                        >
+                            <TextField
+                                value={amount}
+                                id="outlined-basic"
+                                label="$$"
+                                variant="outlined"
+                                multiline
+                                onChange={(e) => {
+                                    setAmount(e.target.value);
+                                }}
+                                sx={{ maxWidth: 500 }}
+                            />
+                            <TextField
+                                value={description}
+                                id="outlined-basic"
+                                label="Description"
+                                variant="outlined"
+                                multiline
+                                onChange={(e) => {
+                                    setDescription(e.target.value);
+                                }}
+                                sx={{maxWidth:500}}
+                            />
+                        </Box>
+                        <DialogActions sx={{justifyContent:'center'}}>
+                            <Button onClick={handleSubmit} autoFocus>
+                                Submit
+                            </Button>
+                        </DialogActions>
+                    </Grid>
+                </Grid>
+            </Dialog>
         </Container>
     );
 }
