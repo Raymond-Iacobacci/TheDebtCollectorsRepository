@@ -38,12 +38,10 @@ managerRouter.get("/get-report", async (req, res) => {
 
 async function generateReportData(managerID) {
   const reportData = {};
-  console.log(`This is the managerID: ${managerID}`);
   const totalPaidRent = await selectQuery(
     `select SUM(amount) as amount from (select type, description, amount from paymentsLedger p INNER JOIN (select tenantID from tenants where managerID = ${managerID}) AS t where t
 .tenantID = p.tenantID) AS final where final.type='Payment' and final.description='Rent'`
   );
-  console.log(totalPaidRent);
   reportData.paid_rent = totalPaidRent[0].amount || 0;
 
 
