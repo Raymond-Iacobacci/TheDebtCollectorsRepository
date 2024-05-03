@@ -42,7 +42,7 @@ async function generateReportData(managerID) {
     `select SUM(amount) as amount from (select type, description, amount from paymentsLedger p INNER JOIN (select tenantID from tenants where managerID = ${managerID}) AS t where t
 .tenantID = p.tenantID) AS final where final.type='Payment' and final.description='Rent'`
   );
-  reportData.paid_rent = totalPaidRent[0].amount || 0;
+  reportData.income_rent = totalPaidRent[0].amount || 0;
 
 
   const totalPaidUtilities = await selectQuery(
@@ -55,8 +55,6 @@ async function generateReportData(managerID) {
     `select SUM(amount) as amount from (select type, description, amount from paymentsLedger p INNER JOIN (select tenantID from tenants where managerID = ${managerID}) AS t where t
 .tenantID = p.tenantID) AS final where final.type='Payment' and final.description='Other'`);
 reportData.income_other = totalPaidOther[0].amount || 0;
-
-
 
   const other = await selectQuery(`
     SELECT SUM(amount) AS other
@@ -104,7 +102,7 @@ managerRouter.get("/get-tenant-payments", async (req, res) => {
   try {
     const managerID = "0x" + req.query["manager-id"];
     const tenantsQuery = await selectQuery(
-      `SELECT firstName, lastName, address, amount, type, p.tenantID, time FROM paymentsDue p INNER JOIN tenants t ON p.tenantID = t.tenantID WHERE t.managerID =${managerID};`
+      `SELECT firstName, lastName, address, amount, type, p.tenantID, timeAssigned FROM paymentsDue p INNER JOIN tenants t ON p.tenantID = t.tenantID WHERE t.managerID =${managerID};`
     );
     for (let tenant of tenantsQuery) {
       tenant.tenantID = tenant.tenantID.toString("hex").toUpperCase();

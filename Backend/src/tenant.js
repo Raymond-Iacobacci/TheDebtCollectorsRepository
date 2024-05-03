@@ -8,7 +8,7 @@ tenantRouter.get('/get-payments', async(req, res) =>{
     try {
         tenantID = req.query['tenant-id'];
     
-        paymentsDue = await selectQuery(`SELECT paymentsID, time, amount, type, late FROM paymentsDue WHERE tenantID=${'0x' + tenantID}`);
+        paymentsDue = await selectQuery(`SELECT paymentsID, timeAssigned, amount, type, late FROM paymentsDue WHERE tenantID=${'0x' + tenantID}`);
         const result = [];
         paymentsDue.forEach(async function(payment){
             const moment = require('moment-timezone');
