@@ -21,14 +21,14 @@ const navConfig = (access) => {
         icon: icon('ic_blog'),
         access: 'all',
       },
+      // {
+      //   title: 'Make Payments',
+      //   path: '/payments',
+      //   icon: icon('ic_cart'),
+      //   access: 'tenant',
+      // },
       {
-        title: 'Make Payments',
-        path: '/payments',
-        icon: icon('ic_cart'),
-        access: 'tenant',
-      },
-      {
-        title: 'Payment History',
+        title: 'Payments',
         path: '/payments-history',
         icon: icon('ic_cart'),
         access: 'tenant',
@@ -61,12 +61,12 @@ const navConfig = (access) => {
         icon: icon('ic_cart'),
         access: 'manager',
       },
-      {
-        title: 'Pending Payments',
-        path: '/all-payments-view',
-        icon: icon('ic_cart'),
-        access: 'manager',
-      },
+      // {
+      //   title: 'Pending Payments',
+      //   path: '/all-payments-view',
+      //   icon: icon('ic_cart'),
+      //   access: 'manager',
+      // },
       {
         title: 'Reports',
         path: '/report',

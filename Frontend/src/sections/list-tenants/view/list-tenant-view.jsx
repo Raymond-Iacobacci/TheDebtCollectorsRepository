@@ -71,8 +71,8 @@ export default function ListTenantView({ managerID }) {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [page, setPage] = useState(0);
     const [rent, setRent] = useState('');
-    const [type, setType] = useState('');
-    const [time, setTime] = useState('');
+    const [description, setDescription] = useState('');
+    // const [time, setTime] = useState('');
     // const [dueDate, setDueDate] = useState('');
 
     useEffect(() => {
@@ -95,7 +95,7 @@ export default function ListTenantView({ managerID }) {
     //     setDueDate(event.target.value);
     // };
     const handleTypeChange = (event) => {
-        setType(event.target.value);
+        setDescription(event.target.value);
     }
     const handlePaymentAmountChange = (event) => {
         setPaymentAmount(event.target.value);
@@ -110,16 +110,13 @@ export default function ListTenantView({ managerID }) {
     const handleClose = () => {
         setOpen(false);
     };
-    const handleTimeChange = (event) => {
-        setTime(event.target.value);
-    }
+    // const handleTimeChange = (event) => {
+    //     setTime(event.target.value);
+    // }
     const handlePaymentSubmit = async () => {
         // Should call an API here
-        console.log(tenantRow.email);
-        console.log(type);
-        console.log(paymentAmount);
         await fetch(
-            `${import.meta.env.VITE_MIDDLEWARE_URL}/manager/create-payment?manager-id=${managerID}`,
+            `${import.meta.env.VITE_MIDDLEWARE_URL}/manager/create-payment`,
             {
                 method: 'POST',
                 headers: {
@@ -128,9 +125,8 @@ export default function ListTenantView({ managerID }) {
                 },
                 body: JSON.stringify({
                     email: `${tenantRow.email}`,
-                    type: `${type}`,
+                    description: `${description}`,
                     amount: `${paymentAmount}`,
-                    time: `${time}`,
                 }),
             }
         );
@@ -230,8 +226,8 @@ export default function ListTenantView({ managerID }) {
                 <DialogTitle id="alert-dialog-title">Fill Payment Details</DialogTitle>
                 <Box sx={{ padding: '20px' }}>
                     <TextField
-                        value={type}
-                        label="Type"
+                        value={description}
+                        label="Description"
                         onChange={handleTypeChange}
                         sx={{ marginBottom: '10px' }}
                     />
@@ -241,12 +237,12 @@ export default function ListTenantView({ managerID }) {
                         onChange={handlePaymentAmountChange}
                         sx={{ marginBottom: '10px' }}
                     />
-                    <TextField
+                    {/* <TextField
                         value={time}
                         label="MM-DD-YYYY"
                         onChange={handleTimeChange}
                         sx={{ marginBottom: '10px' }}
-                    />
+                    /> */}
                     <Button
                         variant="contained"
                         onClick={handlePaymentSubmit}
