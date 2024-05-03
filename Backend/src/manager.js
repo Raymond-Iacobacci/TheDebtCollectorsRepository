@@ -60,7 +60,7 @@ reportData.income_other = totalPaidOther[0].amount || 0;
 
   const other = await selectQuery(`
     SELECT SUM(amount) AS other
-    FROM expenses WHERE description IN ('Other') and managerID = ${managerID}
+    FROM expenses WHERE type IN ('Other') and managerID = ${managerID}
   `);
 
   reportData.expenses_other = other[0].other || 0;
@@ -70,28 +70,28 @@ reportData.income_other = totalPaidOther[0].amount || 0;
   const maintenance = await selectQuery(`
   SELECT SUM(amount) AS maintenance
   FROM expenses
-  WHERE description IN ('Maintenance Request') and managerID = ${managerID}
+  WHERE type IN ('Maintenance Request') and managerID = ${managerID}
   `);
   reportData.expenses_maintenance = maintenance[0].maintenance || 0;
 
   const wages = await selectQuery(`
   SELECT SUM(amount) AS wages
   FROM expenses
-  WHERE description IN ('Wages') and managerID = ${managerID}
+  WHERE type IN ('Wages') and managerID = ${managerID}
   `);
   reportData.expenses_wages = wages[0].wages || 0;
 
   const mortgage = await selectQuery(`
   SELECT SUM(amount) AS mortgage
   FROM expenses
-  WHERE description IN ('Mortgage Interest') and managerID = ${managerID}
+  WHERE type IN ('Mortgage Interest') and managerID = ${managerID}
   `);
   reportData.expenses_mortgage = mortgage[0].mortgage || 0;
 
   const utilities = await selectQuery(`
     SELECT SUM(amount) AS utilities
     FROM expenses
-    WHERE description IN ('Utilities') and managerID = ${managerID}
+    WHERE type IN ('Utilities') and managerID = ${managerID}
   `);
   reportData.expenses_utilities = utilities[0].utilities || 0;
 
