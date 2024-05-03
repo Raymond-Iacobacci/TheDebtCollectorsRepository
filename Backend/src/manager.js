@@ -3,7 +3,8 @@ const express = require("express");
 const managerRouter = express.Router();
 const { selectQuery, insertQuery, uuidToString } = require("./db");
 const { sendEmail } = require("./sendEmail");
-
+const charge = 'Charge';
+const payment = 'Payment';
 managerRouter.use(express.json());
 
 function getDate() {
@@ -112,19 +113,9 @@ managerRouter.get("/get-tenant-payments", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-function getDatePayment(dateString) {
-  const moment = require("moment-timezone");
-
-  const parts = dateString.split("-");
-
-  // Reorder the parts to match the expected format YYYY-MM-DD
-  let formattedDate =
-    parts[2] +
-    "-" +
-    parts[0].padStart(2, "0") +
-    "-" +
-    parts[1].padStart(2, "0");
-  return moment(formattedDate).tz("America/Los_Angeles").format("YYYY-MM-DD");
+function getDatePayment() {
+    const moment = require("moment-timezone");
+    return moment().tz("America/Los_Angeles").format("YYYY-MM-DD");
 }
 function getDateTenant() {
   const moment = require("moment-timezone");
@@ -174,32 +165,37 @@ managerRouter.post("/create-tenant", async (req, res) => {
 });
 
 managerRouter.post("/create-payment", async (req, res) => {
-  try {
-    const email = req.body.email;
-    const type = req.body.type;
-    const amount = req.body.amount;
-    const currentDate = getDatePayment(req.body.time);
-    console.log(req.body.time);
-    console.log(currentDate);
-    const tenantID = await selectQuery(
-      `SELECT tenantID from tenants where email='${email}'`
-    );
-    const query =
-      "INSERT INTO paymentsDue (type, time, amount, tenantID) VALUES (?, ?, ?, ?)";
-    const values = [type, currentDate, amount, tenantID[0].tenantID];
-    await insertQuery(query, values);
-
-    const message = `Hello ${firstName} ${lastName} welcome to the DebtCollectors.`;
-    sendEmail(email, 'Test Subject', message)
-      .then(data => {
-        res.send('Email sent successfully:');
-      })
-      .catch(error => {
-        res.send('Error sending email:');
-      });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    try {
+        const email = req.body.email;
+        const description = req.body.description;
+        const amount = req.body.amount;
+        const currentDate = getDatePayment();
+        const tenantID = await selectQuery(
+            `SELECT tenantID from tenants where email='${email}';`
+        );
+        
+        const chargeBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${uuidToString(tenantID[0].tenantID)}`);
+        const paymentBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${uuidToString(tenantID[0].tenantID)}`);
+        // console.log(`This is the amount: ${amount}`);
+        // console.log(chargeBalance[0].amount-paymentBalance[0].amount)
+        let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0);
+         balance = Number(amount) + balance;
+        const query = "INSERT INTO paymentsLedger (type, description, time, amount, tenantID, balance) VALUES (?, ?, ?, ?, ?, ?)";
+        const values = [charge, description, currentDate, amount, tenantID[0].tenantID, balance];
+        await insertQuery(query, values);
+        
+        // const message = `Hello ${firstName} ${lastName} welcome to the DebtCollectors.`;
+        // sendEmail(email, 'Test Subject', message)
+        //     .then(data => {
+        //         res.send('Email sent successfully:');
+        //     })
+        //     .catch(error => {
+        //         res.send('Error sending email:');
+        //     });
+        res.send(currentDate);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 managerRouter.get("/get-tenants", async (req, res) => {
