@@ -15,7 +15,9 @@ import Typography from '@mui/material/Typography';
 
 export default function PaymentTableRow({ type, time, amount, description, balance }) {
   const [firstWord, ...restWords] = type.split(' ');
-  const formattedDate = new Date(time).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  const parts = time.split('T');
+  const datePart = parts[0];
+  const timeFinal = `${datePart.split('-')[1]}/${datePart.split('-')[2]}/${datePart.split('-')[0]}`;
 
   return (
     <TableRow
@@ -32,7 +34,7 @@ export default function PaymentTableRow({ type, time, amount, description, balan
           {description && <Box mt={1}>{description}</Box>}
         </Box>
       </TableCell>
-      <TableCell>{formattedDate}</TableCell>
+      <TableCell>{timeFinal}</TableCell>
       <TableCell>{amount}</TableCell>
       <TableCell>{balance}</TableCell>
     </TableRow>

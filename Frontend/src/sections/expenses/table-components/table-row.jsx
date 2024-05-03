@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import { useRouter, usePathname } from 'src/routes/hooks';
 import { useSearchParams } from 'react-router-dom';
 
-import { fDate } from 'src/utils/format-time';
+// import { fDate } from 'src/utils/format-time';
 import { fCurrency } from 'src/utils/format-number'
 
 import Iconify from 'src/components/iconify';
@@ -22,7 +22,9 @@ export default function UserTableRow({ type, amount, description, date, request 
   const path = usePathname();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('session');
-
+  const parts = date.split('T');
+  const datePart = parts[0];
+  const timeFinal = `${datePart.split('-')[1]}/${datePart.split('-')[2]}/${datePart.split('-')[0]}`;
   const handleRowClick = () => {
     router.replace(`${path.split('/').slice(0, 4).join('/')}/requests/${request}?session=${token}`)
   };
@@ -55,7 +57,7 @@ export default function UserTableRow({ type, amount, description, date, request 
         {description}
       </TableCell>
 
-      <TableCell id="date">{fDate(date)}</TableCell>
+      <TableCell id="date">{timeFinal}</TableCell>
     </TableRow>
   );
 }
