@@ -164,6 +164,23 @@ managerRouter.post("/create-tenant", async (req, res) => {
   }
 });
 
+async function updatePayment(amount){
+  console.log(amount);
+  let newCharge = 0;
+  let subtractAmount = 0;
+  do {
+      const oldestCharge = await selectQuery(`SELECT paidAmount AS oldestCharge, id FROM paymentsLedger WHERE type='Charge' AND paidAmount > 0 LIMIT 1`);
+      if (oldestCharge.length === 0) {
+          break;
+      }
+      newCharge = oldestCharge[0].oldestCharge;
+      subtractAmount = Math.min(oldestCharge[0].oldestCharge, amount);
+      newCharge -= subtractAmount;
+      amount -= subtractAmount;
+      await selectQuery(`UPDATE paymentsLedger SET paidAmount=${newCharge} WHERE id=${oldestCharge[0].id}`);
+  } while (amount > 0);
+}
+
 managerRouter.post("/create-payment", async (req, res) => {
     try {
         const email = req.body.email;
@@ -179,10 +196,15 @@ managerRouter.post("/create-payment", async (req, res) => {
         // console.log(`This is the amount: ${amount}`);
         // console.log(chargeBalance[0].amount-paymentBalance[0].amount)
         let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0);
-         balance = Number(amount) + balance;
-        const query = "INSERT INTO paymentsLedger (type, description, time, amount, tenantID, balance) VALUES (?, ?, ?, ?, ?, ?)";
-        const values = [charge, description, currentDate, amount, tenantID[0].tenantID, balance];
+        let temp = balance;
+        balance = Number(amount) + balance;
+        const query = "INSERT INTO paymentsLedger (type, description, time, amount, tenantID, balance, paidAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        const values = [charge, description, currentDate, amount, tenantID[0].tenantID, balance, amount];
         await insertQuery(query, values);
+        
+        updatePayment(-temp);
+
+
         
         // const message = `Hello ${firstName} ${lastName} welcome to the DebtCollectors.`;
         // sendEmail(email, 'Test Subject', message)
