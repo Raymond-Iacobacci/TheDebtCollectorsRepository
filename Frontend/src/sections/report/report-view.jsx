@@ -73,6 +73,7 @@ export default function ReportView() {
       <Typography gutterBottom variant="h5" sx={{ margin: '8px' }}>
         {label}
       </Typography>
+      {renderLegend('Weekly')}
       {Object.entries(map).map(([key, value]) => (
         <Grid container key={key}>
           <Grid item xs={6} sx={{ paddingLeft: '16px' }}>
@@ -88,26 +89,129 @@ export default function ReportView() {
     </>
   );
 
-  const renderTotals = (map, category) => (
+  const renderOverallTotals = (map, category) => (
     <Grid container>
       <Grid item xs={6} sx={{ paddingLeft: '16px' }}>
         <Typography variant="body1">{category}</Typography>
       </Grid>
       <Grid item xs={6} sx={{ paddingRight: '32px' }}>
         <Typography align="right" variant="body1">
-          {fCurrency(calculateTotal(map))}
+          {fCurrency(calculateOverallTotal(map))}
         </Typography>
       </Grid>
     </Grid>
   );
 
-  const calculateTotal = (category) => {
+  const renderColumnTotals = (map) => (
+    <>
+      <Divider sx={{ borderStyle: 'dashed', marginTop: '12px', marginRight: '20px', marginLeft: '20px' }} />
+      <Grid container sx={{ marginTop: '8px' }}>
+        <Grid item xs={6} sx={{ paddingLeft: '16px' }}>
+          <Typography variant="subtitle1">Total</Typography>
+        </Grid>
+        <Grid item xs={6} sx={{ paddingRight: '32px' }}>
+          <Typography align="right" variant="subtitle1">
+            {fCurrency(calculateOverallTotal(map))}
+          </Typography>
+        </Grid>
+      </Grid>
+    </>
+  );
+
+  const calculateOverallTotal = (category) => {
     let total = 0;
     Object.values(category).forEach((amount) => {
       total += parseInt(amount, 10);
     });
-    console.log(`total: ${total}`)
     return total.toString();
+  };
+
+  const renderNet = (
+    <Grid container>
+      <Grid item xs={6} sx={{ paddingLeft: '16px' }}>
+        <Typography variant="subtitle1">Net Total</Typography>
+      </Grid>
+      <Grid item xs={6} sx={{ paddingRight: '32px' }}>
+        <Typography align="right" variant="subtitle1">
+          {fCurrency(
+            (
+              parseInt(calculateOverallTotal(paid), 10) -
+              parseInt(calculateOverallTotal(expenses), 10)
+            ).toString()
+          )}
+        </Typography>
+      </Grid>
+    </Grid>
+  );
+
+  const renderLegend = (interval) => {
+    switch (interval) {
+      case 'Daily':
+        return (
+          <Grid container sx={{ marginBottom: '6px' }}>
+            <Grid item xs={6} sx={{ paddingLeft: '16px' }}>
+              <Typography variant="subtitle1">Category</Typography>
+            </Grid>
+            <Grid item xs={6} sx={{ paddingRight: '32px' }}>
+              <Typography align="right" variant="subtitle1">
+                Today
+              </Typography>
+            </Grid>
+          </Grid>
+        );
+      case 'Weekly':
+        return (
+          <Grid container sx={{ marginBottom: '6px' }}>
+            <Grid item xs={6} sx={{ paddingLeft: '16px' }}>
+              <Typography variant="subtitle1">Category</Typography>
+            </Grid>
+            <Grid item xs={6} sx={{ paddingRight: '32px' }}>
+              <Typography align="right" variant="subtitle1">
+                This Week
+              </Typography>
+            </Grid>
+          </Grid>
+        );
+      case 'Monthly':
+        return (
+          <Grid container sx={{ marginBottom: '6px' }}>
+            <Grid item xs={6} sx={{ paddingLeft: '16px' }}>
+              <Typography variant="subtitle1">Category</Typography>
+            </Grid>
+            <Grid item xs={6} sx={{ paddingRight: '32px' }}>
+              <Typography align="right" variant="subtitle1">
+                This Month
+              </Typography>
+            </Grid>
+          </Grid>
+        );
+      case 'Yearly':
+        return (
+          <Grid container sx={{ marginBottom: '6px' }}>
+            <Grid item xs={6} sx={{ paddingLeft: '16px' }}>
+              <Typography variant="subtitle1">Category</Typography>
+            </Grid>
+            <Grid item xs={6} sx={{ paddingRight: '32px' }}>
+              <Typography align="right" variant="subtitle1">
+                This Year
+              </Typography>
+            </Grid>
+          </Grid>
+        );
+      default:
+        return (
+          <Grid container sx={{ marginBottom: '6px' }}>
+            <Grid item xs={6} sx={{ paddingLeft: '16px' }}>
+              <Typography variant="subtitle1">Category</Typography>
+            </Grid>
+            <Grid item xs={6} sx={{ paddingRight: '32px' }}>
+              <Typography align="right" variant="subtitle1">
+                This Month
+              </Typography>
+            </Grid>
+          </Grid>
+        );
+    }
   };
 
   return (
@@ -117,20 +221,25 @@ export default function ReportView() {
       </Stack>
 
       <Grid container spacing={3}>
-        <Grid xs={12} sm={6} md={8}>
+        <Grid item xs={12} sm={6} md={8}>
           <Card sx={{ padding: '16px' }}>
-            {renderItems(expenses, "Expenses")}
-            <Divider sx={{ borderStyle: 'dashed', marginTop: '12px' }} />
-            {renderItems(paid, "Income")}
+            {renderItems(expenses, 'Expenses')}
+            {renderColumnTotals(expenses)}
+          </Card>
+          <Card sx={{ padding: '16px', marginTop: '25px' }}>
+            {renderItems(paid, 'Income')}
+            {renderColumnTotals(paid)}
           </Card>
         </Grid>
-        <Grid xs={12} sm={6} md={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <Card sx={{ padding: '16px' }}>
-            <Typography gutterBottom variant="h5">
+            <Typography gutterBottom variant="h5" sx={{ margin: '8px' }}>
               Totals
             </Typography>
-            {renderTotals(expenses, 'Expenses')}
-            {renderTotals(paid, 'Income')}
+            {renderOverallTotals(expenses, 'Expenses')}
+            {renderOverallTotals(paid, 'Income')}
+            <Divider sx={{ borderStyle: 'dashed', marginTop: '12px', marginBottom: '8px' }} />
+            {renderNet}
           </Card>
         </Grid>
       </Grid>
