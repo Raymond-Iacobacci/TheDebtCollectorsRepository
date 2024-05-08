@@ -27,8 +27,30 @@ function getDate() {
 //     console.log(tenantPayments);
 // }
 
+const interval = 1000;
+setInterval(crawlForLatePayments, interval);
+
+function getAbbrDate() {
+  const date = new Date();
+  return date.toISOString().split('T')[0];
+}
+
+async function crawlForLatePayments() {
+  var tenantsWithLatePayments = await selectQuery(`SELECT tenantID FROM paymentsLedger WHERE type = 'Charge' AND paidAmount > 0 AND DATEDIFF('${getAbbrDate()}', time) > 5`); // TODO: change to < 11
+  tenantsWithLatePayments = Array.from(new Set(tenantsWithLatePayments));
+  for (let tenantWithLatePayments of tenantsWithLatePayments) {
+    let insertTenantID = Buffer.from(tenantWithLatePayments.tenantID, 'hex');
+    console.log(insertTenantID);
+    // await insertQuery(`INSERT INTO paymentsLedger (type, description, time, amount, tenantID, late_payment) VALUES ('Charge', 'Late', '${getAbbrDate()}', 10, '${insertTenantID}', 1`);
+  }
+  
+
+
+}
+
 managerRouter.get("/get-report", async (req, res) => {
   try {
+    console.log(`This is the date: ${getDate()}`);
     const managerID = "0x" + req.query["manager-id"];
     const reportData = await generateReportData(managerID);
     res.json(reportData);
