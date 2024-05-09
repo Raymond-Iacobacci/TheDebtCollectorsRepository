@@ -30,72 +30,89 @@ function getDate() {
 managerRouter.get("/get-report", async (req, res) => {
   try {
     const managerID = "0x" + req.query["manager-id"];
-    const reportData = await generateReportData(managerID);
+    const schedule = req.query["schedule"];
+    const reportData = await generateReportData(managerID, schedule);
     res.json(reportData);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-async function generateReportData(managerID) {
-  const reportData = {};
-  const totalPaidRent = await selectQuery(
-    `select SUM(amount) as amount from (select type, description, amount from paymentsLedger p INNER JOIN (select tenantID from tenants where managerID = ${managerID}) AS t where t
-.tenantID = p.tenantID) AS final where final.type='Payment' and final.description='Rent'`
-  );
-  reportData.income_rent = totalPaidRent[0].amount || 0;
+function getPaymentsQuery(managerID, description, startDate, endDate) {
+  const formattedStartDate = startDate.toISOString().slice(0, 10);
+  const formattedEndDate = endDate.toISOString().slice(0, 10);
 
+  return `
+    SELECT SUM(amount) AS amount
+    FROM (
+      SELECT type, description, amount, time
+      FROM paymentsLedger p
+      INNER JOIN (
+        SELECT tenantID
+        FROM tenants
+        WHERE managerID = ${managerID}
+      ) AS t ON t.tenantID = p.tenantID
+    ) AS final
+    WHERE final.type = 'Payment' AND final.description = '${description}' AND final.time >= '${formattedStartDate}' AND final.time <= '${formattedEndDate}';`;
+}
 
-  const totalPaidUtilities = await selectQuery(
-    `select SUM(amount) as amount from (select type, description, amount from paymentsLedger p INNER JOIN (select tenantID from tenants where managerID = ${managerID}) AS t where t
-.tenantID = p.tenantID) AS final where final.type='Payment' and final.description='Utilities'`);
-  reportData.income_utilities = totalPaidUtilities[0].amount || 0;
-
-
-  const totalPaidOther = await selectQuery(
-    `select SUM(amount) as amount from (select type, description, amount from paymentsLedger p INNER JOIN (select tenantID from tenants where managerID = ${managerID}) AS t where t
-.tenantID = p.tenantID) AS final where final.type='Payment' and final.description='Other'`);
-reportData.income_other = totalPaidOther[0].amount || 0;
-
-  const other = await selectQuery(`
-    SELECT SUM(amount) AS other
-    FROM expenses WHERE type IN ('Other') and managerID = ${managerID}
-  `);
-
-  reportData.expenses_other = other[0].other || 0;
-
-  // ------------------
-
-  const maintenance = await selectQuery(`
-  SELECT SUM(amount) AS maintenance
-  FROM expenses
-  WHERE type IN ('Maintenance Request') and managerID = ${managerID}
-  `);
-  reportData.expenses_maintenance = maintenance[0].maintenance || 0;
-
-  const wages = await selectQuery(`
-  SELECT SUM(amount) AS wages
-  FROM expenses
-  WHERE type IN ('Wages') and managerID = ${managerID}
-  `);
-  reportData.expenses_wages = wages[0].wages || 0;
-
-  const mortgage = await selectQuery(`
-  SELECT SUM(amount) AS mortgage
-  FROM expenses
-  WHERE type IN ('Mortgage Interest') and managerID = ${managerID}
-  `);
-  reportData.expenses_mortgage = mortgage[0].mortgage || 0;
-
-  const utilities = await selectQuery(`
-    SELECT SUM(amount) AS utilities
+function getExpensesQuery(managerID, type, startDate, endDate) {
+  return `
+    SELECT SUM(amount) AS ${type.toLowerCase().replace(/\s/g, '_')}
     FROM expenses
-    WHERE type IN ('Utilities') and managerID = ${managerID}
-  `);
-  reportData.expenses_utilities = utilities[0].utilities || 0;
+    WHERE type IN ('${type}')
+    AND managerID = ${managerID} AND datePosted >= '${startDate.toISOString()}' AND datePosted <= '${endDate.toISOString()}';`;
+}
 
-  // -----------------------
+async function performQueries(managerID, startDate, endDate){
+  const reportDataObject = {} 
+  
+  const totalPaidRent = await selectQuery(getPaymentsQuery(managerID, 'Rent', startDate, endDate));
+  const totalPaidUtilities = await selectQuery(getPaymentsQuery(managerID, 'Utilities', startDate, endDate));
+  const totalPaidOther = await selectQuery(getPaymentsQuery(managerID, 'Other', startDate, endDate));
 
+  reportDataObject.income_rent = totalPaidRent[0].amount || 0;
+  reportDataObject.income_utilities = totalPaidUtilities[0].amount || 0;
+  reportDataObject.income_other = totalPaidOther[0].amount || 0;
+
+  const expenses_other = await selectQuery(getExpensesQuery(managerID, 'Other', startDate, endDate));
+  const expenses_maintenance = await selectQuery(getExpensesQuery(managerID, 'Maintenance Request', startDate, endDate));
+  const expenses_wages = await selectQuery(getExpensesQuery(managerID, 'Wages', startDate, endDate));
+  const expenses_mortgage = await selectQuery(getExpensesQuery(managerID, 'Mortgage Interest', startDate, endDate));
+  const expenses_utilities = await selectQuery(getExpensesQuery(managerID, 'Utilities', startDate, endDate));
+  
+  reportDataObject.expenses_other = expenses_other[0].other || 0;
+  reportDataObject.expenses_maintenance = expenses_maintenance[0].maintenance_request || 0;
+  reportDataObject.expenses_wages = expenses_wages[0].wages || 0;
+  reportDataObject.expenses_mortgage = expenses_mortgage[0].mortgage_interest || 0;  
+  reportDataObject.expenses_utilities = expenses_utilities[0].utilities || 0;
+  return reportDataObject;
+}
+
+async function generateReportData(managerID, schedule) {
+  const reportData = [];
+  const today = new Date();
+
+  if(schedule === "monthly"){
+    for (let i = 0; i < 12; i++) {
+      const monthStartDate = new Date(today.getFullYear(), i, 1);
+      const monthEndDate = new Date(today.getFullYear(), i + 1, 0); 
+      const reportDataObject = await performQueries(managerID, monthStartDate, monthEndDate);
+      reportData.push(reportDataObject);
+    }
+  } else if(schedule === "quarterly"){
+    for (let i = 0; i < 4; i++) {
+      const quarterStartDate = new Date(today.getFullYear(), i * 3, 1);
+      const quarterEndDate = new Date(today.getFullYear(), (i+1)*3, 0); 
+      const reportDataObject = await performQueries(managerID, quarterStartDate, quarterEndDate);
+      reportData.push(reportDataObject);
+    }
+  } else if(schedule === "yearly"){
+      const yearStartDate = new Date(today.getFullYear(), 0, 1); // January 1st
+      const yearEndDate = new Date(today.getFullYear(), 11, 31); // December 31st
+      const reportDataObject = await performQueries(managerID, yearStartDate, yearEndDate);
+      reportData.push(reportDataObject);
+  }
   return reportData;
 }
 
