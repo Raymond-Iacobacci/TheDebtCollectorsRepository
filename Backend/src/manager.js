@@ -27,26 +27,37 @@ function getDate() {
 //     console.log(tenantPayments);
 // }
 
-const interval = 1000;
-setInterval(crawlForLatePayments, interval);
+// const interval = 86400;
+// setInterval(crawlForLatePayments, interval);
 
-function getAbbrDate() {
-  const date = new Date();
-  return date.toISOString().split('T')[0];
-}
+// function getAbbrDate() {
+//   const date = new Date();
+//   return date.toISOString().split('T')[0];
+// }
 
-async function crawlForLatePayments() {
-  var tenantsWithLatePayments = await selectQuery(`SELECT tenantID FROM paymentsLedger WHERE type = 'Charge' AND paidAmount > 0 AND DATEDIFF('${getAbbrDate()}', time) > 5`); // TODO: change to < 11
-  tenantsWithLatePayments = Array.from(new Set(tenantsWithLatePayments));
-  for (let tenantWithLatePayments of tenantsWithLatePayments) {
-    let insertTenantID = Buffer.from(tenantWithLatePayments.tenantID, 'hex');
-    console.log(insertTenantID);
-    // await insertQuery(`INSERT INTO paymentsLedger (type, description, time, amount, tenantID, late_payment) VALUES ('Charge', 'Late', '${getAbbrDate()}', 10, '${insertTenantID}', 1`);
-  }
-  
+// async function crawlForLatePayments() {
+//   var tenantsWithLatePayments = await selectQuery(`SELECT id, tenantID, description, time FROM paymentsLedger WHERE type = 'Charge' AND idLate is NULL AND paidAmount > 0 AND DATEDIFF('${getAbbrDate()}', time) < 11`); // TODO: change to < 11
+//   console.log(tenantsWithLatePayments);
+
+//   for (let tenantWithLateCharges of tenantsWithLatePayments) {
+
+//     const chargeBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${uuidToString(tenantWithLateCharges.tenantID)}`);
+//     const paymentBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${uuidToString(tenantWithLateCharges.tenantID)}`);
+//     let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0);
+//     balance = 10 + balance;
+    
+//     const time = tenantWithLateCharges.time
+//     const parts = time.toISOString().split('T');
+//     const datePart = parts[0];
+//     const timeFinal = `${datePart.split('-')[1]}/${datePart.split('-')[2]}/${datePart.split('-')[0]}`;
+
+//     const query = "INSERT INTO paymentsLedger (type, description, time, amount, tenantID, idLate, balance, paidAmount) VALUES (?,?,?,?,?,?,?,?);";
+//     const values = ['Charge', `Late: ${tenantWithLateCharges.description}, ${timeFinal}`, getDatePayment(), 10, tenantWithLateCharges.tenantID, tenantWithLateCharges.id, balance, 10];
+//     await insertQuery(query, values);
 
 
-}
+//   }
+// }
 
 managerRouter.get("/get-report", async (req, res) => {
   try {
@@ -190,7 +201,7 @@ async function updatePayment(amount){
   console.log(amount);
   let newCharge = 0;
   let subtractAmount = 0;
-  do {
+  while (amount > 0) {
       const oldestCharge = await selectQuery(`SELECT paidAmount AS oldestCharge, id FROM paymentsLedger WHERE type='Charge' AND paidAmount > 0 LIMIT 1`);
       if (oldestCharge.length === 0) {
           break;
@@ -200,7 +211,7 @@ async function updatePayment(amount){
       newCharge -= subtractAmount;
       amount -= subtractAmount;
       await selectQuery(`UPDATE paymentsLedger SET paidAmount=${newCharge} WHERE id=${oldestCharge[0].id}`);
-  } while (amount > 0);
+  }
 }
 
 managerRouter.post("/create-payment", async (req, res) => {
