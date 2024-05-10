@@ -218,23 +218,23 @@ async function updatePayment(amount){
 
 managerRouter.post("/create-payment", async (req, res) => {
     try {
-        const email = req.body.email;
+        const tenantID = req.body.tenantID;
         const description = req.body.description;
         const amount = req.body.amount;
         const currentDate = getDatePayment();
-        const tenantID = await selectQuery(
-            `SELECT tenantID from tenants where email='${email}';`
-        );
+        // const tenantID = await selectQuery(
+        //     `SELECT tenantID from tenants where email='${email}';`
+        // );
         
-        const chargeBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${uuidToString(tenantID[0].tenantID)}`);
-        const paymentBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${uuidToString(tenantID[0].tenantID)}`);
+        const chargeBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${'0x' + tenantID}`);
+        const paymentBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${'0x' + tenantID}`);
         // console.log(`This is the amount: ${amount}`);
         // console.log(chargeBalance[0].amount-paymentBalance[0].amount)
         let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0);
         let temp = balance;
         balance = Number(amount) + balance;
         const query = "INSERT INTO paymentsLedger (type, description, time, amount, tenantID, balance, paidAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        const values = [charge, description, currentDate, amount, tenantID[0].tenantID, balance, amount];
+        const values = [charge, description, currentDate, amount, Buffer.from(tenantID, 'hex'), balance, amount];
         await insertQuery(query, values);
         
         updatePayment(-temp);
