@@ -27,8 +27,42 @@ function getDate() {
 //     console.log(tenantPayments);
 // }
 
+// NOTE: late fees logic
+// const interval = 10000;
+// setInterval(crawlForLatePayments, interval);
+
+// function getAbbrDate() {
+//   const date = new Date();
+//   return date.toISOString().split('T')[0];
+// }
+
+// async function crawlForLatePayments() {
+//   var tenantsWithLatePayments = await selectQuery(`SELECT id, tenantID, description, time FROM paymentsLedger WHERE type = 'Charge' AND idLate is NULL AND paidAmount > 0 AND DATEDIFF('${getAbbrDate()}', time) > -50`); // TODO: change to < 11
+//   console.log(tenantsWithLatePayments);
+
+//   for (let tenantWithLateCharges of tenantsWithLatePayments) {
+
+//     const chargeBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${uuidToString(tenantWithLateCharges.tenantID)}`);
+//     const paymentBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${uuidToString(tenantWithLateCharges.tenantID)}`);
+//     let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0);
+//     balance = 10 + balance;
+    
+//     const time = tenantWithLateCharges.time
+//     const parts = time.toISOString().split('T');
+//     const datePart = parts[0];
+//     const timeFinal = `${datePart.split('-')[1]}/${datePart.split('-')[2]}/${datePart.split('-')[0]}`;
+
+//     const query = "INSERT INTO paymentsLedger (type, description, time, amount, tenantID, idLate, balance, paidAmount) VALUES (?,?,?,?,?,?,?,?);";
+//     const values = ['Charge', `Late: ${tenantWithLateCharges.description}, ${timeFinal}`, getDatePayment(), 10, tenantWithLateCharges.tenantID, tenantWithLateCharges.id, balance, 10];
+//     await insertQuery(query, values);
+
+
+//   }
+// }
+
 managerRouter.get("/get-report", async (req, res) => {
   try {
+    console.log(`This is the date: ${getDate()}`);
     const managerID = "0x" + req.query["manager-id"];
     const schedule = req.query["schedule"];
     const reportData = await generateReportData(managerID, schedule);
@@ -185,7 +219,7 @@ async function updatePayment(amount){
   console.log(amount);
   let newCharge = 0;
   let subtractAmount = 0;
-  do {
+  while (amount > 0) {
       const oldestCharge = await selectQuery(`SELECT paidAmount AS oldestCharge, id FROM paymentsLedger WHERE type='Charge' AND paidAmount > 0 LIMIT 1`);
       if (oldestCharge.length === 0) {
           break;
@@ -195,28 +229,28 @@ async function updatePayment(amount){
       newCharge -= subtractAmount;
       amount -= subtractAmount;
       await selectQuery(`UPDATE paymentsLedger SET paidAmount=${newCharge} WHERE id=${oldestCharge[0].id}`);
-  } while (amount > 0);
+  }
 }
 
 managerRouter.post("/create-payment", async (req, res) => {
     try {
-        const email = req.body.email;
+        const tenantID = req.body.tenantID;
         const description = req.body.description;
         const amount = req.body.amount;
         const currentDate = getDatePayment();
-        const tenantID = await selectQuery(
-            `SELECT tenantID from tenants where email='${email}';`
-        );
+        // const tenantID = await selectQuery(
+        //     `SELECT tenantID from tenants where email='${email}';`
+        // );
         
-        const chargeBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${uuidToString(tenantID[0].tenantID)}`);
-        const paymentBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${uuidToString(tenantID[0].tenantID)}`);
+        const chargeBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${'0x' + tenantID}`);
+        const paymentBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${'0x' + tenantID}`);
         // console.log(`This is the amount: ${amount}`);
         // console.log(chargeBalance[0].amount-paymentBalance[0].amount)
         let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0);
         let temp = balance;
         balance = Number(amount) + balance;
         const query = "INSERT INTO paymentsLedger (type, description, time, amount, tenantID, balance, paidAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        const values = [charge, description, currentDate, amount, tenantID[0].tenantID, balance, amount];
+        const values = [charge, description, currentDate, amount, Buffer.from(tenantID, 'hex'), balance, amount];
         await insertQuery(query, values);
         
         updatePayment(-temp);
@@ -241,7 +275,7 @@ managerRouter.get("/get-tenants", async (req, res) => {
   try {
     const managerID = req.query["manager-id"];
     const tenantsList = await selectQuery(
-      `SELECT firstName, lastName, email, address from tenants where managerID = ${"0x" + managerID
+      `SELECT firstName, lastName, email, address, tenantID from tenants where managerID = ${"0x" + managerID
       }`
     );
     const formattedData = tenantsList.map((row) => ({
@@ -249,6 +283,7 @@ managerRouter.get("/get-tenants", async (req, res) => {
       lastName: row.lastName,
       email: row.email,
       address: row.address,
+      tenantID: row.tenantID.toString('hex').toUpperCase(),
     }));
     res.send(formattedData);
   } catch (error) {
