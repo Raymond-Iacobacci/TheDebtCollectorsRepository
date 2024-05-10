@@ -27,7 +27,8 @@ function getDate() {
 //     console.log(tenantPayments);
 // }
 
-// const interval = 86400;
+// NOTE: late fees logic
+// const interval = 10000;
 // setInterval(crawlForLatePayments, interval);
 
 // function getAbbrDate() {
@@ -36,7 +37,7 @@ function getDate() {
 // }
 
 // async function crawlForLatePayments() {
-//   var tenantsWithLatePayments = await selectQuery(`SELECT id, tenantID, description, time FROM paymentsLedger WHERE type = 'Charge' AND idLate is NULL AND paidAmount > 0 AND DATEDIFF('${getAbbrDate()}', time) < 11`); // TODO: change to < 11
+//   var tenantsWithLatePayments = await selectQuery(`SELECT id, tenantID, description, time FROM paymentsLedger WHERE type = 'Charge' AND idLate is NULL AND paidAmount > 0 AND DATEDIFF('${getAbbrDate()}', time) > -50`); // TODO: change to < 11
 //   console.log(tenantsWithLatePayments);
 
 //   for (let tenantWithLateCharges of tenantsWithLatePayments) {
@@ -69,6 +70,7 @@ managerRouter.get("/get-report", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 async function generateReportData(managerID) {
   const reportData = {};
@@ -257,7 +259,7 @@ managerRouter.get("/get-tenants", async (req, res) => {
   try {
     const managerID = req.query["manager-id"];
     const tenantsList = await selectQuery(
-      `SELECT firstName, lastName, email, address from tenants where managerID = ${"0x" + managerID
+      `SELECT firstName, lastName, email, address, tenantID from tenants where managerID = ${"0x" + managerID
       }`
     );
     const formattedData = tenantsList.map((row) => ({
@@ -265,6 +267,7 @@ managerRouter.get("/get-tenants", async (req, res) => {
       lastName: row.lastName,
       email: row.email,
       address: row.address,
+      tenantID: row.tenantID.toString('hex').toUpperCase(),
     }));
     res.send(formattedData);
   } catch (error) {
