@@ -7,18 +7,18 @@ import { PaymentsHistoryView } from 'src/sections/payments-history/view';
 
 // ----------------------------------------------------------------------
 
-export default function PaymentsHistory({tenantID}) {
+export default function PaymentsHistory({access}) {
 
   return (
     <>
       <Helmet>
         <title> List Payments | Property Management Suite </title>
       </Helmet>
-      <PaymentsHistoryView tenantID={tenantID}/>
+      <PaymentsHistoryView access={access}/>
     </>
   );
 }
 
 PaymentsHistory.propTypes = {
-    tenantID: PropTypes.string,
+    access: PropTypes.string,
 };

@@ -21,11 +21,7 @@ export default function PaymentTableHead({
       <TableRow>
         <TableCell padding="checkbox" />
 
-        {headLabel.map((headCell) => {
-          // Print headCell.id to console
-          console.log(`This is the head cell id: ${headCell.id}`);
-          
-          return (
+        {headLabel.map((headCell) => (
             <TableCell
               key={headCell.id}
               align={headCell.align || 'left'}
@@ -46,8 +42,7 @@ export default function PaymentTableHead({
                 ) : null}
               </TableSortLabel>
             </TableCell>
-          );
-        })}
+        ))}
       </TableRow>
     </TableHead>
   );
