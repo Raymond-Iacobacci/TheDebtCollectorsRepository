@@ -60,6 +60,8 @@ export default function ExpensesView() {
 
   const [requestPopup, setRequestPopup] = useState(false);
 
+  const [reload, setReload] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -77,8 +79,11 @@ export default function ExpensesView() {
         console.log(`Expenses API: ${error}`);
       }
     };
-    fetchData();
-  }, [uuid]);
+    if( reload ) {
+      fetchData();
+      setReload(false);
+    }
+  }, [uuid, reload]);
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -144,6 +149,7 @@ export default function ExpensesView() {
         setExpenseAmount('');
         setExpenseRequest(null);
         setRequestPopup(false);
+        setReload(true);
       } else {  
         console.log('Error posting data to backend');
       }
