@@ -17,15 +17,34 @@ tenantRouter.get('/get-ledger', async(req, res) =>{
         res.status(500).json({ error: error });
     }
 });
+
 function getDatePayment() {
     const moment = require("moment-timezone");
     return moment().tz("America/Los_Angeles").format("YYYY-MM-DD");
 }
+
+async function updatePayment(amount){
+    let newCharge = 0;
+    let subtractAmount = 0;
+    do {
+        const oldestCharge = await selectQuery(`SELECT paidAmount AS oldestCharge, id FROM paymentsLedger WHERE type='Charge' AND paidAmount > 0 LIMIT 1`);
+        if (oldestCharge.length === 0) {
+            break;
+        }
+        newCharge = oldestCharge[0].oldestCharge;
+        subtractAmount = Math.min(oldestCharge[0].oldestCharge, amount);
+        newCharge -= subtractAmount;
+        amount -= subtractAmount;
+        await selectQuery(`UPDATE paymentsLedger SET paidAmount=${newCharge} WHERE id=${oldestCharge[0].id}`);
+    } while (amount != 0);
+}
+
 tenantRouter.post('/make-payment', async(req, res)=>{
     try{
         const tenantID = req.query['tenant-id'];
         const description = req.body.description;
-        const amount = req.body.amount;
+        let amount = req.body.amount;
+        amount = Number(amount);
         const currentDate = getDatePayment();
 
         const chargeBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${'0x' + tenantID}`);
@@ -33,7 +52,10 @@ tenantRouter.post('/make-payment', async(req, res)=>{
         // console.log(`This is the amount: ${amount}`);
         // console.log(chargeBalance[0].amount-paymentBalance[0].amount)
         let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0);
-         balance =  balance - Number(amount);
+        balance =  balance - amount;
+
+        updatePayment(amount);
+        
         const query = "INSERT INTO paymentsLedger (type, description, time, amount, tenantID, balance) VALUES (?, ?, ?, ?, ?, ?)";
         const values = [payment, description, currentDate, amount, Buffer.from(tenantID, 'hex'), balance];
         await insertQuery(query, values);
