@@ -43,6 +43,8 @@ export default function PaymentsHistoryView({ access }) {
   const [paymentAmount, setPaymentAmount] = useState('');
   const [openPayment, setOpenPayment] = useState(false);
 
+  const [reload, setReload] = useState(true);
+
   useEffect(() => {
     const fetchPayments = async () => {
       try {
@@ -56,8 +58,11 @@ export default function PaymentsHistoryView({ access }) {
         console.log(`HeaderInfo API: ${error}`);
       }
     };
-    fetchPayments();
-  }, [tenantID]);
+    if (reload) {
+      fetchPayments();
+      setReload(false);
+    }
+  }, [tenantID, reload]);
 
   const handleClose = () => {
     setOpen(false);
@@ -124,6 +129,7 @@ export default function PaymentsHistoryView({ access }) {
       if (data.ok) {
         setAmount('');
         setDescription('');
+        setReload(true);
       } else {
         console.log('Error posting data to backend');
       }
