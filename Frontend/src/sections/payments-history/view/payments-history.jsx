@@ -115,7 +115,6 @@ export default function PaymentsHistoryView({ access }) {
   };
   // todo: change API
   const handleSubmit = async () => {
-    console.log("SUBMITTING");
     await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/make-payment?tenant-id=${uuid}`, {
       method: 'POST',
       headers: {
@@ -130,7 +129,6 @@ export default function PaymentsHistoryView({ access }) {
       if (data.ok) {
         setAmount('');
         setDescription('');
-        setReload(true);
       } else {
         console.log('Error posting data to backend');
       }
