@@ -85,6 +85,7 @@ export default function ListTenantView({ managerID }) {
   const [ searchParams ] = useSearchParams();
   const token = searchParams.get("session");
 
+
   useEffect(() => {
     const fetchTenants = async () => {
       try {
@@ -98,7 +99,7 @@ export default function ListTenantView({ managerID }) {
       }
     };
     fetchTenants();
-  }, [managerID, tenants.length]);
+  }, [managerID]);
 
   // const handleDueDateChange = (event) => {
   //     setDueDate(event.target.value);
