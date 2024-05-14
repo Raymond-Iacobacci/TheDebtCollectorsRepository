@@ -1,5 +1,5 @@
 const express = require('express');
-const {selectQuery} = require('./db');
+const {executeQuery} = require('./db');
 
 const usersRouter = express.Router();
 
@@ -7,11 +7,11 @@ usersRouter.use(express.json());
 usersRouter.use(express.urlencoded({ extended: true }));
 
 async function getUserType(userID) {
-  const tenantResults = await selectQuery(`SELECT tenantID FROM tenants WHERE tenantID = ${userID};`);
+  const tenantResults = await executeQuery(`SELECT tenantID FROM tenants WHERE tenantID = ${userID};`);
   if (tenantResults.length > 0) {
       return 'tenant';
   }
-  const managerResults = await selectQuery(`SELECT managerID FROM managers WHERE managerID = ${userID};`);
+  const managerResults = await executeQuery(`SELECT managerID FROM managers WHERE managerID = ${userID};`);
   if (managerResults.length > 0) {
       return 'manager';
   }
@@ -20,12 +20,12 @@ async function getUserType(userID) {
 
 async function verifyUser(tableName, userID, email, token, res) {
   try {
-    const user = await selectQuery(`SELECT ${userID} FROM ${tableName} WHERE email = '${email}';`);
+    const user = await executeQuery(`SELECT ${userID} FROM ${tableName} WHERE email = '${email}';`);
     if (!user || user.length === 0) {
       res.status(404).send({ err: "User not found." });
       return;
     }
-    await selectQuery(`UPDATE ${tableName} SET token = '${token}' WHERE email = '${email}';`);
+    await executeQuery(`UPDATE ${tableName} SET token = '${token}' WHERE email = '${email}';`);
     res.send({ uuid: user[0][userID].toString('hex').toUpperCase() });
   } catch (error) {
     res.status(500).send('Internal server error');
@@ -51,7 +51,7 @@ usersRouter.get('/get-attributes', async (req, res) => {
     res.status(404).send({ err: "User not found." });
     return;
   }
-  const user = await selectQuery(`SELECT firstName, lastName, email FROM ${userType}s WHERE ${userType}ID = ${userID};`);
+  const user = await executeQuery(`SELECT firstName, lastName, email FROM ${userType}s WHERE ${userType}ID = ${userID};`);
   res.send(user[0]);
 });
 
@@ -65,7 +65,7 @@ usersRouter.get('/verify-token', async (req, res) => {
     return;
   }
 
-  queryResults = await selectQuery(`SELECT token FROM ${userType}s WHERE ${userType}ID = ${userID};`);
+  queryResults = await executeQuery(`SELECT token FROM ${userType}s WHERE ${userType}ID = ${userID};`);
   const backendToken = queryResults[0].token;
 
   if (frontendToken === backendToken) {
@@ -84,7 +84,7 @@ usersRouter.put('/remove-token', async (req, res) => {
     return;
   }
 
-  await selectQuery(`UPDATE ${userType}s SET token = NULL WHERE ${userType}ID = ${userID};`);
+  await executeQuery(`UPDATE ${userType}s SET token = NULL WHERE ${userType}ID = ${userID};`);
   res.sendStatus(200);
 });
 

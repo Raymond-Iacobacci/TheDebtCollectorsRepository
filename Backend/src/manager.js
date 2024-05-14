@@ -1,7 +1,7 @@
 
 const express = require("express");
 const managerRouter = express.Router();
-const { selectQuery, insertQuery, uuidToString } = require("./db");
+const { executeQuery, uuidToString } = require("./db");
 const { sendEmail } = require("./sendEmail");
 const charge = 'Charge';
 const payment = 'Payment';
@@ -101,19 +101,19 @@ function getExpensesQuery(managerID, type, startDate, endDate) {
 async function performQueries(managerID, startDate, endDate){
   const reportDataObject = {} 
   
-  const totalPaidRent = await selectQuery(getPaymentsQuery(managerID, 'Rent', startDate, endDate));
-  const totalPaidUtilities = await selectQuery(getPaymentsQuery(managerID, 'Utilities', startDate, endDate));
-  const totalPaidOther = await selectQuery(getPaymentsQuery(managerID, 'Other', startDate, endDate));
+  const totalPaidRent = await executeQuery(getPaymentsQuery(managerID, 'Rent', startDate, endDate));
+  const totalPaidUtilities = await executeQuery(getPaymentsQuery(managerID, 'Utilities', startDate, endDate));
+  const totalPaidOther = await executeQuery(getPaymentsQuery(managerID, 'Other', startDate, endDate));
 
   reportDataObject.income_rent = totalPaidRent[0].amount || 0;
   reportDataObject.income_utilities = totalPaidUtilities[0].amount || 0;
   reportDataObject.income_other = totalPaidOther[0].amount || 0;
 
-  const expenses_other = await selectQuery(getExpensesQuery(managerID, 'Other', startDate, endDate));
-  const expenses_maintenance = await selectQuery(getExpensesQuery(managerID, 'Maintenance Request', startDate, endDate));
-  const expenses_wages = await selectQuery(getExpensesQuery(managerID, 'Wages', startDate, endDate));
-  const expenses_mortgage = await selectQuery(getExpensesQuery(managerID, 'Mortgage Interest', startDate, endDate));
-  const expenses_utilities = await selectQuery(getExpensesQuery(managerID, 'Utilities', startDate, endDate));
+  const expenses_other = await executeQuery(getExpensesQuery(managerID, 'Other', startDate, endDate));
+  const expenses_maintenance = await executeQuery(getExpensesQuery(managerID, 'Maintenance Request', startDate, endDate));
+  const expenses_wages = await executeQuery(getExpensesQuery(managerID, 'Wages', startDate, endDate));
+  const expenses_mortgage = await executeQuery(getExpensesQuery(managerID, 'Mortgage Interest', startDate, endDate));
+  const expenses_utilities = await executeQuery(getExpensesQuery(managerID, 'Utilities', startDate, endDate));
   
   reportDataObject.expenses_other = expenses_other[0].other || 0;
   reportDataObject.expenses_maintenance = expenses_maintenance[0].maintenance_request || 0;
@@ -153,7 +153,7 @@ async function generateReportData(managerID, schedule) {
 managerRouter.get("/get-tenant-payments", async (req, res) => {
   try {
     const managerID = "0x" + req.query["manager-id"];
-    const tenantsQuery = await selectQuery(
+    const tenantsQuery = await executeQuery(
       `SELECT firstName, lastName, address, amount, type, p.tenantID, timeAssigned FROM paymentsDue p INNER JOIN tenants t ON p.tenantID = t.tenantID WHERE t.managerID =${managerID};`
     );
     for (let tenant of tenantsQuery) {
@@ -182,7 +182,7 @@ managerRouter.post("/create-tenant", async (req, res) => {
     const monthlyRent = req.body.monthlyRent;
     const monthlyUtilites = req.body.monthlyUtilities;
     const managerId = req.query["manager-id"];
-    const managerResult = await selectQuery(
+    const managerResult = await executeQuery(
       `SELECT firstName,lastName FROM managers where managerID = ${"0x" + managerId
       };`
     );
@@ -200,7 +200,7 @@ managerRouter.post("/create-tenant", async (req, res) => {
       monthlyRent,
       monthlyUtilites,
     ];
-    await insertQuery(query, values);
+    await executeQuery(query, values);
 
     const message = `Hello ${firstName} ${lastName} welcome to the DebtCollectors.`;
     sendEmail(email, 'Test Subject', message)
@@ -220,7 +220,7 @@ async function updatePayment(amount){
   let newCharge = 0;
   let subtractAmount = 0;
   while (amount > 0) {
-      const oldestCharge = await selectQuery(`SELECT paidAmount AS oldestCharge, id FROM paymentsLedger WHERE type='Charge' AND paidAmount > 0 LIMIT 1`);
+      const oldestCharge = await executeQuery(`SELECT paidAmount AS oldestCharge, id FROM paymentsLedger WHERE type='Charge' AND paidAmount > 0 LIMIT 1`);
       if (oldestCharge.length === 0) {
           break;
       }
@@ -228,7 +228,7 @@ async function updatePayment(amount){
       subtractAmount = Math.min(oldestCharge[0].oldestCharge, amount);
       newCharge -= subtractAmount;
       amount -= subtractAmount;
-      await selectQuery(`UPDATE paymentsLedger SET paidAmount=${newCharge} WHERE id=${oldestCharge[0].id}`);
+      await executeQuery(`UPDATE paymentsLedger SET paidAmount=${newCharge} WHERE id=${oldestCharge[0].id}`);
   }
 }
 
@@ -242,8 +242,8 @@ managerRouter.post("/create-payment", async (req, res) => {
         //     `SELECT tenantID from tenants where email='${email}';`
         // );
         
-        const chargeBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${'0x' + tenantID}`);
-        const paymentBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${'0x' + tenantID}`);
+        const chargeBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${'0x' + tenantID}`);
+        const paymentBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${'0x' + tenantID}`);
         // console.log(`This is the amount: ${amount}`);
         // console.log(chargeBalance[0].amount-paymentBalance[0].amount)
         let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0);
@@ -251,7 +251,7 @@ managerRouter.post("/create-payment", async (req, res) => {
         balance = Number(amount) + balance;
         const query = "INSERT INTO paymentsLedger (type, description, time, amount, tenantID, balance, paidAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
         const values = [charge, description, currentDate, amount, Buffer.from(tenantID, 'hex'), balance, amount];
-        await insertQuery(query, values);
+        await executeQuery(query, values);
         
         updatePayment(-temp);
 
@@ -274,7 +274,7 @@ managerRouter.post("/create-payment", async (req, res) => {
 managerRouter.get("/get-tenants", async (req, res) => {
   try {
     const managerID = req.query["manager-id"];
-    const tenantsList = await selectQuery(
+    const tenantsList = await executeQuery(
       `SELECT firstName, lastName, email, address, tenantID from tenants where managerID = ${"0x" + managerID
       }`
     );
@@ -294,7 +294,7 @@ managerRouter.get("/get-tenants", async (req, res) => {
 managerRouter.get('/get-expenses', async (req, res) => {
   try {
     const managerID = '0x' + req.query['manager-id'];
-    const expenses = await selectQuery(`SELECT managerID, amount, type, description, datePosted, requestID FROM expenses where managerID = ${managerID};`);
+    const expenses = await executeQuery(`SELECT managerID, amount, type, description, datePosted, requestID FROM expenses where managerID = ${managerID};`);
     if (!expenses) {
       res.status(404).json({ error: 'no expenses for this manager' });
       return;
@@ -324,7 +324,7 @@ managerRouter.post('/add-expense', async (req, res) => {
     }
     const query = `INSERT INTO expenses (managerID, amount, type, description, datePosted, requestID) VALUES (?, ?, ?, ?, ?, ?);`;
     const values = [managerID, amount, type, description, datePosted, requestID];
-    await insertQuery(query, values);
+    await executeQuery(query, values);
     res.sendStatus(200);
   } catch (error) {
     res.status(500).json({ error: error.message });

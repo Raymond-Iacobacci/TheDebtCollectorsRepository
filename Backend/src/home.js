@@ -1,6 +1,6 @@
 const express = require('express');
 const homeRouter = express.Router();
-const { insertQuery } = require('./db');
+const { executeQuery } = require('./db');
 
 homeRouter.use(express.json());
 
@@ -13,7 +13,7 @@ homeRouter.post('/create-account', async (req, res) => {
 
       const query = 'INSERT INTO pendingTenants (tenantEmail, firstName, lastName, managerEmail) VALUES (?, ?, ?, ?)';
       const values = [tenantEmail, firstName, lastName, managerEmail];
-      const results = await insertQuery(query, values);
+      const results = await executeQuery(query, values);
       res.send(results);
     } catch (error) {
       res.status(500).json({ error: 'Error inserting into pendingTenants table' });
