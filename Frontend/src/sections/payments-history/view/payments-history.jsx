@@ -4,7 +4,9 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
 import Dialog from '@mui/material/Dialog';
+import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Unstable_Grid2';
 import TextField from '@mui/material/TextField';
@@ -12,9 +14,11 @@ import Container from '@mui/material/Container';
 import DialogActions from '@mui/material/DialogActions';
 import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
+import InputLabel from '@mui/material/InputLabel';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import DialogTitle from '@mui/material/DialogTitle';
+import FormControl from '@mui/material/FormControl';
 import { useState, useEffect } from 'react';
 
 import { useRouter, usePathname } from 'src/routes/hooks';
@@ -30,7 +34,7 @@ export default function PaymentsHistoryView({ access }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const uuid = pathname.split('/')[3];
-  const tenantID = (access === 'tenant')?pathname.split('/')[3]:pathname.split('/')[5];
+  const tenantID = access === 'tenant' ? pathname.split('/')[3] : pathname.split('/')[5];
   const [amount, setAmount] = useState('');
   const [payments, setPayments] = useState([]);
   const [page, setPage] = useState(0);
@@ -147,14 +151,16 @@ export default function PaymentsHistoryView({ access }) {
   const handleGoBack = (event) => {
     router.back();
   };
-
+  // const handleDescriptionChange = (event) => {
+  //   setDescription(event.target.value);
+  // }
   const handlePaymentAmountChange = (event) => {
     setPaymentAmount(event.target.value);
   };
 
   const handleCreditAmountChange = (event) => {
     setCreditAmount(event.target.value);
-  }
+  };
 
   const handleTypeChange = (event) => {
     setDescription(event.target.value);
@@ -168,17 +174,17 @@ export default function PaymentsHistoryView({ access }) {
 
   const handlePaymentOpen = () => {
     setOpenPayment(true);
-  }
+  };
 
   const handleCreditClose = () => {
     setCreditAmount('');
     setDescription('');
     setOpenCredit(false);
-  }
+  };
 
   const handleCreditOpen = () => {
     setOpenCredit(true);
-  }
+  };
 
   const handlePaymentSubmit = async () => {
     await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/create-payment`, {
@@ -200,7 +206,6 @@ export default function PaymentsHistoryView({ access }) {
   };
 
   const handleCreditSubmit = async () => {
-
     await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/create-credit`, {
       method: 'POST',
       headers: {
@@ -210,14 +215,14 @@ export default function PaymentsHistoryView({ access }) {
       body: JSON.stringify({
         tenantID: `${tenantID}`,
         description: `${description}`,
-        amount: `${ creditAmount}`,
+        amount: `${creditAmount}`,
       }),
     });
     setCreditAmount('');
     setOpenCredit(false);
     setDescription('');
     setReload(true);
-  }
+  };
 
   return (
     <Container>
@@ -301,7 +306,6 @@ export default function PaymentsHistoryView({ access }) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Card>
-
       <Dialog
         open={open}
         onClose={handleClose}
@@ -334,17 +338,24 @@ export default function PaymentsHistoryView({ access }) {
                 }}
                 sx={{ maxWidth: 500 }}
               />
-              <TextField
-                value={description}
-                id="outlined-basic"
-                label="Description"
-                variant="outlined"
-                multiline
-                onChange={(e) => {
-                  setDescription(e.target.value);
-                }}
-                sx={{ maxWidth: 500 }}
-              />
+              {/* TODO: code above should go here */}
+              <Grid>
+                <FormControl sx={{ m: 1, minWidth: 150 }} size="medium">
+                  <InputLabel id="demo-select-small-label">Categories</InputLabel>
+                  <Select
+                    labelId="demo-select-small-label"
+                    id="demo-select-small"
+                    value={description}
+                    label="Description"
+                    onChange={handleTypeChange}
+                    SelectProps={{ MenuProps: { sx: { maxHeight: 150 } } }}
+                  >
+                    <MenuItem value="Rent">Rent</MenuItem>
+                    <MenuItem value="Utilities">Utilities</MenuItem>
+                    <MenuItem value="Other">Other</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
             </Box>
             <DialogActions sx={{ justifyContent: 'center' }}>
               <Button onClick={handleSubmit} autoFocus>
@@ -378,27 +389,36 @@ export default function PaymentsHistoryView({ access }) {
 
 
       <Dialog open={openPayment} onClose={handlePaymentClose} sx={{ textAlign: 'center' }}>
-        <DialogTitle id="alert-dialog-title">Fill Payment Details</DialogTitle>
+        <DialogTitle id="alert-dialog-title">Fill Charge Details</DialogTitle>
         <Box sx={{ padding: '20px' }}>
-          <TextField
-            value={description}
-            label="Description"
-            onChange={handleTypeChange}
-            sx={{ marginBottom: '10px' }}
-          />
-          <TextField
-            value={paymentAmount}
-            label="Payment Amount"
-            onChange={handlePaymentAmountChange}
-            sx={{ marginBottom: '10px' }}
-          />
-          {/* <TextField
-                        value={time}
-                        label="MM-DD-YYYY"
-                        onChange={handleTimeChange}
-                        sx={{ marginBottom: '10px' }}
-                    /> */}
-          <Button variant="contained" onClick={handlePaymentSubmit}>
+          <Grid container spacing={0} justifyContent="center">
+            <Grid item xs={12} sm={6}>
+              <TextField
+                value={paymentAmount}
+                label="Payment Amount"
+                onChange={handlePaymentAmountChange}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl sx={{ minWidth: 150 }} size="medium" fullWidth>
+                <InputLabel id="demo-select-small-label">Categories</InputLabel>
+                <Select
+                  labelId="demo-select-small-label"
+                  id="demo-select-small"
+                  value={description}
+                  label="Description"
+                  onChange={handleTypeChange}
+                  SelectProps={{ MenuProps: { sx: { maxHeight: 150 } } }}
+                >
+                  <MenuItem value="Rent">Rent</MenuItem>
+                  <MenuItem value="Utilities">Utilities</MenuItem>
+                  <MenuItem value="Other">Other</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+          <Button variant="contained" onClick={handlePaymentSubmit} sx={{ mt: 2 }}>
             Create Payment
           </Button>
         </Box>
