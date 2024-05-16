@@ -138,10 +138,8 @@ export default function PaymentsHistoryView({ access }) {
         console.log('Error posting data to backend');
       }
     });
-    // if (reload) {
-      handleClose();
-      // setReload(false);
-    // }
+    handleClose();
+    setReload(true);
   };
   // TODO: access control via tenant-manager split
 
