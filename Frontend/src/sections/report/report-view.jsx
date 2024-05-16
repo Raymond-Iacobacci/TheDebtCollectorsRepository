@@ -28,9 +28,32 @@ export default function ReportView() {
 
   const [paid, setPaid] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const [credits, setCredits] = useState([]);
 
   const [timePeriod, setTimePeriod] = useState('monthly');
   const [timePopover, setTimePopover] = useState(null);
+
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  const quarters = [
+    'Q1',
+    'Q2',
+    'Q3',
+    'Q4'
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,39 +66,47 @@ export default function ReportView() {
         )
           .then((res) => res.json())
           .then((data) => {
+            console.log(data)
             let finalPaid = [];
             let finalExpenses = [];
-            for( let i = 0; i < data.length; i += 1 ) {
-              if( (lastFourTimePeriods(i) && timePeriod === 'monthly') || timePeriod !== 'monthly' ) {
-                const period = data[i];
-                const parsedIncome = {};
-                const parsedExpenses = {};
-                Object.entries(period).forEach(([key, value]) => {
-                  let category;
-                  if (key.includes('income')) {
-                    category = 'income';
-                  } else if (key.includes('expense')) {
-                    category = 'expenses';
-                  } else {
-                    category = 'misc';
-                  }
-                  switch (category) {
-                    case 'income':
-                      parsedIncome[key.substring(7)] = value;
-                      break;
-                    case 'expenses':
-                      parsedExpenses[key.substring(9)] = value;
-                      break;
-                    default:
-                      break;
-                  }
-                });
-                finalPaid = [...finalPaid, parsedIncome];
-                finalExpenses = [...finalExpenses, parsedExpenses];
-              }
+            let finalCredits = []; 
+            for (let i = 0; i < data.length; i += 1) {
+              const period = data[i];
+              const parsedIncome = {};
+              const parsedExpenses = {};
+              const parsedCredits = {};
+              Object.entries(period).forEach(([key, value]) => {
+                let category;
+                if (key.includes('income')) {
+                  category = 'income';
+                } else if (key.includes('expense')) {
+                  category = 'expenses';
+                } else if (key.includes('credit')) {
+                  category = 'credits';
+                } else {
+                  category = 'misc';
+                }
+                switch (category) {
+                  case 'income':
+                    parsedIncome[key.substring(7)] = value;
+                    break;
+                  case 'expenses':
+                    parsedExpenses[key.substring(9)] = value;
+                    break;
+                  case 'credits':
+                    parsedCredits.credits = value;
+                    break;
+                  default:
+                    break;
+                }
+              });
+              finalPaid = [...finalPaid, parsedIncome];
+              finalExpenses = [...finalExpenses, parsedExpenses];
+              finalCredits = [...finalCredits, parsedCredits];
             }
             setPaid(finalPaid);
             setExpenses(finalExpenses);
+            setCredits(finalCredits);
           });
         setLoading(false);
       } catch (error) {
@@ -86,62 +117,75 @@ export default function ReportView() {
     fetchData();
   }, [uuid, timePeriod]);
 
-  const lastFourTimePeriods = (index) => {
-    const cmonth = new Date().getMonth();
-    if( index <= cmonth && cmonth-4 < index) {
-      return true;
-    }
-    return false;
-  };
-
-  const renderItems = (map, label) => (
-    <>
-      <Typography gutterBottom variant="h5" sx={{ margin: '8px' }}>
-        {label}
-      </Typography>
-      {renderLegend(timePeriod)}
+  const renderColumnLegend = (map) => (
+    <Stack justifyContent="space-between" sx={{ paddingRight: '10px' }}>
+      <Grid item xs={3} sx={{ paddingLeft: '16px' }}>
+        <Typography variant="subtitle1">Category</Typography>
+      </Grid>
       {map.length !== 0 ? (
         Object.entries(map[0]).map(([key, value]) => (
-          <Stack direction="row" alignItems="center" justifyContent="space-between">
-            <Grid item xs={3} sx={{ paddingLeft: '16px' }}>
-              <Typography variant="body1">{key.charAt(0).toUpperCase() + key.slice(1)}</Typography>
-            </Grid>
-            {timePeriod === 'monthly' ? (
-              Object.entries(map).map(([k, v]) => (
-                <Grid xs={2}>
-                  <Typography align="right" variant="body1">
-                    {fCurrency(v[key].toString())}
-                  </Typography>
-                </Grid>
-              )
-            )) : (
-              <div />
-            )}
-            {timePeriod === 'quarterly' ? (
-              Object.entries(map).map(([k, v]) => (
-                <Grid xs={2}>
-                  <Typography align="right" variant="body1">
-                    {fCurrency(v[key].toString())}
-                  </Typography>
-                </Grid>
-              ))
-            ) : (
-              <div />
-            )}
-            {timePeriod === 'yearly' ? (
-              <Grid item xs={6}>
-                <Typography align="right" variant="body1">
-                  {fCurrency(value)}
-                </Typography>
-              </Grid>
-            ) : (
-              <div />
-            )}
-          </Stack>
+          <Grid item xs={3} sx={{ paddingLeft: '16px' }}>
+            <Typography variant="body1">{key.charAt(0).toUpperCase() + key.slice(1)}</Typography>
+          </Grid>
         ))
       ) : (
         <div />
       )}
+    </Stack>
+  );
+
+  const renderColumnData = (map) => (
+    <>
+      {map.length !== 0 ? (
+        <Stack direction="row" alignItems="center" sx={{ overflowX: 'scroll' }}>
+          {Object.entries(map).map(([key, value]) => (
+            <Stack alignItems="center">
+              <Grid item xs={1} sx={{ paddingLeft: '20px' }}>
+                  {timePeriod === 'monthly' ? (
+                    <Typography variant="subtitle1">{months[key]}</Typography>
+                  ) : (
+                    <div />
+                  )}
+                  {timePeriod === 'quarterly' ? (
+                    <Typography variant="subtitle1">{quarters[key]}</Typography>
+                  ) : (
+                    <div />
+                  )}
+                  {timePeriod === 'yearly' ? (
+                    <Typography variant="subtitle1">{new Date().getFullYear()}</Typography>
+                  ) : (
+                    <div />
+                  )}
+              </Grid>
+              {Object.entries(map[key]).map(([k, v]) => (
+                <Grid item xs={1} sx={{ paddingLeft: '20px' }}>
+                  <Typography align="right" variant="body1">
+                    {fCurrency(v.toString())}
+                  </Typography>
+                </Grid>
+              ))}
+            </Stack>
+          ))}
+        </Stack>
+      ) : (
+        <div />
+      )}
+    </>
+  );
+
+  const renderData = (map, label) => (
+    <>
+      <Typography gutterBottom variant="h5" sx={{ margin: '8px' }}>
+        {label}
+      </Typography>
+      <Grid container spacing={1} wrap>
+        <Grid item sx={{ padding: '10px', marginRight: '35px' }}>
+          {renderColumnLegend(map)}
+        </Grid>
+        <Grid item sx={{ padding: '10px', width: '100%' }}>
+          {renderColumnData(map)}
+        </Grid>
+      </Grid>
     </>
   );
 
@@ -157,24 +201,6 @@ export default function ReportView() {
       </Grid>
     </Grid>
   );
-
-  // const renderColumnTotals = (map) => (
-  //   <>
-  //     <Divider
-  //       sx={{ borderStyle: 'dashed', marginTop: '12px', marginRight: '20px', marginLeft: '20px' }}
-  //     />
-  //     <Grid container sx={{ marginTop: '8px' }}>
-  //       <Grid item xs={6} sx={{ paddingLeft: '16px' }}>
-  //         <Typography variant="subtitle1">Total</Typography>
-  //       </Grid>
-  //       <Grid item xs={6} sx={{ paddingRight: '32px' }}>
-  //         <Typography align="right" variant="subtitle1">
-  //           {fCurrency(calculateOverallTotal(map))}
-  //         </Typography>
-  //       </Grid>
-  //     </Grid>
-  //   </>
-  // );
 
   const calculateOverallTotal = (data) => {
     let total = 0;
@@ -203,93 +229,6 @@ export default function ReportView() {
       </Grid>
     </Grid>
   );
-
-  const renderLegend = (interval) => {
-    switch (interval) {
-      case 'monthly':
-        return (
-          <Stack direction="row" alignItems="center" justifyContent="space-between" >
-            <Grid item xs={6} sx={{ paddingLeft: '16px' }}>
-              <Typography variant="subtitle1">Category</Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography align="right" variant="subtitle1">
-                February
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography align="right" variant="subtitle1">
-                March
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography align="right" variant="subtitle1">
-                April
-              </Typography>
-            </Grid>
-            <Grid item xs={3} sx={{ paddingRight: '32px' }}>
-              <Typography align="right" variant="subtitle1">
-                May
-              </Typography>
-            </Grid>
-          </Stack>
-        );
-      case 'quarterly':
-        return (
-          <Stack direction="row" alignItems="center" justifyContent="space-between" >
-            <Grid item xs={6} sx={{ paddingLeft: '16px' }}>
-              <Typography variant="subtitle1">Category</Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography align="right" variant="subtitle1">
-                Q1
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography align="right" variant="subtitle1">
-                Q2
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography align="right" variant="subtitle1">
-                Q3
-              </Typography>
-            </Grid>
-            <Grid item xs={3} sx={{ paddingRight: '32px' }}>
-              <Typography align="right" variant="subtitle1">
-                Q4
-              </Typography>
-            </Grid>
-          </Stack>
-        );
-      case 'yearly':
-        return (
-          <Stack direction="row" alignItems="center" justifyContent="space-between" >
-            <Grid item xs={6} sx={{ paddingLeft: '16px' }}>
-              <Typography variant="subtitle1">Category</Typography>
-            </Grid>
-            <Grid item xs={3} sx={{ paddingRight: '16px' }}>
-              <Typography align="right" variant="subtitle1">
-                2024
-              </Typography>
-            </Grid>
-          </Stack>
-        );
-      default:
-        return (
-          <Grid container sx={{ marginBottom: '6px' }}>
-            <Grid item xs={6} sx={{ paddingLeft: '16px' }}>
-              <Typography variant="subtitle1">Category</Typography>
-            </Grid>
-            <Grid item xs={6} sx={{ paddingRight: '32px' }}>
-              <Typography align="right" variant="subtitle1">
-                This Month
-              </Typography>
-            </Grid>
-          </Grid>
-        );
-    }
-  };
 
   const handleOpenTimePopover = (event) => {
     setTimePopover(event.currentTarget);
@@ -358,12 +297,13 @@ export default function ReportView() {
       <Grid container spacing={3}>
         <Grid item xs={12} sm={12} md={8}>
           <Card sx={{ padding: '16px' }}>
-            {renderItems(expenses, 'Expenses')}
-            {/* {renderColumnTotals(expenses)} */}
+            {renderData(expenses, 'Expenses')}
           </Card>
           <Card sx={{ padding: '16px', marginTop: '25px' }}>
-            {renderItems(paid, 'Income')}
-            {/* {renderColumnTotals(paid)} */}
+            {renderData(paid, 'Income')}
+          </Card>
+          <Card sx={{ padding: '16px', marginTop: '25px' }}>
+            {renderData(credits, 'Credits')}
           </Card>
         </Grid>
         <Grid item xs={12} sm={12} md={4}>
@@ -373,6 +313,7 @@ export default function ReportView() {
             </Typography>
             {renderOverallTotals(expenses, 'Expenses')}
             {renderOverallTotals(paid, 'Income')}
+            {/* {renderOverallTotals(credits, 'Credits')} */}
             <Divider sx={{ borderStyle: 'dashed', marginTop: '12px', marginBottom: '8px' }} />
             {renderNet}
           </Card>
