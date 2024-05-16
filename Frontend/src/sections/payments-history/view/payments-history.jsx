@@ -151,9 +151,7 @@ export default function PaymentsHistoryView({ access }) {
   const handleGoBack = (event) => {
     router.back();
   };
-  // const handleDescriptionChange = (event) => {
-  //   setDescription(event.target.value);
-  // }
+
   const handlePaymentAmountChange = (event) => {
     setPaymentAmount(event.target.value);
   };
@@ -256,7 +254,7 @@ export default function PaymentsHistoryView({ access }) {
                 color="inherit"
                 startIcon={<Iconify icon="eva:plus-fill" />}
                 onClick={handleCreditOpen}
-                sx={{ marginRight: 1 }} // Added marginRight to create space
+                sx={{ marginRight: 1 }} 
               >
                 Credit Tenant
               </Button>
@@ -307,7 +305,6 @@ export default function PaymentsHistoryView({ access }) {
         />
       </Card>
 
-      {/* NOTE BEGIN */}
       <Dialog open={open} onClose={handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="xs" fullWidth>
   <DialogTitle id="alert-dialog-title" sx={{ textAlign: 'center' }}>
     Balance
@@ -348,7 +345,6 @@ export default function PaymentsHistoryView({ access }) {
   </Box>
 </Dialog>
 
-      {/* NOTE END */}
       <Dialog open={openCredit} onClose={handleCreditClose} sx={{ textAlign: 'center' }}>
         <DialogTitle id="alert-dialog-title">Fill Credit Details</DialogTitle>
         <Box sx={{ padding: '20px' }}>
