@@ -38,10 +38,13 @@ export default function PaymentsHistoryView({ access }) {
   const [orderBy, setOrderBy] = useState('');
   const [order, setOrder] = useState('asc');
   const [filterName] = useState('');
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState(''); // TODO: potentially add in creditDescription
 
   const [paymentAmount, setPaymentAmount] = useState('');
   const [openPayment, setOpenPayment] = useState(false);
+
+  const [creditAmount, setCreditAmount] = useState('');
+  const [openCredit, setOpenCredit] = useState(false);
 
   const [reload, setReload] = useState(true);
 
@@ -66,6 +69,8 @@ export default function PaymentsHistoryView({ access }) {
 
   const handleClose = () => {
     setOpen(false);
+    setAmount('');
+    setDescription('');
   };
 
   const handleOpen = () => {
@@ -133,7 +138,10 @@ export default function PaymentsHistoryView({ access }) {
         console.log('Error posting data to backend');
       }
     });
-    handleClose();
+    // if (reload) {
+      handleClose();
+      // setReload(false);
+    // }
   };
   // TODO: access control via tenant-manager split
 
@@ -146,17 +154,32 @@ export default function PaymentsHistoryView({ access }) {
     setPaymentAmount(event.target.value);
   };
 
+  const handleCreditAmountChange = (event) => {
+    setCreditAmount(event.target.value);
+  }
+
   const handleTypeChange = (event) => {
     setDescription(event.target.value);
   };
 
   const handlePaymentClose = () => {
     setPaymentAmount('');
+    setDescription('');
     setOpenPayment(false);
   };
 
   const handlePaymentOpen = () => {
     setOpenPayment(true);
+  }
+
+  const handleCreditClose = () => {
+    setCreditAmount('');
+    setDescription('');
+    setOpenCredit(false);
+  }
+
+  const handleCreditOpen = () => {
+    setOpenCredit(true);
   }
 
   const handlePaymentSubmit = async () => {
@@ -172,9 +195,31 @@ export default function PaymentsHistoryView({ access }) {
         amount: `${paymentAmount}`,
       }),
     });
+    setPaymentAmount('');
     setOpenPayment(false);
+    setDescription('');
     setReload(true);
   };
+
+  const handleCreditSubmit = async () => {
+
+    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/create-credit`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        tenantID: `${tenantID}`,
+        description: `${description}`,
+        amount: `${ creditAmount}`,
+      }),
+    });
+    setCreditAmount('');
+    setOpenCredit(false);
+    setDescription('');
+    setReload(true);
+  }
 
   return (
     <Container>
@@ -201,14 +246,26 @@ export default function PaymentsHistoryView({ access }) {
             >
               Back
             </Button>
-            <Button
-              variant="contained"
-              color="inherit"
-              startIcon={<Iconify icon="eva:plus-fill" />}
-              onClick={handlePaymentOpen}
-            >
-              Charge Tenant
-            </Button>
+
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Button
+                variant="contained"
+                color="inherit"
+                startIcon={<Iconify icon="eva:plus-fill" />}
+                onClick={handleCreditOpen}
+                sx={{ marginRight: 1 }} // Added marginRight to create space
+              >
+                Credit Tenant
+              </Button>
+              <Button
+                variant="contained"
+                color="inherit"
+                startIcon={<Iconify icon="eva:plus-fill" />}
+                onClick={handlePaymentOpen}
+              >
+                Charge Tenant
+              </Button>
+            </Box>
           </>
         )}
       </Stack>
@@ -299,6 +356,28 @@ export default function PaymentsHistoryView({ access }) {
           </Grid>
         </Grid>
       </Dialog>
+
+      <Dialog open={openCredit} onClose={handleCreditClose} sx={{ textAlign: 'center' }}>
+        <DialogTitle id="alert-dialog-title">Fill Credit Details</DialogTitle>
+        <Box sx={{ padding: '20px' }}>
+          <TextField
+            value={description}
+            label="Description"
+            onChange={handleTypeChange}
+            sx={{ marginBottom: '10px' }}
+          />
+          <TextField
+            value={creditAmount}
+            label="Credit Amount"
+            onChange={handleCreditAmountChange}
+            sx={{ marginBottom: '10px' }}
+          />
+          <Button variant="contained" onClick={handleCreditSubmit}>
+            Create Credit
+          </Button>
+        </Box>
+      </Dialog>
+
 
       <Dialog open={openPayment} onClose={handlePaymentClose} sx={{ textAlign: 'center' }}>
         <DialogTitle id="alert-dialog-title">Fill Payment Details</DialogTitle>

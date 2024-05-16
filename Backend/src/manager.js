@@ -5,6 +5,7 @@ const { executeQuery, uuidToString } = require("./db");
 const { sendEmail } = require("./sendEmail");
 const charge = 'Charge';
 const payment = 'Payment';
+const credit = 'Credit';
 managerRouter.use(express.json());
 
 function getDate() {
@@ -90,9 +91,27 @@ function getPaymentsQuery(managerID, description, startDate, endDate) {
     WHERE final.type = 'Payment' AND final.description = '${description}' AND final.time >= '${formattedStartDate}' AND final.time <= '${formattedEndDate}';`;
 }
 
+function getCreditsQuery(managerID, startDate, endDate) {
+  const formattedStartDate = startDate.toISOString().slice(0, 10);
+  const formattedEndDate = endDate.toISOString().slice(0, 10);
+
+  return `
+    SELECT SUM(amount) AS amount
+    FROM (
+      SELECT type, amount, time
+      FROM paymentsLedger p
+      INNER JOIN (
+        SELECT tenantID
+        FROM tenants
+        WHERE managerID = ${managerID}
+      ) AS t ON t.tenantID = p.tenantID
+    ) AS final
+    WHERE final.type = 'Credit' AND final.time >= '${formattedStartDate}' AND final.time <= '${formattedEndDate}';`;
+}
+
 function getExpensesQuery(managerID, type, startDate, endDate) {
   return `
-    SELECT SUM(amount) AS ${type.toLowerCase().replace(/\s/g, '_')}
+    SELECT SUM(amount) AS amount
     FROM expenses
     WHERE type IN ('${type}')
     AND managerID = ${managerID} AND datePosted >= '${startDate.toISOString()}' AND datePosted <= '${endDate.toISOString()}';`;
@@ -115,11 +134,15 @@ async function performQueries(managerID, startDate, endDate){
   const expenses_mortgage = await executeQuery(getExpensesQuery(managerID, 'Mortgage Interest', startDate, endDate));
   const expenses_utilities = await executeQuery(getExpensesQuery(managerID, 'Utilities', startDate, endDate));
   
-  reportDataObject.expenses_other = expenses_other[0].other || 0;
-  reportDataObject.expenses_maintenance = expenses_maintenance[0].maintenance_request || 0;
-  reportDataObject.expenses_wages = expenses_wages[0].wages || 0;
-  reportDataObject.expenses_mortgage = expenses_mortgage[0].mortgage_interest || 0;  
-  reportDataObject.expenses_utilities = expenses_utilities[0].utilities || 0;
+  reportDataObject.expenses_other = expenses_other[0].amount || 0;
+  reportDataObject.expenses_maintenance = expenses_maintenance[0].amount || 0;
+  reportDataObject.expenses_wages = expenses_wages[0].amount || 0;
+  reportDataObject.expenses_mortgage = expenses_mortgage[0].amount || 0;  
+  reportDataObject.expenses_utilities = expenses_utilities[0].amount || 0;
+
+  const credits = await executeQuery(getCreditsQuery(managerID, startDate, endDate));
+  reportDataObject.credits = credits[0].amount || 0;
+
   return reportDataObject;
 }
 
@@ -150,6 +173,35 @@ async function generateReportData(managerID, schedule) {
   return reportData;
 }
 
+managerRouter.post("/create-credit", async(req, res) =>{
+try {  
+  const tenantID = req.body.tenantID;
+  const description = req.body.description;
+  const amount = req.body.amount;
+  const currentDate = getDatePayment();
+  // const tenantID = await selectQuery(
+  //     `SELECT tenantID from tenants where email='${email}';`
+  // );
+  
+  const chargeBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${'0x' + tenantID}`);
+  const paymentBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${'0x' + tenantID}`);
+  const creditBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${credit}' AND tenantID=${'0x' + tenantID}`)
+  // console.log(`This is the amount: ${amount}`);
+  // console.log(chargeBalance[0].amount-paymentBalance[0].amount)
+  let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0)-Number(creditBalance[0].amount || 0);
+  balance =  balance -Number(amount);
+  updatePayment(amount);
+  const query = "INSERT INTO paymentsLedger (type, description, time, amount, tenantID, balance, paidAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
+  const values = [credit, description, currentDate, amount, Buffer.from(tenantID, 'hex'), balance, 0];
+  await executeQuery(query, values);
+  
+
+  res.send(200);
+  }catch(error){
+    res.status(500).json({ error: error });
+  }
+});
+
 managerRouter.get("/get-tenant-payments", async (req, res) => {
   try {
     const managerID = "0x" + req.query["manager-id"];
@@ -164,6 +216,7 @@ managerRouter.get("/get-tenant-payments", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 function getDatePayment() {
     const moment = require("moment-timezone");
     return moment().tz("America/Los_Angeles").format("YYYY-MM-DD");
@@ -244,9 +297,11 @@ managerRouter.post("/create-payment", async (req, res) => {
         
         const chargeBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${'0x' + tenantID}`);
         const paymentBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${'0x' + tenantID}`);
+        const creditBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${credit}' AND tenantID=${'0x' + tenantID}`)
+
         // console.log(`This is the amount: ${amount}`);
         // console.log(chargeBalance[0].amount-paymentBalance[0].amount)
-        let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0);
+        let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0) - Number(creditBalance[0].amount || 0);
         let temp = balance;
         balance = Number(amount) + balance;
         const query = "INSERT INTO paymentsLedger (type, description, time, amount, tenantID, balance, paidAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";

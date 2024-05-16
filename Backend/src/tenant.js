@@ -3,6 +3,7 @@ const { executeQuery } = require('./db');
 const tenantRouter = express.Router();
 const charge = "Charge"
 const payment = "Payment"
+const credit = "Credit"
 tenantRouter.use(express.json());
 
 tenantRouter.get('/get-ledger', async(req, res) =>{
@@ -49,9 +50,10 @@ tenantRouter.post('/make-payment', async(req, res)=>{
 
         const chargeBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${'0x' + tenantID}`);
         const paymentBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${'0x' + tenantID}`);
+        const creditBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${credit}' AND tenantID=${'0x' + tenantID}`);
         // console.log(`This is the amount: ${amount}`);
         // console.log(chargeBalance[0].amount-paymentBalance[0].amount)
-        let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0);
+        let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0) - Number(creditBalance[0].amount || 0);
         balance =  balance - amount;
 
         updatePayment(amount);
