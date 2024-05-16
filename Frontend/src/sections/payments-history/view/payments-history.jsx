@@ -306,79 +306,63 @@ export default function PaymentsHistoryView({ access }) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Card>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        fullWidth
-        maxWidth="md"
-      >
-        <DialogTitle id="alert-dialog-title" sx={{ textAlign: 'center' }}>
-          Balance
-        </DialogTitle>
-        <Grid container sx={{ textAlign: 'center' }}>
-          <Grid>
-            <Box
-              component="form"
-              sx={{
-                '& > :not(style)': { m: 1, width: '100ch' },
-              }}
-              noValidate
-              autoComplete="off"
-            >
-              <TextField
-                value={amount}
-                id="outlined-basic"
-                label="$$"
-                variant="outlined"
-                multiline
-                onChange={(e) => {
-                  setAmount(e.target.value);
-                }}
-                sx={{ maxWidth: 500 }}
-              />
-              {/* TODO: code above should go here */}
-              <Grid>
-                <FormControl sx={{ m: 1, minWidth: 150 }} size="medium">
-                  <InputLabel id="demo-select-small-label">Categories</InputLabel>
-                  <Select
-                    labelId="demo-select-small-label"
-                    id="demo-select-small"
-                    value={description}
-                    label="Description"
-                    onChange={handleTypeChange}
-                    SelectProps={{ MenuProps: { sx: { maxHeight: 150 } } }}
-                  >
-                    <MenuItem value="Rent">Rent</MenuItem>
-                    <MenuItem value="Utilities">Utilities</MenuItem>
-                    <MenuItem value="Other">Other</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Box>
-            <DialogActions sx={{ justifyContent: 'center' }}>
-              <Button onClick={handleSubmit} autoFocus>
-                Submit
-              </Button>
-            </DialogActions>
-          </Grid>
-        </Grid>
-      </Dialog>
 
+      {/* NOTE BEGIN */}
+      <Dialog open={open} onClose={handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description" maxWidth="xs" fullWidth>
+  <DialogTitle id="alert-dialog-title" sx={{ textAlign: 'center' }}>
+    Balance
+  </DialogTitle>
+  <Box sx={{ padding: '20px' }}>
+    <Box sx={{ display: 'flex', gap: 0, width: '100%' }}>
+      <TextField
+        value={amount}
+        label="Amount"
+        variant="outlined"
+        multiline
+        onChange={(e) => {
+          setAmount(e.target.value);
+        }}
+        sx={{ flex: 1, borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+      />
+      <FormControl sx={{ flex: 1, marginLeft: 0, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}>
+        <InputLabel id="demo-select-small-label">Categories</InputLabel>
+        <Select
+          labelId="demo-select-small-label"
+          id="demo-select-small"
+          value={description}
+          label="Categories"
+          onChange={handleTypeChange}
+          SelectProps={{ MenuProps: { sx: { maxHeight: 150 } } }}
+        >
+          <MenuItem value="Rent">Rent</MenuItem>
+          <MenuItem value="Utilities">Utilities</MenuItem>
+          <MenuItem value="Other">Other</MenuItem>
+        </Select>
+      </FormControl>
+    </Box>
+    <DialogActions sx={{ justifyContent: 'center', mt: 2 }}>
+      <Button onClick={handleSubmit} variant="contained">
+        Submit
+      </Button>
+    </DialogActions>
+  </Box>
+</Dialog>
+
+      {/* NOTE END */}
       <Dialog open={openCredit} onClose={handleCreditClose} sx={{ textAlign: 'center' }}>
         <DialogTitle id="alert-dialog-title">Fill Credit Details</DialogTitle>
         <Box sx={{ padding: '20px' }}>
-          <TextField
-            value={description}
-            label="Description"
-            onChange={handleTypeChange}
-            sx={{ marginBottom: '10px' }}
-          />
+
           <TextField
             value={creditAmount}
             label="Credit Amount"
             onChange={handleCreditAmountChange}
+            sx={{ marginBottom: '10px' }}
+          />
+          <TextField
+            value={description}
+            label="Description"
+            onChange={handleTypeChange}
             sx={{ marginBottom: '10px' }}
           />
           <Button variant="contained" onClick={handleCreditSubmit}>
@@ -386,7 +370,6 @@ export default function PaymentsHistoryView({ access }) {
           </Button>
         </Box>
       </Dialog>
-
 
       <Dialog open={openPayment} onClose={handlePaymentClose} sx={{ textAlign: 'center' }}>
         <DialogTitle id="alert-dialog-title">Fill Charge Details</DialogTitle>
