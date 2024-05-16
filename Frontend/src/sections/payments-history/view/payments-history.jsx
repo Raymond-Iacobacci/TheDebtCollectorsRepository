@@ -398,7 +398,7 @@ export default function PaymentsHistoryView({ access }) {
             </Grid>
           </Grid>
           <Button variant="contained" onClick={handlePaymentSubmit} sx={{ mt: 2 }}>
-            Create Payment
+            Create Charge
           </Button>
         </Box>
       </Dialog>
