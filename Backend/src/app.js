@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/users', usersRouter);
 app.use('/requests', requestsRouter);
-app.use('/home', homeRouter);
+app.use('/dashboard', dashBoardRouter);
 app.use('/manager', managerRouter);
 app.use('/tenant', tenantRouter);
 

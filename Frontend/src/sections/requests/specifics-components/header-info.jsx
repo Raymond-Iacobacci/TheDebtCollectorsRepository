@@ -57,8 +57,8 @@ export default function RequestHeaderInfo({ id }) {
   };
 
   const handleEditStatusToCompleted = async (event) => {
-    await changeStatus(id, 'Completed');
-    setStatus('Completed');
+    await changeStatus(id, 'Resolved');
+    setStatus('Resolved');
     setStatusPopover(null);
   };
 
@@ -69,8 +69,8 @@ export default function RequestHeaderInfo({ id }) {
   };
 
   const handleEditStatusToNotStarted = async (event) => {
-    await changeStatus(id, 'Not Started');
-    setStatus('Not Started');
+    await changeStatus(id, 'Unresolved');
+    setStatus('Unresolved');
     setStatusPopover(null);
   };
 
@@ -116,9 +116,9 @@ export default function RequestHeaderInfo({ id }) {
             >
               <Label
                 color={
-                  (status === 'Not Started' && 'error') ||
+                  (status === 'Unresolved' && 'error') ||
                   (status === 'Ongoing' && 'warning') ||
-                  (status === 'Completed' && 'success') ||
+                  (status === 'Resolved' && 'success') ||
                   'error'
                 }
               >
@@ -135,13 +135,13 @@ export default function RequestHeaderInfo({ id }) {
                 transformOrigin={{ vertical: 'top', horizontal: 'center' }}
               >
                 <MenuItem onClick={handleEditStatusToCompleted} sx={{ pt: 1 }}>
-                  <Label color="success">Completed</Label>
+                  <Label color="success">Resolved</Label>
                 </MenuItem>
                 <MenuItem onClick={handleEditStatusToOngoing}>
                   <Label color="warning">Ongoing</Label>
                 </MenuItem>
                 <MenuItem onClick={handleEditStatusToNotStarted} sx={{ pb: 1 }}>
-                  <Label color="error">Not Started</Label>
+                  <Label color="error">Unresolved</Label>
                 </MenuItem>
               </Popover>
             </Stack>

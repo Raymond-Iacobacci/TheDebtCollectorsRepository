@@ -92,7 +92,7 @@ export default function UserTableRow({
       }
   
       <TableCell id="status">
-        <Label color={(status === 'Unresolved' && 'error') || (status === 'Not Started' && 'error') || (status === 'Ongoing' && 'warning') || 'success'}>{status}</Label>
+        <Label color={(status === 'Unresolved' && 'error')  || (status === 'Ongoing' && 'warning') || 'success'}>{status}</Label>
       </TableCell>
       
     </TableRow>
