@@ -198,13 +198,10 @@ function NavItem({ item }) {
   const active = (`/dashboard/manager/${uuid}/${item.path}/` === pathname) || (`/dashboard/tenant/${uuid}/${item.path}/` === pathname) || (item.path.split('/')[1] === pathname.split('/')[4]);
 
   const handleItemClick = () =>{
-    console.log(pathname)
     const isManager = pathname.search("/manager");
     if( isManager !== -1 ) {
-      console.log(`dashboard/manager/${uuid}${item.path}?session=${token}`)
       router.replace(`/dashboard/manager/${uuid}${item.path}?session=${token}`)
     } else {
-      console.log(`/dashboard/tenant/${uuid}${item.path}?session=${token}`)
       router.replace(`/dashboard/tenant/${uuid}${item.path}?session=${token}`)
     }
   }

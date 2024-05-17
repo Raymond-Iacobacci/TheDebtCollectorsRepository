@@ -17,7 +17,7 @@ export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 // export const LandingPage = lazy(() => import('src/pages/landing'));
 export const PaymentsHistory = lazy(() => import('src/pages/payments-history'));
-export const AllPaymentsView = lazy(() => import('src/pages/all-payments'));
+// export const AllPaymentsView = lazy(() => import('src/pages/all-payments'));
 export const Expenses = lazy(() => import('src/pages/expenses'));
 export const Report = lazy(() => import('src/pages/report'));
 
@@ -44,7 +44,7 @@ export default function Router() {
             { path: 'requests', element: <RequestPage access="tenant" /> },
             { path: 'requests/:requestID', element: <RequestDetailsPage /> },
             { path: 'payments', element: <Payments tenantID={userID} /> },
-            { path: 'payments-history', element: <PaymentsHistory tenantID={userID} /> },
+            { path: 'payments-history', element: <PaymentsHistory access="tenant" /> },
           ],
         },
         {
@@ -54,7 +54,7 @@ export default function Router() {
             { path: 'requests', element: <RequestPage access="manager" /> },
             { path: 'requests/:requestID', element: <RequestDetailsPage /> },
             { path: 'list-tenants', element: <ListTenant managerID={userID} /> },
-            { path: 'all-payments-view', element: <AllPaymentsView managerID={userID} /> },
+            { path: 'list-tenants/:tenantID', element: <PaymentsHistory access="manager" /> },
             { path: 'expenses', element: <Expenses access="manager" /> },
             { path: 'report', element: <Report /> }
           ],

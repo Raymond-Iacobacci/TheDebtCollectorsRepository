@@ -27,8 +27,7 @@ function getDate() {
 //     console.log(tenantPayments);
 // }
 
-// NOTE: late fees logic
-// const interval = 10000;
+// const interval = 20000;  // TODO: increase the interval when demoing
 // setInterval(crawlForLatePayments, interval);
 
 // function getAbbrDate() {
