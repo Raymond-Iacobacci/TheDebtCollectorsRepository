@@ -3,7 +3,7 @@ const cors = require('cors');
 
 const usersRouter = require('./users');
 const requestsRouter = require('./requests');
-const homeRouter = require('./home')
+const dashBoardRouter = require('./dashboard')
 const managerRouter = require('./manager')
 const tenantRouter = require('./tenant');
 
