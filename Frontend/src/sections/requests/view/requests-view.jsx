@@ -81,6 +81,7 @@ export default function RequestsView({ access }) {
       }
     };
     fetchData();
+    
   }, [access, uuid]);
 
   const handleSort = (event, id) => {
@@ -162,7 +163,7 @@ export default function RequestsView({ access }) {
         console.log('Error posting data to backend');
       }
     });
-    handleOpenRequestPopup(false);
+    handleCloseRequestPopup();
   };
 
   const tableLabels =
