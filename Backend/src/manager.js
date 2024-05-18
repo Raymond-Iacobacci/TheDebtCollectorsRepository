@@ -386,4 +386,15 @@ managerRouter.post('/add-expense', async (req, res) => {
   }
 });
 
+managerRouter.post('/delete-expense', async (req, res) => {
+  try {
+    const expenseID = req.query['expense-id'];
+    const query = `DELETE FROM expenses where expenseID = ${expenseID};`;
+    await executeQuery(query);
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = managerRouter;
