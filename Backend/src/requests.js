@@ -1,7 +1,7 @@
 const express = require('express');
 const requestsRouter = express.Router();
 const multer = require('multer');
-const { selectQuery, insertQuery, uuidToString } = require('./db');
+const { executeQuery, uuidToString } = require('./db');
 
 requestsRouter.use(express.json());
 
@@ -18,7 +18,7 @@ requestsRouter.get('/get-manager-view', async (req, res) => {
     const managerID = '0x' + req.query['manager-id'];
     const query = `SELECT r.requestID, CONCAT(t.firstname, ' ', t.lastname) AS name, t.address, r.type, r.status FROM requests 
     AS r JOIN tenants AS t ON r.tenantID = t.tenantID WHERE r.managerID = ${managerID} ORDER BY r.dateRequested;`;
-    const requestResults = await selectQuery(query);
+    const requestResults = await executeQuery(query);
 
     if (!requestResults) {
       res.send('No requests for this managerID').end();
@@ -38,7 +38,7 @@ requestsRouter.get('/get-manager-view', async (req, res) => {
 requestsRouter.get('/get-tenant-view', async (req, res) => {
   try {
     const tenantID = '0x' + req.query['tenant-id'];
-    const requestResults = await selectQuery(`SELECT requestID, description, type, status, dateRequested FROM requests WHERE tenantID = ${tenantID};`);
+    const requestResults = await executeQuery(`SELECT requestID, description, type, status, dateRequested FROM requests WHERE tenantID = ${tenantID};`);
     
     if(!requestResults){
       res.send('no requests for this tenantID');
@@ -60,7 +60,7 @@ requestsRouter.get('/specifics/header-info', async (req, res) => {
     const requestID = '0x' + req.query['request-id'];
     const query = `SELECT r.type, CONCAT(t.firstname, ' ', t.lastname) AS tenant, t.address, r.description, r.status FROM requests 
     AS r JOIN tenants AS t ON r.tenantID = t.tenantID WHERE r.requestID = ${requestID};`
-    const requestInfo = await selectQuery(query);
+    const requestInfo = await executeQuery(query);
 
     if (!requestInfo) {
       res.status(404).json({ error: 'requestID not found in requests table' });
@@ -76,7 +76,7 @@ requestsRouter.get('/specifics/header-info', async (req, res) => {
 requestsRouter.get('/specifics/comments', async (req, res) => {
   try {
     const requestID = '0x' + req.query['request-id'];
-    const commentResults = await selectQuery(`SELECT commentID, userID, comment, datePosted FROM comments WHERE requestID = ${requestID} ORDER BY datePosted;`);
+    const commentResults = await executeQuery(`SELECT commentID, userID, comment, datePosted FROM comments WHERE requestID = ${requestID} ORDER BY datePosted;`);
 
     if (commentResults.length === 0) {
       res.send([]).end();
@@ -84,10 +84,10 @@ requestsRouter.get('/specifics/comments', async (req, res) => {
     }
     
     for(let commentEntry of commentResults){
-      const userResults = await selectQuery(`SELECT firstName, lastName FROM tenants WHERE tenantID = ${uuidToString(commentEntry.userID)};`);
+      const userResults = await executeQuery(`SELECT firstName, lastName FROM tenants WHERE tenantID = ${uuidToString(commentEntry.userID)};`);
       let user = userResults[0];
       if(!user){
-        const userResults = await selectQuery(`SELECT firstName, lastName FROM managers WHERE managerID = ${uuidToString(commentEntry.userID)};`);
+        const userResults = await executeQuery(`SELECT firstName, lastName FROM managers WHERE managerID = ${uuidToString(commentEntry.userID)};`);
         user = userResults[0];
         if(!user){
           res.status(404).json({ error: 'No user found with this userID' });
@@ -111,7 +111,7 @@ requestsRouter.post('/specifics/new-comment', async (req, res) => {
     const datePosted = getDate();
     const query = 'INSERT INTO comments (requestID, datePosted, comment, userID) VALUES (?, ?, ?, ?)';
     const values = [requestID, datePosted, comment, userID];
-    const results = await insertQuery(query, values);
+    const results = await executeQuery(query, values);
     res.send(results);
   } catch (error) {
     res.status(500).json({ error: 'Error inserting into table' });
@@ -127,7 +127,7 @@ requestsRouter.post('/specifics/new-attachment', upload.single('attachment'), as
     const datePosted = getDate();
     const query = 'INSERT INTO attachments (title, description, attachment, requestID, datePosted) VALUES (?, ?, ?, ?, ?)';
     const values = [title, description, attachmentFile, requestID, datePosted];
-    const results = await insertQuery(query, values);
+    const results = await executeQuery(query, values);
     res.send(results);
   } catch (error) {
     console.error('Error adding attachment:', error);
@@ -142,7 +142,7 @@ requestsRouter.post('/new', upload.single('attachment'), async (req, res) => {
     const type = req.body.type;
     const status = 'Unresolved';
     const dateRequested = getDate();
-    const managerResult = await selectQuery(`SELECT managerID FROM tenants where tenantID = ${'0x' + tenantID};`);
+    const managerResult = await executeQuery(`SELECT managerID FROM tenants where tenantID = ${'0x' + tenantID};`);
 
     if (!managerResult) {
       res.status(404).json({ error: 'managerID not found in managers table' });
@@ -153,9 +153,9 @@ requestsRouter.post('/new', upload.single('attachment'), async (req, res) => {
 
     const query = 'INSERT INTO requests (description, tenantID, managerID, status, dateRequested, type) VALUES (?, ?, ?, ?, ?, ?)';
     const values = [description, Buffer.from(tenantID, 'hex'), Buffer.from(managerID, 'hex'), status, dateRequested, type];
-    await insertQuery(query, values);
+    await executeQuery(query, values);
 
-    const results = await selectQuery(`SELECT requestID FROM requests where tenantID = ${'0x' + tenantID} AND dateRequested = '${dateRequested}';`);
+    const results = await executeQuery(`SELECT requestID FROM requests where tenantID = ${'0x' + tenantID} AND dateRequested = '${dateRequested}';`);
     const requestIDObject = results[0];
 
     if (!requestIDObject) {
@@ -168,7 +168,7 @@ requestsRouter.post('/new', upload.single('attachment'), async (req, res) => {
     const datePosted = getDate();
     const thisSTring = 'INSERT INTO attachments (title, description, attachment, requestID, datePosted) VALUES (?, ?, ?, ?, ?)';
     const thesevalues= [type, description, attachmentFile, requestIDObject.requestID, datePosted];
-    const attachmentResults = await insertQuery(thisSTring, thesevalues);
+    const attachmentResults = await executeQuery(thisSTring, thesevalues);
     res.send(requestID);
   } catch (error) {
     res.status(500).json({ error: 'Error inserting into table' });
@@ -179,7 +179,7 @@ requestsRouter.put('/specifics/change-status', async (req, res) => {
   try {
     const requestID = '0x' + req.query['request-id'];
     const newStatusString = req.body.status;
-    const results = await selectQuery(`UPDATE requests SET status = '${newStatusString}' WHERE requestID = ${requestID};`);
+    const results = await executeQuery(`UPDATE requests SET status = '${newStatusString}' WHERE requestID = ${requestID};`);
     res.send(results);
   } catch (error) {
     res.status(500).json({ error: 'Error updating status'});
@@ -189,7 +189,7 @@ requestsRouter.put('/specifics/change-status', async (req, res) => {
 requestsRouter.get('/specifics/attachments', async (req, res) => { 
   try {
     const requestID = '0x' + req.query['request-id'];
-    const attachments = await selectQuery(`SELECT title, description, datePosted, attachment FROM attachments where requestID = ${requestID} ORDER BY datePosted;`);
+    const attachments = await executeQuery(`SELECT title, description, datePosted, attachment FROM attachments where requestID = ${requestID} ORDER BY datePosted;`);
     for(let attachmentObject of attachments){
       attachmentObject.attachment = attachmentObject.attachment.toString('base64');
     }

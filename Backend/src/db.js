@@ -29,14 +29,6 @@ const executeQuery = (query, values = []) => {
   });
 };
 
-const selectQuery = (query) => {
-  return executeQuery(query);
-};
-
-const insertQuery = (query, values) => {
-  return executeQuery(query, values);
-};
-
 const uuidToString = (buffer) => {
   if(buffer){
     return '0x' + buffer.toString('hex').toUpperCase();
@@ -44,4 +36,4 @@ const uuidToString = (buffer) => {
   return null;
 }
   
-module.exports = {pool, selectQuery, insertQuery, executeQuery, uuidToString};
+module.exports = {pool, executeQuery, uuidToString};
