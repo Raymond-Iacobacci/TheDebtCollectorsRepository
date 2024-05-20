@@ -73,6 +73,10 @@ export default function UserTableRow({
             <TableCell id="address">{address}</TableCell>
 
             <TableCell id="type">{type}</TableCell>
+            {/* <TableCell id="status">{type}</TableCell> */}
+
+            <TableCell id="date">{fDate(date)}</TableCell>
+
           </>
         :
           <>
@@ -105,8 +109,8 @@ UserTableRow.propTypes = {
   name: PropTypes.any,
   address: PropTypes.any,
   type: PropTypes.any,
+  date: PropTypes.any,
   status: PropTypes.any,
   description: PropTypes.any,
-  date: PropTypes.any,
   access: PropTypes.any,
 };

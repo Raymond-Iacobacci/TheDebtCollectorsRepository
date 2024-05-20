@@ -170,7 +170,7 @@ export default function ExpensesView() {
       type={row.type}
       amount={row.amount}
       description={row.description}
-      date={row.datePosted}
+      date={row.date}
       request={row.requestID}
     />
   );

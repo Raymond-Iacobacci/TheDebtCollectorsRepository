@@ -172,12 +172,13 @@ export default function RequestsView({ access }) {
         { id: 'name', label: 'Name' },
         { id: 'address', label: 'Address' },
         { id: 'type', label: 'Type' },
+        { id: 'date', label: 'Date'},
         { id: 'status', label: 'Status' },
       ]
       : [
         { id: 'type', label: 'Type' },
         { id: 'description', label: 'Description' },
-        { id: 'date', label: 'Date Requested' },
+        { id: 'date', label: 'Date' },
         { id: 'status', label: 'Status' },
       ];
 
@@ -190,6 +191,7 @@ export default function RequestsView({ access }) {
           avatarUrl={row.avatarUrl}
           name={row.name}
           address={row.address}
+          date={row.date}
           type={row.type}
           status={row.status}
           access={access}
@@ -203,7 +205,7 @@ export default function RequestsView({ access }) {
         avatarUrl={row.avatarUrl}
         type={row.type}
         description={row.description}
-        date={row.dateRequested}
+        date={row.date}
         status={row.status}
         access={access}
       />

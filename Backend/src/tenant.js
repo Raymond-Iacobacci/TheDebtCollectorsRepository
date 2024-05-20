@@ -10,7 +10,7 @@ tenantRouter.get('/get-ledger', async(req, res) =>{
     try {
         tenantID = req.query['tenant-id'];
     
-        ledger = await executeQuery(`SELECT type, time, amount, description, balance FROM paymentsLedger WHERE tenantID=${'0x' + tenantID}`);
+        ledger = await executeQuery(`SELECT type, date, amount, description, balance FROM paymentsLedger WHERE tenantID=${'0x' + tenantID}`);
         
         res.send(ledger);
 
@@ -58,7 +58,7 @@ tenantRouter.post('/make-payment', async(req, res)=>{
 
         updatePayment(amount);
         
-        const query = "INSERT INTO paymentsLedger (type, description, time, amount, tenantID, balance) VALUES (?, ?, ?, ?, ?, ?)";
+        const query = "INSERT INTO paymentsLedger (type, description, date, amount, tenantID, balance) VALUES (?, ?, ?, ?, ?, ?)";
         const values = [payment, description, currentDate, amount, Buffer.from(tenantID, 'hex'), balance];
         await executeQuery(query, values);
         

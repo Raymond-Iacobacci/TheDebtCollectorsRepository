@@ -92,7 +92,7 @@ export default function PaymentsHistoryView({ access }) {
         key={row.paymentsID}
         tenantID={uuid}
         type={row.type}
-        time={row.time}
+        time={row.date}
         amount={row.amount}
         balance={row.balance}
         description={row.description}
