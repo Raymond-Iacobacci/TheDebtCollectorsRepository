@@ -11,13 +11,16 @@ import TableCell from '@mui/material/TableCell'; // Import TableCell
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
+import { fDate } from 'src/utils/format-time';
+
+
 // ----------------------------------------------------------------------
 
 export default function PaymentTableRow({ type, time, amount, description, balance }) {
   const [firstWord, ...restWords] = type.split(' ');
-  const parts = time.split('T');
-  const datePart = parts[0];
-  const timeFinal = `${datePart.split('-')[1]}/${datePart.split('-')[2]}/${datePart.split('-')[0]}`;
+  // const parts = time.split('T');
+  // const datePart = parts[0];
+  // const timeFinal = `${datePart.split('-')[1]}/${datePart.split('-')[2]}/${datePart.split('-')[0]}`;
 
   return (
     <TableRow
@@ -34,7 +37,7 @@ export default function PaymentTableRow({ type, time, amount, description, balan
           {description && <Box mt={1}>{description}</Box>}
         </Box>
       </TableCell>
-      <TableCell>{timeFinal}</TableCell>
+      <TableCell>{fDate(time)}</TableCell>
       <TableCell>{amount}</TableCell>
       <TableCell>{balance}</TableCell>
     </TableRow>
