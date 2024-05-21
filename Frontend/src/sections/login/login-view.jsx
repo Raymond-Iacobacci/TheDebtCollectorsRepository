@@ -54,24 +54,29 @@ export default function LoginView() {
           await fetch(
             `${import.meta.env.VITE_MIDDLEWARE_URL}/users/login-${loginType.toLowerCase()}?email=${
               profile.email
-            }`, {
+            }`,
+            {
               method: 'PUT',
               headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                token: newToken
-              })
-            })
+                token: newToken,
+              }),
+            }
+          )
             .then((res) => res.json())
             .then((data) => {
               const { uuid } = data;
               if (uuid) {
-                console.log(uuid);
-                router.push(`/dashboard/${loginType.toLowerCase()}/${uuid}/main?session=${newToken}`);
+                router.push(
+                  `/dashboard/${loginType.toLowerCase()}/${uuid}/${
+                    loginType === 'Manager' ? 'main' : 'announcements'
+                  }?session=${newToken}`
+                );
               } else {
-                router.replace('/404')
+                router.replace('/404');
               }
               setProfile([]);
             });

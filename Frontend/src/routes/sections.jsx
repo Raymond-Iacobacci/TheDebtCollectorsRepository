@@ -6,6 +6,7 @@ import { usePathname } from 'src/routes/hooks';
 import DashboardLayout from 'src/layouts/dashboard';
 
 export const IndexPage = lazy(() => import('src/pages/app'));
+export const AnnouncementsPage = lazy(() => import('src/pages/announcements'));
 // export const BlogPage = lazy(() => import('src/pages/blog'));
 export const RequestPage = lazy(() => import('src/pages/requests'));
 export const RequestDetailsPage = lazy(() => import('src/pages/request-details'));
@@ -39,6 +40,7 @@ export default function Router() {
           path: 'tenant/:userID',
           children: [
             { path: 'main', element: <IndexPage /> },
+            { path: 'announcements', element: <AnnouncementsPage /> },
             { path: 'requests', element: <RequestPage access="tenant" /> },
             { path: 'requests/:requestID', element: <RequestDetailsPage /> },
             { path: 'payments-history', element: <PaymentsHistory access="tenant" /> },

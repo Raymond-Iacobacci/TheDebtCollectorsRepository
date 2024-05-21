@@ -10,8 +10,8 @@ const navConfig = (access) => {
   if (access === 'tenant') {
     return [
       {
-        title: 'dashboard',
-        path: '/main',
+        title: 'announcements',
+        path: '/announcements',
         icon: icon('ic_user'),
         access: 'all',
       },

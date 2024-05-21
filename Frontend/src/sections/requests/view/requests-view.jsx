@@ -60,6 +60,8 @@ export default function RequestsView({ access }) {
 
   const [requestPopup, setRequestPopup] = useState(false);
 
+  const [ reload, setReload ] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -80,9 +82,11 @@ export default function RequestsView({ access }) {
         console.log(`HeaderInfo API: ${error}`);
       }
     };
-    fetchData();
-    
-  }, [access, uuid]);
+    if( reload ) {
+      fetchData();
+      setReload(false);
+    }  
+  }, [access, uuid, reload]);
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -163,7 +167,8 @@ export default function RequestsView({ access }) {
         console.log('Error posting data to backend');
       }
     });
-    handleCloseRequestPopup();
+    setReload(true);
+    setRequestPopup(null);
   };
 
   const tableLabels =
