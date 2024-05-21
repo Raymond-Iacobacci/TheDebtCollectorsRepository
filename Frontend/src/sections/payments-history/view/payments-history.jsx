@@ -242,9 +242,11 @@ export default function PaymentsHistoryView({ access }) {
 
   return (
     <Container>
+    { (access === 'manager')?
     <Typography variant="h4" gutterBottom mb={5}>
       {`${firstName} ${lastName}`}
     </Typography>
+    :<div />}
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         {access === 'tenant' ? (
           <>
