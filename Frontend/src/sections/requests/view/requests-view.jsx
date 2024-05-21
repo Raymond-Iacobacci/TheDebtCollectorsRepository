@@ -358,13 +358,13 @@ export default function RequestsView({ access }) {
                 )}
               </Grid>
               <Grid>
-                <Button component="label" variant="contained">
+                <Button >
                   Upload image
                   <input type="file" style={{ display: 'none' }} onChange={handleFileChange} />
                 </Button>
               </Grid>
 
-              <Button onClick={handleSubmitRequest} autoFocus>
+              <Button component="label" variant="contained" onClick={handleSubmitRequest} autoFocus>
                 Submit
               </Button>
             </DialogActions>
