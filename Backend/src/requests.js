@@ -182,4 +182,16 @@ requestsRouter.get('/specifics/attachments', async (req, res) => {
   }
 });
 
+requestsRouter.post('/delete-request', async (req, res) => { 
+  try {
+    const requestID = '0x' + req.query['request-id'];
+    await executeQuery(`DELETE FROM attachments where requestID = ${requestID}`);
+    await executeQuery(`DELETE FROM comments where requestID = ${requestID}`);
+    await executeQuery(`DELETE FROM requests where requestID = ${requestID}`);
+    res.send(200);
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting request' });
+  }
+});
+
 module.exports = requestsRouter;

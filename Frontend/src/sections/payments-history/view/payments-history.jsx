@@ -52,6 +52,9 @@ export default function PaymentsHistoryView({ access }) {
 
   const [reload, setReload] = useState(true);
 
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
   useEffect(() => {
     const fetchPayments = async () => {
       try {
@@ -69,7 +72,22 @@ export default function PaymentsHistoryView({ access }) {
       fetchPayments();
       setReload(false);
     }
+    const fetchName = async () => {
+      try {
+        fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/users/get-attributes?userID=${tenantID}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setFirstName(data.firstName);
+          setLastName(data.lastName);
+        });
+      } catch (error) {
+        console.log(`Error fetching name: ${error}`);
+      }
+    };
+
+    fetchName();
   }, [tenantID, reload]);
+
 
   const handleClose = () => {
     setOpen(false);
@@ -224,6 +242,9 @@ export default function PaymentsHistoryView({ access }) {
 
   return (
     <Container>
+    <Typography variant="h4" gutterBottom mb={5}>
+      {`${firstName} ${lastName}`}
+    </Typography>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         {access === 'tenant' ? (
           <>

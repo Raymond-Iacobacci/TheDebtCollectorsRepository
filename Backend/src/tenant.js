@@ -68,15 +68,26 @@ tenantRouter.post('/make-payment', async(req, res)=>{
     
     }
 });
+
 tenantRouter.get('/get-payment-history', async(req, res) => {
     try{
         tenantID = req.query['tenant-id'];
         tenantsPayment = await executeQuery(`SELECT type, time, amount FROM paymentsMade where tenantID=${'0x' +tenantID}`);
         res.send(tenantsPayment);
-    }catch(error){
+    } catch(error){
         res.status(500).json({error:error.message});
     }
-
-
 });
+
+tenantRouter.get('/get-announcements', async (req, res) => {
+    try {
+      const tenantID = '0x' + req.query['tenant-id'];
+      const query = `SELECT a.title, a.description, a.date FROM announcements a JOIN tenants t ON a.managerID = t.managerID WHERE t.tenantID = ${tenantID};`;
+      const announcements = await executeQuery(query);
+      res.send(announcements);
+    } catch (error) {
+      res.status(500).json({ error: error.message});
+    }
+  });
+
 module.exports = tenantRouter;
