@@ -19,7 +19,7 @@ import Iconify from 'src/components/iconify';
 export default function AnalyticsTasks({ title, subheader, list, ...other }) {
   return (
     <Card {...other}>
-      <CardHeader title={title} subheader={subheader} />
+      <CardHeader title={title} subheader={subheader} sx={{ pb: 2 }}/>
 
       {list.map((tenant) => (
         <TaskItem key={tenant.tenantID} tenant={tenant} />
@@ -52,6 +52,7 @@ function TaskItem({ tenant }) {
       direction="row"
       alignItems="center"
       spacing={3}
+      onClick={handleOpenMenu}
       sx={{
         pl: 2,
         pr: 1,
