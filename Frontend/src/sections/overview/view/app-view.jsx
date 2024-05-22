@@ -18,7 +18,7 @@ import AppWidgetSummary from '../components/app-widget-summary';
 // import AppCurrentSubject from '../app-current-subject';
 // import AppConversionRates from '../app-conversion-rates';
 
-import { getNumberTenants, getNumberRequests, getNumberPayments } from '../hooks/summary';
+import { getNumberTenants, getNumberRequests, getNumberPayments, getTotalOutstandingBalance } from '../hooks/summary';
 
 // ----------------------------------------------------------------------
 
@@ -30,6 +30,7 @@ export default function AppView() {
   const [numTenants, setNumTenants] = useState({});
   const [numPayments, setNumPayments ] = useState({});
   const [numRequests, setNumRequests ] = useState({});
+  const [totalOutstanding, setTotalOutstanding ] = useState({});
 
   useEffect(() => {
     const fetchNumTenants = async () => {
@@ -59,9 +60,19 @@ export default function AppView() {
         console.log(`NumTenants API: ${error}`);
       }
     };
+    const fetchNumBalance = async () => {
+      try {
+        await getTotalOutstandingBalance(uuid).then((data) => {
+          setTotalOutstanding(data);
+        });
+      } catch (error) {
+        console.log(`NumTenants API: ${error}`);
+      }
+    };
     fetchNumTenants();
     fetchNumPayments();
     fetchNumRequests();
+    fetchNumBalance();
   }, [uuid]);
 
   return (
@@ -100,7 +111,7 @@ export default function AppView() {
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Monthly Payments"
-            total={234}
+            total={(totalOutstanding.length !== 0)?totalOutstanding.totalBalance:0}
             color="error"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
           />
@@ -135,7 +146,7 @@ export default function AppView() {
 
         <Grid xs={12} md={6} lg={8}>
           <AppTasks
-            title="Tasks"
+            title="Outstanding Balances"
             list={[
               { id: '1', name: 'Fix sink at unit 102.' },
               { id: '2', name: 'Refund safety deposits.' },
@@ -145,6 +156,7 @@ export default function AppView() {
             ]}
           />
         </Grid>
+
         {/* <Grid xs={12} md={6} lg={4}>
           <AppOrderTimeline
             title="Payment Timeline"

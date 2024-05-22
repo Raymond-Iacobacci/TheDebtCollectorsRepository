@@ -24,3 +24,10 @@ export async function getNumberRequests(uuid) {
       .then((data) => data);
   }
   
+  export async function getTotalOutstandingBalance(uuid) {
+    return fetch(
+      `${import.meta.env.VITE_MIDDLEWARE_URL}/manager/get-total-balances?manager-id=${uuid}`
+    )
+      .then((res) => res.json())
+      .then((data) => data);
+  }
