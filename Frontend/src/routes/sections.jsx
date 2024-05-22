@@ -50,6 +50,7 @@ export default function Router() {
           path: 'manager/:userID',
           children: [
             { path: 'main', element: <IndexPage /> },
+            { path: 'announcements', element: <AnnouncementsPage /> },
             { path: 'requests', element: <RequestPage access="manager" /> },
             { path: 'requests/:requestID', element: <RequestDetailsPage /> },
             { path: 'list-tenants', element: <ListTenant managerID={userID} /> },

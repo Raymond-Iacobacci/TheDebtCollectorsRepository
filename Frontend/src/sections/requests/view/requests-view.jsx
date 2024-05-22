@@ -171,6 +171,10 @@ export default function RequestsView({ access }) {
     setRequestPopup(null);
   };
 
+  const handleDeleteRow = () => {
+    setReload(true);
+  }
+
   const tableLabels =
     access === 'manager'
       ? [
@@ -193,13 +197,13 @@ export default function RequestsView({ access }) {
         <RequestTableRow
           key={row.requestID}
           id={row.requestID}
-          avatarUrl={row.avatarUrl}
           name={row.name}
           address={row.address}
           date={row.date}
           type={row.type}
           status={row.status}
           access={access}
+          deleteRow={handleDeleteRow}
         />
       );
     }
@@ -207,12 +211,12 @@ export default function RequestsView({ access }) {
       <RequestTableRow
         key={row.requestID}
         id={row.requestID}
-        avatarUrl={row.avatarUrl}
         type={row.type}
         description={row.description}
         date={row.date}
         status={row.status}
         access={access}
+        deleteRow={handleDeleteRow}
       />
     );
   };

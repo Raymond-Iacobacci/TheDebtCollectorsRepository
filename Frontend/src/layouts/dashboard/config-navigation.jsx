@@ -39,6 +39,12 @@ const navConfig = (access) => {
         access: 'all',
       },
       {
+        title: 'announcements',
+        path: '/announcements',
+        icon: icon('ic_user'),
+        access: 'all',
+      },
+      {
         title: 'requests',
         path: '/requests',
         icon: icon('ic_blog'),

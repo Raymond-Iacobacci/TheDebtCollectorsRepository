@@ -1,24 +1,69 @@
 // import { faker } from '@faker-js/faker';
+import { useState, useEffect } from 'react';
 
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
+import { usePathname } from 'src/routes/hooks';
 // import Iconify from 'src/components/iconify';
 
-import AppTasks from '../app-tasks';
+import AppTasks from '../components/app-tasks';
 // import AppNewsUpdate from '../app-news-update';
 // import AppOrderTimeline from '../app-order-timeline';
 // import AppCurrentVisits from '../app-current-visits';
 // import AppWebsiteVisits from '../app-website-visits';
-import AppWidgetSummary from '../app-widget-summary';
+import AppWidgetSummary from '../components/app-widget-summary';
 // import AppTrafficBySite from '../app-traffic-by-site';
 // import AppCurrentSubject from '../app-current-subject';
 // import AppConversionRates from '../app-conversion-rates';
 
+import { getNumberTenants, getNumberRequests, getNumberPayments } from '../hooks/summary';
+
 // ----------------------------------------------------------------------
 
 export default function AppView() {
+
+  const pathname = usePathname();
+  const uuid = pathname.split('/')[3];
+
+  const [numTenants, setNumTenants] = useState({});
+  const [numPayments, setNumPayments ] = useState({});
+  const [numRequests, setNumRequests ] = useState({});
+
+  useEffect(() => {
+    const fetchNumTenants = async () => {
+      try {
+        await getNumberTenants(uuid).then((data) => {
+          setNumTenants(data);
+        });
+      } catch (error) {
+        console.log(`NumTenants API: ${error}`);
+      }
+    };
+    const fetchNumPayments = async () => {
+      try {
+        await getNumberPayments(uuid).then((data) => {
+          setNumPayments(data);
+        });
+      } catch (error) {
+        console.log(`NumTenants API: ${error}`);
+      }
+    };
+    const fetchNumRequests = async () => {
+      try {
+        await getNumberRequests(uuid).then((data) => {
+          setNumRequests(data);
+        });
+      } catch (error) {
+        console.log(`NumTenants API: ${error}`);
+      }
+    };
+    fetchNumTenants();
+    fetchNumPayments();
+    fetchNumRequests();
+  }, [uuid]);
+
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" sx={{ mb: 5 }}>
@@ -28,8 +73,16 @@ export default function AppView() {
       <Grid container spacing={3}>
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
+            title="Number of Tenants"
+            total={(numTenants.length !== 0)?numTenants.numberOfTenants:0}
+            color="info"
+            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
+          />
+        </Grid>
+        <Grid xs={12} sm={6} md={3}>
+          <AppWidgetSummary
             title="Rent Payments"
-            total={150}
+            total={(numPayments.length !== 0)?numPayments.count:0}
             color="success"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
           />
@@ -37,19 +90,10 @@ export default function AppView() {
 
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Number of Tenants"
-            total={200}
-            color="info"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={3}>
-          <AppWidgetSummary
             title="Requests Pending"
-            total={5}
+            total={(numRequests.length !== 0)?numRequests.count:0}
             color="warning"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
+            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
           />
         </Grid>
 
@@ -58,7 +102,7 @@ export default function AppView() {
             title="Monthly Payments"
             total={234}
             color="error"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
+            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
           />
         </Grid>
 
@@ -74,7 +118,6 @@ export default function AppView() {
             }))}
           />
         </Grid> */}
-       
 
         {/* <Grid xs={12} md={6} lg={4}>
           <AppCurrentVisits
@@ -97,11 +140,10 @@ export default function AppView() {
               { id: '1', name: 'Fix sink at unit 102.' },
               { id: '2', name: 'Refund safety deposits.' },
               { id: '3', name: 'Add client A as a tenant to unit 103.' },
-              { id: '4', name: 'Email tenant B regarding Request C.'  },
-              { id: '5', name: 'Email tenant C regarding Request D.'  },
+              { id: '4', name: 'Email tenant B regarding Request C.' },
+              { id: '5', name: 'Email tenant C regarding Request D.' },
             ]}
           />
-
         </Grid>
         {/* <Grid xs={12} md={6} lg={4}>
           <AppOrderTimeline
@@ -155,7 +197,7 @@ export default function AppView() {
           />
         </Grid> */}
 
-         {/* <Grid xs={12} md={6} lg={8}>
+        {/* <Grid xs={12} md={6} lg={8}>
           <AppWebsiteVisits
             title="Website Visits"
             subheader="(+43%) than last year"
@@ -197,7 +239,6 @@ export default function AppView() {
           />
         </Grid> */}
 
-
         {/* <Grid xs={12} md={6} lg={4}>
           <AppTrafficBySite
             title="Traffic by Site"
@@ -225,7 +266,6 @@ export default function AppView() {
             ]}
           />
         </Grid> */}
-
       </Grid>
     </Container>
   );

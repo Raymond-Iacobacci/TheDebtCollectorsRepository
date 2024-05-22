@@ -157,6 +157,10 @@ export default function ExpensesView() {
     handleCloseRequestPopup();
   };
 
+  const handleDeleteRow = () => {
+    setReload(true);
+  }
+
   const tableLabels = [
     { id: 'type', label: 'Type' },
     { id: 'amount', label: 'Amount' },
@@ -167,11 +171,13 @@ export default function ExpensesView() {
   const tableValues = (row) => (
     <ExpenseTableRow
       key={row.expenseID}
+      id={row.expenseID}
       type={row.type}
       amount={row.amount}
       description={row.description}
       date={row.date}
       request={row.requestID}
+      deleteRow={handleDeleteRow}
     />
   );
 
