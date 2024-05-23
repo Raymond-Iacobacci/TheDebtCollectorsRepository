@@ -1,25 +1,36 @@
 const express = require("express");
 const managerRouter = express.Router();
-const { executeQuery } = require("./db");
+const { executeQuery, uuidToString } = require("./db");
 const { sendEmail } = require("./sendEmail");
 const charge = 'Charge';
 const payment = 'Payment';
 const credit = 'Credit';
 managerRouter.use(express.json());
 
-// const intervalMinutes = 1;
+// const intervalMinutes = 0.25;
 // const interval = intervalMinutes * 60000;
-// const i = 10000
+
 // const timerID = setInterval(fillRentPayments, interval);
 
 // async function fillRentPayments(){
-//     const tenantPayments = await selectQuery(`SELECT * FROM tenants where rents IS NOT NULL`);
+//     const tenantPayments = await executeQuery(`SELECT * FROM tenants where rents IS NOT NULL`);
 //     for (const payment of tenantPayments) {
 //         const { rents, type, tenantID } = payment;
 //         const date = getDate();
-//         await insertQuery("INSERT INTO paymentsDue (date, amount, type, tenantID) VALUES (?, ?, ?, ?)", [date, rents, 'Rent', tenantID]);
+
+//         const chargeBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${uuidToString(tenantID)}`);
+//         const paymentBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${uuidToString(tenantID)}`);
+//         const creditBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${credit}' AND tenantID=${uuidToString(tenantID)}`);
+
+//         let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0) - Number(creditBalance[0].amount || 0);
+//         balance =  balance - payment;
+
+//         updatePayment(payment);
+        
+//         const query = "INSERT INTO paymentsLedger (type, description, date, amount, tenantID, balance) VALUES (?, ?, ?, ?, ?, ?)";
+//         const values = ['Rent', "Rent payment", date, rents, tenantID, balance];
+//         await executeQuery(query, values);
 //     }
-//     console.log(tenantPayments);
 // }
 
 // NOTE: late fees logic
@@ -406,7 +417,7 @@ managerRouter.get("/get-outstanding-balances", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message});
   }
-  
+
 });
 
 
