@@ -4,6 +4,10 @@ const { executeQuery } = require('./db');
 
 dashBoardRouter.use(express.json());
 
+const charge = 'Charge';
+const payment = 'Payment';
+const credit = 'Credit';
+
 dashBoardRouter.get('/get-number-of-tenants', async (req, res) => {
   try{
     const managerID = '0x' + req.query['manager-id'];
@@ -50,6 +54,21 @@ dashBoardRouter.get('/get-number-of-rent-payments', async (req, res) => {
     res.send(results[0]);
   } catch (error) {
     res.status(500).json({ error: `error getting number of rent payments with error: ${error}` });
+  }
+});
+
+dashBoardRouter.get("/get-total-balances", async (req, res) => {
+  try {
+    const managerID = req.query["manager-id"];
+    const chargeBalance = await executeQuery(`select sum(amount) as amount FROM paymentsLedger p1 INNER JOIN tenants t ON t.tenantID=p1.tenantID where managerID=${'0x' + managerID} and type='${charge}'`);
+    const paymentBalance = await executeQuery(`select sum(amount) as amount FROM paymentsLedger p1 INNER JOIN tenants t ON t.tenantID=p1.tenantID where managerID=${'0x' + managerID} and type='${payment}'`);
+    const creditBalance=await executeQuery(`select sum(amount) as amount FROM paymentsLedger p1 INNER JOIN tenants t ON t.tenantID=p1.tenantID where managerID=${'0x' + managerID} and type='${credit}'`);
+
+    let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0) - Number(creditBalance[0].amount || 0);
+    res.send({balance});
+
+  } catch (error) {
+    res.status(500).json({ error: error.message});
   }
 });
 
