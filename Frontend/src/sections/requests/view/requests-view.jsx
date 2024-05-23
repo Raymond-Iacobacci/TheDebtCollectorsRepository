@@ -125,6 +125,9 @@ export default function RequestsView({ access }) {
   const [imageFile, setImageFile] = useState(null);
 
   const handleOpenRequestPopup = () => {
+    setDescription("");
+    setRequestType("");
+    setSelectedImage(null);
     setRequestPopup(true);
   };
 
@@ -367,7 +370,7 @@ export default function RequestsView({ access }) {
                 )}
               </Grid>
               <Grid>
-                <Button >
+                <Button component="label">
                   Upload image
                   <input type="file" style={{ display: 'none' }} onChange={handleFileChange} />
                 </Button>

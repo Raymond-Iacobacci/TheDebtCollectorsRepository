@@ -138,7 +138,7 @@ requestsRouter.post('/new', upload.single('attachment'), async (req, res) => {
     const values = [description, Buffer.from(tenantID, 'hex'), Buffer.from(managerID, 'hex'), status, date, type];
     await executeQuery(query, values);
 
-    const results = await executeQuery(`SELECT * FROM requests ORDER BY id DESC LIMIT 1;`);
+    const results = await executeQuery(`SELECT requestID FROM requests ORDER BY id DESC LIMIT 1;`);
     const requestIDObject = results[0];
 
     if (!requestIDObject) {
@@ -146,12 +146,11 @@ requestsRouter.post('/new', upload.single('attachment'), async (req, res) => {
       return;
     }
 
-    const requestID = uuidToString(requestIDObject.requestID);
+    const requestID = '0x' + requestIDObject.requestID.toString('hex').toUpperCase();
     const attachmentFile = req.file.buffer; 
     const attachmentsQuery = 'INSERT INTO attachments (title, description, attachment, requestID, date) VALUES (?, ?, ?, ?, ?)';
     const attachmentsValues= [type, description, attachmentFile, requestIDObject.requestID, date];
     await executeQuery(attachmentsQuery, attachmentsValues);
-
     res.send(requestID);
   } catch (error) {
     res.status(500).json({ error: 'Error inserting into table' });
