@@ -30,7 +30,7 @@ export async function getNumberRequests(uuid) {
 
 export async function getTotalOutstandingBalance(uuid) {
   return fetch(
-    `${import.meta.env.VITE_MIDDLEWARE_URL}/dashboard/get-total-balances?manager-id=${uuid}`
+    `${import.meta.env.VITE_MIDDLEWARE_URL}/dashboard/get-total-balance?manager-id=${uuid}`
   )
     .then((res) => res.json())
     .then((data) => data);
@@ -38,7 +38,7 @@ export async function getTotalOutstandingBalance(uuid) {
 
 export async function getListOfOutstandingTenants(uuid) {
   return fetch(
-    `${import.meta.env.VITE_MIDDLEWARE_URL}/manager/get-outstanding-balances?manager-id=${uuid}`
+    `${import.meta.env.VITE_MIDDLEWARE_URL}/dashboard/get-outstanding-balances-per-tenant?manager-id=${uuid}`
   )
     .then((res) => res.json())
     .then((data) => data);
