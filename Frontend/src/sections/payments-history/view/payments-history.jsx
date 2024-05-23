@@ -87,7 +87,9 @@ export default function PaymentsHistoryView({ access }) {
 
     fetchName();
   }, [tenantID, reload]);
-
+  const handleDeleteRow = () => {
+    setReload(true);
+  }
 
   const handleClose = () => {
     setOpen(false);
@@ -107,6 +109,7 @@ export default function PaymentsHistoryView({ access }) {
   const tableValues = (row) => {
     const temp = (
       <PaymentTableRow
+        id={row.id}
         key={row.paymentsID}
         tenantID={uuid}
         type={row.type}
@@ -114,6 +117,8 @@ export default function PaymentsHistoryView({ access }) {
         amount={row.amount}
         balance={row.balance}
         description={row.description}
+        access={access}
+        deleteRow={handleDeleteRow}
       />
     );
     return temp;
@@ -131,6 +136,7 @@ export default function PaymentsHistoryView({ access }) {
     { id: 'time', label: 'Date' },
     { id: 'amount', label: 'Amount' },
     { id: 'balance', label: 'Balance' },
+    { id: 'trash', label: ''}
     // Charge or Payment
   ];
   const handleSort = (event, id) => {

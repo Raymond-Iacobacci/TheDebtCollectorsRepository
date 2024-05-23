@@ -10,7 +10,7 @@ tenantRouter.get('/get-ledger', async(req, res) =>{
     try {
         tenantID = req.query['tenant-id'];
     
-        ledger = await executeQuery(`SELECT type, date, amount, description, balance FROM paymentsLedger WHERE tenantID=${'0x' + tenantID}`);
+        ledger = await executeQuery(`SELECT id, type, date, amount, description, balance FROM paymentsLedger WHERE tenantID=${'0x' + tenantID}`);
         
         res.send(ledger);
 

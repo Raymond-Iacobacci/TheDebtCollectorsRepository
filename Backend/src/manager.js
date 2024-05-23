@@ -285,6 +285,17 @@ managerRouter.post("/create-payment", async (req, res) => {
     }
 });
 
+managerRouter.post('/delete-charge', async (req, res) => {
+  try {
+    const paymentID = req.query['payment-id'];
+    const query = `DELETE FROM paymentsLedger where id = ${paymentID};`;
+    await executeQuery(query);
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 managerRouter.get("/get-tenants", async (req, res) => {
   try {
     const managerID = req.query["manager-id"];
@@ -381,8 +392,5 @@ managerRouter.post('/make-announcement', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-
-
 
 module.exports = managerRouter;
