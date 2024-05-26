@@ -1,9 +1,11 @@
-# Setting Up a Google Cloud Project on Google Cloud Console
-This documentation provides a step-by-step guide to setting up a Google Cloud Project on the Google Cloud Console, integrating Cloud SQL, and deploying Docker containers to Cloud Run.
+# Google Cloud Documentation
+This documentation provides a step-by-step guide to setting up a Google Cloud Project on the Google Cloud Console, integrating Cloud SQL into your project, and deploying Docker containers to Cloud Run.
 
-## Prerequisites
+## Setting up Google Cloud Project
+
+### Prerequisites
 - A Google account
-- Billing information 
+- Billing information
 
 ### 1. Sign in to Google Cloud Console
 1. Navigate to the [Google Cloud Console](https://console.cloud.google.com/).
@@ -75,7 +77,7 @@ This documentation provides a step-by-step guide to setting up a Google Cloud Pr
 9. Paste the Client ID in the GOOGLE_CLIENT_ID field.
 10. Paste Client Secret into the GOOGLE_CLIENT_SECRET field.
 
-# Integrating Cloud SQL in your project
+## Integrating Cloud SQL in your project
 1. On the Google Console, click on the navigation pane > **Cloud SQL**.
 2. Retrieve Public and Private IP Address
 If you are connecting to Cloud SQL in your application, your project can be in either of the two states:
@@ -85,7 +87,7 @@ If you are connecting to Cloud SQL in your application, your project can be in e
    - In this case, the DB_HOST field in the Backend/.env file must be set to the Public IP address.
    - Also, to connect locally to the Cloud SQL database when testing, your current IP Address must be in the list of authorized networks for the database.  Note: If you don't add your IP address to this list, you won't be able to connect to the database.
 
-## Adding your IP Address as an authorized network.
+### Adding your IP Address as an authorized network.
 1. Find your current IP address from [Google Cloud Console](https://whatismyipaddress.com/).
 2. On the Google Console, Click on the Navigation Menu > **SQL**.
 3. Select the database for your project.
@@ -96,4 +98,17 @@ If you are connecting to Cloud SQL in your application, your project can be in e
 8. Click **Done** on the New Network box.
 9. Click **Save**.
 
-# Deploying containers to Cloud Run
+## Deploying Docker containers to Cloud Run
+This project works follows a three-tiered web architecture, meaning there is a Frontend, Backend, and Database layer. 
+You will always have a seperate Cloud Run container for the Frontend and Backend. In the following steps, you will learn how to deploy and connect both containers to Cloud Run. 
+
+### Prerequisites
+- A working directory with the appropriate Dockerfile configuration
+- Docker
+
+### Building a docker image
+1. Navigate to the directory you want to containerize (Ex: cd Backend).  If you are deploying a Backend and Frontend container, you should deploy the Backend container first. This is because the Frontend/.env file needs to know the URL of the Backend container.
+2. Enter the command: docker build -t [IMAGE]  .  Note: Replace [IMAGE] with the name of your desired image.
+3. Enter the command: gcloud builds submit --tag gcr.io/[PROJECT-ID]/[IMAGE]  Note: Replace [PROJECT-ID] with your Google Cloud Project's Project ID. Replace [IMAGE] with the same image you specified in Step 2.
+4. Enter the command: gcloud run deploy [CONTAINER] --image=gcr.io/PROJECT-ID]/[IMAGE]  Note: Replace [CONTAINER] with the desired container name (Ex: Backend). Make sure PROJECT-ID and IMAGE are consistent with the previous steps.  Note: You will be prompted to enter which server you are deploying to. Enter the server associated with your project.  Your container should be deployed on [Cloud Run](https://console.cloud.google.com/run).
+
