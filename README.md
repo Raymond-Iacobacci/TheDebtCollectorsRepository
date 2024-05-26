@@ -5,28 +5,22 @@ This documentation provides a step-by-step guide to setting up a Google Cloud Pr
 - A Google account
 - Billing information 
 
-## Step-by-Step Instructions
-
 ### 1. Sign in to Google Cloud Console
 1. Navigate to the [Google Cloud Console](https://console.cloud.google.com/).
 2. Sign in using your Google account credentials.
 
 ### 2. Create a New Project
-1. **Access the Project Selector Menu**:
-   - In the top navigation bar, click the project drop-down menu (located next to the Google Cloud Platform logo).
-2. **Start a New Project**:
-   - Click on **New Project**.
+1. Click the project drop-down menu located next to the Google Cloud Platform logo
+2. Click on **New Project**
 3. **Configure the Project**:
    - **Project Name**: Enter a name for your project (e.g., "Property Management Suite").
-   - **Billing Account**: Select a billing account if prompted (required for enabling certain services).
+   - **Billing Account**: Select a billing account if prompted (required for Cloud SQL and Cloud Run).
    - **Organization**: If applicable, select your organization.
    - **Location**: If applicable, select the folder or organization.
-4. **Create the Project**:
-   - Click **Create**. 
+4. Click **Create**
 
 ### 3. Set Up Billing
-1. **Navigate to Billing**:
-   - In the left-hand navigation pane, click on **Billing**.
+1. In the left-hand navigation pane, click on **Billing**
 2. **Link Billing Account**:
    - If prompted, link your billing account to the new project.
    - If no billing account is available, follow the prompts to create and configure a new billing account.
@@ -68,9 +62,6 @@ This documentation provides a step-by-step guide to setting up a Google Cloud Pr
    - Once the instance is created, click on the instance name.
    - **Databases**: Under the **Databases** tab, click **Create Database** and enter the database name.
    - **Users**: Under the **Users** tab, click **Add User Account** and configure the user details.
-5. **Connect Your Application to Cloud SQL**:
-   - Use the connection details provided in the instance overview (IP address, connection name, etc.) to configure your application’s database connection.
-   - Ensure your application has the necessary permissions and configurations to connect to the Cloud SQL instance.
 
 ### 7. Integrate OAuth 2.0
 1. **Navigate to the Credentials Page**:
@@ -93,11 +84,14 @@ This documentation provides a step-by-step guide to setting up a Google Cloud Pr
    - After creating the client ID, you will see the **Client ID** and **Client Secret**. 
    - Navigate to the Backend/.env file.
    - Paste the Client ID and Client Secret into the .env file.
-
 6. **Integrate OAuth 2.0 in Your Application**:
    - Use the client ID and client secret in your application to set up OAuth 2.0 authentication.
    - Follow the specific instructions for your programming language or framework to implement the OAuth 2.0 flow (e.g., obtaining authorization codes, exchanging them for access tokens).
 
-# Using Cloud SQL in your project
+# Integrating Cloud SQL in your project
+1. **Navigate to the Cloud SQL page on the Google Console**:
+   - On the Google Console, click on the navigation pane > **Cloud SQL**.
+2. **Retrieve Public and Private IP Address**
+   - 
 
 # Deploying containers to Cloud Run
