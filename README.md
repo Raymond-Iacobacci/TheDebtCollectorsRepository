@@ -79,7 +79,7 @@ This documentation provides a step-by-step guide to setting up a Google Cloud Pr
 
 ## Integrating Cloud SQL in your project
 1. On the Google Console, click on the navigation pane > **Cloud SQL**.
-2. Retrieve Public and Private IP Address
+2. Retrieve Public and Private IP Address\
 If you are connecting to Cloud SQL in your application, your project can be in either of the two states:
 - The application is deployed on a Cloud Run container
    - In this case, before you deploy your container to Cloud Run, your DB_HOST field in the Backend/.env file must be set to the Private IP address
