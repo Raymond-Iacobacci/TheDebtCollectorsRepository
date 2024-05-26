@@ -51,7 +51,7 @@ This documentation provides a step-by-step guide to setting up a Google Cloud Pr
    - Select a role for the user (e.g., Project Editor, Viewer, etc.).
    - Click **Save**.
 
-### 6. Integrate Cloud SQL
+### 6. Setup Cloud SQL
 1. **Navigate to Cloud SQL**:
    - In the left-hand navigation pane, click on **SQL**.
 2. **Create a New Instance**:
@@ -86,14 +86,18 @@ This documentation provides a step-by-step guide to setting up a Google Cloud Pr
 4. **Set Up OAuth 2.0 Client ID**:
    - **Application Type**: Select the application type (e.g., Web application).
    - **Name**: Enter a name for the OAuth 2.0 client ID.
-   - **Authorized JavaScript Origins**: Enter the origins that are allowed to use this client ID (e.g., `https://yourdomain.com`).
-   - **Authorized Redirect URIs**: Enter the URIs to which the OAuth 2.0 server can send responses (e.g., `https://yourdomain.com/oauth2callback`).
+   - **Authorized JavaScript Origins**: Enter the origins that are allowed to use this client ID (usually this will be the link to the application as well as your localhost server).
+   - **Authorized Redirect URIs**: Enter the URIs to which the OAuth 2.0 server can send responses (usually this will be the link to the application as well as your localhost server).
    - Click **Create**.
-5. **Retrieve Client ID and Secret**:
-   - After creating the client ID, you will see the **Client ID** and **Client Secret**. Make sure to save these credentials securely.
+5. **Integrate Client ID and Secret into Application**:
+   - After creating the client ID, you will see the **Client ID** and **Client Secret**. 
+   - Navigate to the Backend/.env file.
+   - Paste the Client ID and Client Secret into the .env file.
+
 6. **Integrate OAuth 2.0 in Your Application**:
    - Use the client ID and client secret in your application to set up OAuth 2.0 authentication.
    - Follow the specific instructions for your programming language or framework to implement the OAuth 2.0 flow (e.g., obtaining authorization codes, exchanging them for access tokens).
 
-## Conclusion
-Your Google Cloud Project is now set up with Cloud SQL and OAuth 2.0 integrated. Ensure you regularly monitor and maintain the project to keep your property management suite running smoothly. For additional resources and detailed guides, refer to the Google Cloud Documentation and support channels.
+# Using Cloud SQL in your project
+
+# Deploying containers to Cloud Run
