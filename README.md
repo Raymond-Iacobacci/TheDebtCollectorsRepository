@@ -93,16 +93,16 @@ If you are connecting to Cloud SQL in your application, your project can be in e
    - Also, to connect locally to the Cloud SQL database when testing, your current IP Address must be in the list of authorized networks for the database.
    Note: If you don't add your IP address to this list, you won't be able to connect to the database.
 
-   ## Adding your IP Address to the list 
-   1. Find your current IP address from [Google Cloud Console](https://whatismyipaddress.com/).
-   2. On the Google Console, Click on the Navigation Menu > **SQL**.
-   3. Select the database for your project.
-   4. Click on the **Connections** tab.
-   5. Click on the **Networking** tab.
-   6. Click on **Add A Network**. 
-      A **New Network** box will appear.
-   7. Enter the network name and IP address with the appropriate CIDR notaion.
-   8. Click **Done** on the New Network box.
-   9. Click **Save**.
+   ## Adding your IP Address as an authorized network.
+1. Find your current IP address from [Google Cloud Console](https://whatismyipaddress.com/).
+2. On the Google Console, Click on the Navigation Menu > **SQL**.
+3. Select the database for your project.
+4. Click on the **Connections** tab.
+5. Click on the **Networking** tab.
+6. Click on **Add A Network**. 
+   - A **New Network** box will appear.
+7. Enter the network name and IP address with the appropriate CIDR notaion.
+8. Click **Done** on the New Network box.
+9. Click **Save**.
 
 # Deploying containers to Cloud Run
