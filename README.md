@@ -75,8 +75,7 @@ This documentation provides a step-by-step guide to setting up a Google Cloud Pr
    - **Authorized JavaScript Origins**: Enter the origins that are allowed to use this client ID (usually this will be the link to the application as well as your localhost server).
    - **Authorized Redirect URIs**: Enter the URIs to which the OAuth 2.0 server can send responses (usually this will be the link to the application as well as your localhost server).
 1. Click **Create**.
-6. Integrate Client ID and Secret into Application:
-   - After creating the client ID, you will see the **Client ID** and **Client Secret**. 
+6. Integrate Client ID and Secret into Application:  After creating the client ID, you will see the **Client ID** and **Client Secret**. 
 1. Navigate to the Backend/.env file.
 2. Paste the Client ID in the GOOGLE_CLIENT_ID field.
 3. Paste Client Secret into the GOOGLE_CLIENT_SECRET field.
