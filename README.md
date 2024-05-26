@@ -107,7 +107,7 @@ You will always have a seperate Cloud Run container for the Frontend and Backend
 - Docker
 
 ### Building a docker image
-**WARNING**: Before deploying your Backend container, make sure the DB_HOST field in the Backend/.env file is set your database's Private IP address.
+**WARNING**: Before deploying your Backend container, make sure the DB_HOST field in the Backend/.env file is set your database's Private IP address. Also make sure that the MIDDLEWARE_URL field in the Frontend/.env file is pointing to your current Cloud Run Backend container.
 1. Navigate to the directory you want to containerize (Ex: cd Backend).\
 *Note*: If you are deploying a Backend and Frontend container, you should deploy the Backend container first. This is because the Frontend/.env file needs to know the URL of the Backend container.
 3. Enter the command: docker build -t [IMAGE]  .\
