@@ -8,7 +8,7 @@ This documentation provides a step-by-step guide to setting up a Google Cloud Pr
 ## Step-by-Step Instructions
 
 ### 1. Sign in to Google Cloud Console
-1. Go to [Google Cloud Console](https://console.cloud.google.com/).
+1. Navigate to the [Google Cloud Console](https://console.cloud.google.com/).
 2. Sign in using your Google account credentials.
 
 ### 2. Create a New Project
@@ -22,7 +22,7 @@ This documentation provides a step-by-step guide to setting up a Google Cloud Pr
    - **Organization**: If applicable, select your organization.
    - **Location**: If applicable, select the folder or organization.
 4. **Create the Project**:
-   - Click **Create**. It may take a few seconds for the project to be created.
+   - Click **Create**. 
 
 ### 3. Set Up Billing
 1. **Navigate to Billing**:
@@ -56,7 +56,7 @@ This documentation provides a step-by-step guide to setting up a Google Cloud Pr
    - In the left-hand navigation pane, click on **SQL**.
 2. **Create a New Instance**:
    - Click **Create Instance**.
-   - Select the database engine you want to use (e.g., MySQL, PostgreSQL).
+   - Select the database engine you want to use, in this case MySQL.
 3. **Configure Instance Settings**:
    - **Instance ID**: Enter a unique identifier for your instance.
    - **Password**: Set a password for the root user.
