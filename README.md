@@ -85,5 +85,24 @@ This documentation provides a step-by-step guide to setting up a Google Cloud Pr
 # Integrating Cloud SQL in your project
 1. On the Google Console, click on the navigation pane > **Cloud SQL**.
 2. Retrieve Public and Private IP Address
+If you are connecting to Cloud SQL in your application, your project can be in either of the two states:
+- The application is deployed on a Cloud Run container
+   - In this case, before you deploy your container to Cloud Run, your DB_HOST field in the Backend/.env file must be set to the Private IP address
+- The application is being run on a localhost for testing
+   - In this case, the DB_HOST field in the Backend/.env file must be set to the Public IP address.
+   - Also, to connect locally to the Cloud SQL database when testing, your current IP Address must be in the list of authorized networks for the database.
+   Note: If you don't add your IP address to this list, you won't be able to connect to the database.
+
+   ## Adding your IP Address to the list 
+   1. Find your current IP address from [Google Cloud Console](https://whatismyipaddress.com/).
+   2. On the Google Console, Click on the Navigation Menu > **SQL**.
+   3. Select the database for your project.
+   4. Click on the **Connections** tab.
+   5. Click on the **Networking** tab.
+   6. Click on **Add A Network**. 
+      A **New Network** box will appear.
+   7. Enter the network name and IP address with the appropriate CIDR notaion.
+   8. Click **Done** on the New Network box.
+   9. Click **Save**.
 
 # Deploying containers to Cloud Run
