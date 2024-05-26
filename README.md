@@ -107,7 +107,7 @@ You will always have a seperate Cloud Run container for the Frontend and Backend
 - Docker
 
 ### Building a docker image
-**WARNING**: Before deploying your Backend container, make sure the DB_HOST field in the Backend/.env file is set your database's Private IP address. Also make sure that the MIDDLEWARE_URL field in the Frontend/.env file is pointing to your current Cloud Run Backend container.
+**WARNING**: Before deploying your Backend container, make sure the DB_HOST field in the Backend/.env file is set your database's Private IP address. Also make sure that the VITE_MIDDLEWARE_URL field in the Frontend/.env file is pointing to your current Cloud Run Backend container.
 1. Navigate to the directory you want to containerize (Ex: cd Backend).\
 *Note*: If you are deploying a Backend and Frontend container, you should deploy the Backend container first. This is because the Frontend/.env file needs to know the URL of the Backend container.
 3. Enter the command: docker build -t [IMAGE]  .\
@@ -126,6 +126,14 @@ You will be prompted to enter which server you are deploying to. Enter the serve
   4. Enter the command: npm start\
      You should now have a localhost started on port 8080\
 **WARNING**: Make sure the DB_HOST field in the Backend/.env file is set to the databases's public IP address. Also make sure your current IP address is listed as an authorized network for the database. If either of these conditions are not met, your application will not connect to the database.
+
+- Frontend:\
+  1. Enter the command: cd Frontend
+  2. Enter the command: yarn install\
+     This command will install the dependencies listed in the node_modules.
+  4. Enter the command: yarn dev\
+     You should now have a localhost started on port 3030\
+**WARNING**: Make sure the VITE_MIDDLEWARE_URL field listed in the Frontend/.env folder is set to the correct Backend URL. This can either be a Cloud Run container or http://localhost:8080 if you are testing the Backend locally.
      
 
 
