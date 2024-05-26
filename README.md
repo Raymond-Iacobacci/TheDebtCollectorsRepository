@@ -118,5 +118,15 @@ You will always have a seperate Cloud Run container for the Frontend and Backend
 *Note*: Replace [CONTAINER] with the desired container name (Ex: Backend). Make sure PROJECT-ID and IMAGE are consistent with the previous steps.\
 You will be prompted to enter which server you are deploying to. Enter the server associated with your project.  Your container should be deployed on [Cloud Run](https://console.cloud.google.com/run).
 
-## TODO: Talk about installing packages on both frontend and backend and how to start the localhosts
+## Developing/Testing code locally
+- Backend:\
+  **WARNING**: Make sure the DB_HOST field in the Backend/.env file is set to the databases's public IP address. Also make sure your current IP address is listed as an authorized network for the database.
+  1. Enter the command: cd Backend
+  2. Enter the command: npm install\
+     This command will install the dependencies listed in the node_modules.
+  4. Enter the command: npm start\
+     You should now have a localhost started on port 8080
+     
+
+
 
