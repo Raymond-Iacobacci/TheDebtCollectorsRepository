@@ -1,5 +1,5 @@
 # Setting Up the Google Cloud Project on the Google Cloud Console
-This documentation provides a step-by-step guide to setting up a Google Cloud Project on the Google Cloud Console, integrating Cloud SQL, and setting up OAuth 2.0.
+This documentation provides a step-by-step guide to setting up a Google Cloud Project on the Google Cloud Console, integrating Cloud SQL, and deploying Docker containers to Cloud Run.
 
 ## Prerequisites
 - A Google account
