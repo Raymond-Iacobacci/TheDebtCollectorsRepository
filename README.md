@@ -109,7 +109,7 @@ You will always have a seperate Cloud Run container for the Frontend and Backend
 ### Building a docker image
 1. Navigate to the directory you want to containerize (Ex: cd Backend).
 If you are deploying a Backend and Frontend container, you should deploy the Backend container first. This is because the Frontend/.env file needs to know the URL of the Backend container.
-3. Enter the command: docker build -t [IMAGE]  .  Note: Replace [IMAGE] with the name of your desired image.
+3. Enter the command: docker build -t [IMAGE]  .]\Note: Replace [IMAGE] with the name of your desired image.
 4. Enter the command: gcloud builds submit --tag gcr.io/[PROJECT-ID]/[IMAGE]  Note: Replace [PROJECT-ID] with your Google Cloud Project's Project ID. Replace [IMAGE] with the same image you specified in Step 2.
 5. Enter the command: gcloud run deploy [CONTAINER] --image=gcr.io/PROJECT-ID]/[IMAGE]  Note: Replace [CONTAINER] with the desired container name (Ex: Backend). Make sure PROJECT-ID and IMAGE are consistent with the previous steps.  Note: You will be prompted to enter which server you are deploying to. Enter the server associated with your project.  Your container should be deployed on [Cloud Run](https://console.cloud.google.com/run).
 
