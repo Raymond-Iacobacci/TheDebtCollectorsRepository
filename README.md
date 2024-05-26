@@ -118,3 +118,5 @@ You will always have a seperate Cloud Run container for the Frontend and Backend
 *Note*: Replace [CONTAINER] with the desired container name (Ex: Backend). Make sure PROJECT-ID and IMAGE are consistent with the previous steps.\
 You will be prompted to enter which server you are deploying to. Enter the server associated with your project.  Your container should be deployed on [Cloud Run](https://console.cloud.google.com/run).
 
+## TODO: Talk about installing packages on both frontend and backend and how to start the localhosts
+
