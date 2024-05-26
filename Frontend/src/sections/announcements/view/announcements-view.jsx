@@ -1,28 +1,27 @@
-import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
+// import Input from '@mui/material/Input';
 import Dialog from '@mui/material/Dialog';
-import Select from '@mui/material/Select';
+// import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
+// import MenuItem from '@mui/material/MenuItem';
 import Grid from '@mui/material/Unstable_Grid2';
 import TextField from '@mui/material/TextField';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
-import InputLabel from '@mui/material/InputLabel';
+// import InputLabel from '@mui/material/InputLabel';
 import DialogTitle from '@mui/material/DialogTitle';
-import FormControl from '@mui/material/FormControl';
+// import FormControl from '@mui/material/FormControl';
 import DialogActions from '@mui/material/DialogActions';
 import TableContainer from '@mui/material/TableContainer';
+// import InputAdornment from '@mui/material/InputAdornment';
 import TablePagination from '@mui/material/TablePagination';
 import CircularProgress from '@mui/material/CircularProgress';
-
-// import { requests } from 'src/_mock/request';
 
 import { usePathname } from 'src/routes/hooks';
 
@@ -31,18 +30,19 @@ import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
 import TableNoData from '../table-components/table-no-data';
-import RequestTableRow from '../table-components/table-row';
-import RequestTableHead from '../table-components/table-head';
-import UserTableToolbar from '../table-components/table-toolbar';
+import ExpenseTableRow from '../table-components/table-row';
+import ExpenseTableHead from '../table-components/table-head';
+// import UserTableToolbar from '../table-components/table-toolbar';
 import TableEmptyRows from '../table-components/table-empty-rows';
 import { emptyRows, applyFilter, getComparator } from '../hooks/utils';
-import { getTenantRequests, getManagerRequests } from '../hooks/request-specifics';
+import { addAnnouncement, getAnnouncements } from '../hooks/announcement-specifics';
 
 // ----------------------------------------------------------------------
 
-export default function RequestsView({ access }) {
+export default function AnnouncementsView() {
   const pathname = usePathname();
   const uuid = pathname.split('/')[3];
+  const access = pathname.split('/')[2];
 
   const [page, setPage] = useState(0);
 
@@ -50,43 +50,37 @@ export default function RequestsView({ access }) {
 
   const [orderBy, setOrderBy] = useState('name');
 
-  const [filterName, setFilterName] = useState('');
+  const [filterName] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const [loading, setLoading] = useState(true);
-  const [requests, setRequests] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
   const [errorMsg, setError] = useState('');
 
   const [requestPopup, setRequestPopup] = useState(false);
 
-  const [ reload, setReload ] = useState(true);
+  const [reload, setReload] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        if (access === 'manager') {
-          await getManagerRequests(uuid).then((data) => {
-            setRequests(data);
-          });
-        } else {
-          await getTenantRequests(uuid).then((data) => {
-            setRequests(data);
-            console.log(data);
-          });
-        }
+        await getAnnouncements(uuid, access).then((data) => {
+          console.log(data);
+          setAnnouncements(data);
+        });
         setLoading(false);
       } catch (error) {
         setError(error.message);
-        console.log(`HeaderInfo API: ${error}`);
+        console.log(`Announcements API: ${error}`);
       }
     };
-    if( reload ) {
+    if (reload) {
       fetchData();
       setReload(false);
-    }  
-  }, [access, uuid, reload]);
+    }
+  }, [uuid, reload, access]);
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -105,13 +99,13 @@ export default function RequestsView({ access }) {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const handleFilterByName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
-  };
+  // const handleFilterByName = (event) => {
+  //   setPage(0);
+  //   setFilterName(event.target.value);
+  // };
 
   const dataFiltered = applyFilter({
-    inputData: requests,
+    inputData: announcements,
     comparator: getComparator(order, orderBy),
     filterName,
   });
@@ -119,15 +113,10 @@ export default function RequestsView({ access }) {
   const notFound = !dataFiltered.length && !!filterName;
 
   // Dialog popup
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [requestType, setRequestType] = useState('');
   const [description, setDescription] = useState('');
-  const [imageFile, setImageFile] = useState(null);
+  const [title, setTitle] = useState('');
 
   const handleOpenRequestPopup = () => {
-    setDescription("");
-    setRequestType("");
-    setSelectedImage(null);
     setRequestPopup(true);
   };
 
@@ -135,100 +124,48 @@ export default function RequestsView({ access }) {
     setRequestPopup(false);
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setImageFile(file);
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setSelectedImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleChange = (event) => {
-    setRequestType(event.target.value);
-  };
-
   const handleSubmitRequest = async () => {
-    const formData = new FormData();
-    formData.append('attachment', imageFile);
-    formData.append('type', requestType);
-    formData.append('description', description);
-    console.log(`This is the formData: ${formData}`);
-    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/requests/new?tenant-id=${uuid}`, {
-      method: 'POST',
-      body: formData, // Convert data to JSON string
-    }).then((data) => {
+    await addAnnouncement(uuid, title, description).then((data) => {
       if (data.ok) {
         console.log('Data posted successfully');
         setDescription('');
-        setSelectedImage(null);
-        setRequestType();
+        setTitle('');
+        setRequestPopup(false);
+        setReload(true);
       } else {
         console.log('Error posting data to backend');
       }
     });
-    setReload(true);
-    setRequestPopup(null);
+    handleCloseRequestPopup();
   };
 
   const handleDeleteRow = () => {
     setReload(true);
-  }
-
-  const tableLabels =
-    access === 'manager'
-      ? [
-        { id: 'name', label: 'Name' },
-        { id: 'address', label: 'Address' },
-        { id: 'type', label: 'Type' },
-        { id: 'date', label: 'Date'},
-        { id: 'status', label: 'Status' },
-      ]
-      : [
-        { id: 'type', label: 'Type' },
-        { id: 'description', label: 'Description' },
-        { id: 'date', label: 'Date' },
-        { id: 'status', label: 'Status' },
-      ];
-
-  const tableValues = (row) => {
-    if (access === 'manager') {
-      return (
-        <RequestTableRow
-          key={row.requestID}
-          id={row.requestID}
-          name={row.name}
-          address={row.address}
-          date={row.date}
-          type={row.type}
-          status={row.status}
-          access={access}
-          deleteRow={handleDeleteRow}
-        />
-      );
-    }
-    return (
-      <RequestTableRow
-        key={row.requestID}
-        id={row.requestID}
-        type={row.type}
-        description={row.description}
-        date={row.date}
-        status={row.status}
-        access={access}
-        deleteRow={handleDeleteRow}
-      />
-    );
   };
+
+  const tableLabels = [
+    { id: 'title', label: 'Title' },
+    { id: 'description', label: 'Description' },
+    { id: 'date', label: 'Date' },
+  ];
+
+  const tableValues = (row) => (
+    <ExpenseTableRow
+      key={row.expenseID}
+      id={row.expenseID}
+      title={row.title}
+      description={row.description}
+      date={row.date}
+      request={row.requestID}
+      deleteRow={handleDeleteRow}
+    />
+  );
 
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Requests</Typography>
-        {access !== 'tenant' ? (
+        <Typography variant="h4">Announcements</Typography>
+        {access !== 'manager' ? (
           <div />
         ) : (
           <Button
@@ -237,21 +174,21 @@ export default function RequestsView({ access }) {
             startIcon={<Iconify icon="eva:plus-fill" />}
             onClick={handleOpenRequestPopup}
           >
-            New Request
+            New Announcement
           </Button>
         )}
       </Stack>
 
       <Card>
-        <UserTableToolbar filterName={filterName} onFilterName={handleFilterByName} />
+        {/* <UserTableToolbar filterName={filterName} onFilterName={handleFilterByName} /> */}
 
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
-              <RequestTableHead
+              <ExpenseTableHead
                 order={order}
                 orderBy={orderBy}
-                rowCount={requests.length}
+                rowCount={announcements.length}
                 onRequestSort={handleSort}
                 headLabel={tableLabels}
               />
@@ -279,7 +216,7 @@ export default function RequestsView({ access }) {
 
                   <TableEmptyRows
                     height={77}
-                    emptyRows={emptyRows(page, rowsPerPage, requests.length)}
+                    emptyRows={emptyRows(page, rowsPerPage, announcements.length)}
                   />
 
                   {notFound && <TableNoData query={filterName} />}
@@ -292,7 +229,7 @@ export default function RequestsView({ access }) {
         <TablePagination
           page={page}
           component="div"
-          count={requests.length}
+          count={announcements.length}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}
@@ -308,13 +245,33 @@ export default function RequestsView({ access }) {
         fullWidth
         maxWidth="lg"
       >
-        <DialogTitle id="alert-dialog-title">Maintenance request</DialogTitle>
+        <DialogTitle id="alert-dialog-title">Make Announcement</DialogTitle>
         <Grid container>
           <Grid>
             <Box
               component="form"
               sx={{
-                '& > :not(style)': { m: 1, width: '100ch' },
+                '& > :not(style)': { m: 1, width: '30ch' },
+              }}
+              noValidate
+              autoComplete="off"
+            >
+              <TextField
+                value={title}
+                id="outlined-basic"
+                label="Title"
+                variant="outlined"
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                }}
+              />
+            </Box>
+          </Grid>
+          <Grid>
+            <Box
+              component="form"
+              sx={{
+                '& > :not(style)': { m: 1, width: '75ch' },
               }}
               noValidate
               autoComplete="off"
@@ -332,51 +289,8 @@ export default function RequestsView({ access }) {
             </Box>
           </Grid>
           <Grid>
-            <FormControl sx={{ m: 1, minWidth: 150 }} size="medium">
-              <InputLabel id="demo-select-small-label">Request Type</InputLabel>
-              <Select
-                labelId="demo-select-small-label"
-                id="demo-select-small"
-                value={requestType}
-                label="Request Type"
-                onChange={handleChange}
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value="Leakage">Leakage</MenuItem>
-                <MenuItem value="Electrical">Electrical</MenuItem>
-                <MenuItem value="Kitchen">Kitchen</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid>
             <DialogActions>
-              <Grid>
-                {selectedImage && (
-                  <div>
-                    <h2>Selected Image</h2>
-                    <img
-                      src={selectedImage}
-                      alt="Uploaded"
-                      style={{
-                        maxWidth: '50%',
-                        maxHeight: '50%',
-                        display: 'block',
-                        margin: 'auto',
-                      }}
-                    />
-                  </div>
-                )}
-              </Grid>
-              <Grid>
-                <Button component="label">
-                  Upload image
-                  <input type="file" style={{ display: 'none' }} onChange={handleFileChange} />
-                </Button>
-              </Grid>
-
-              <Button component="label" variant="contained" onClick={handleSubmitRequest} autoFocus>
+              <Button onClick={handleSubmitRequest} autoFocus>
                 Submit
               </Button>
             </DialogActions>
@@ -386,7 +300,3 @@ export default function RequestsView({ access }) {
     </Container>
   );
 }
-
-RequestsView.propTypes = {
-  access: PropTypes.string,
-};

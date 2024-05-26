@@ -48,6 +48,7 @@ export default function RequestTableHead({
             </TableSortLabel>
           </TableCell>
         ))}
+        <TableCell padding="checkbox" />
       </TableRow>
     </TableHead>
   );

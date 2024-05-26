@@ -52,6 +52,9 @@ export default function PaymentsHistoryView({ access }) {
 
   const [reload, setReload] = useState(true);
 
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
   useEffect(() => {
     const fetchPayments = async () => {
       try {
@@ -69,7 +72,24 @@ export default function PaymentsHistoryView({ access }) {
       fetchPayments();
       setReload(false);
     }
+    const fetchName = async () => {
+      try {
+        fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/users/get-attributes?userID=${tenantID}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setFirstName(data.firstName);
+          setLastName(data.lastName);
+        });
+      } catch (error) {
+        console.log(`Error fetching name: ${error}`);
+      }
+    };
+
+    fetchName();
   }, [tenantID, reload]);
+  const handleDeleteRow = () => {
+    setReload(true);
+  }
 
   const handleClose = () => {
     setOpen(false);
@@ -89,13 +109,16 @@ export default function PaymentsHistoryView({ access }) {
   const tableValues = (row) => {
     const temp = (
       <PaymentTableRow
+        id={row.id}
         key={row.paymentsID}
         tenantID={uuid}
         type={row.type}
-        time={row.time}
+        time={row.date}
         amount={row.amount}
         balance={row.balance}
         description={row.description}
+        access={access}
+        deleteRow={handleDeleteRow}
       />
     );
     return temp;
@@ -113,6 +136,7 @@ export default function PaymentsHistoryView({ access }) {
     { id: 'time', label: 'Date' },
     { id: 'amount', label: 'Amount' },
     { id: 'balance', label: 'Balance' },
+    { id: 'trash', label: ''}
     // Charge or Payment
   ];
   const handleSort = (event, id) => {
@@ -224,6 +248,11 @@ export default function PaymentsHistoryView({ access }) {
 
   return (
     <Container>
+    { (access === 'manager')?
+    <Typography variant="h4" gutterBottom mb={5}>
+      {`${firstName} ${lastName}`}
+    </Typography>
+    :<div />}
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         {access === 'tenant' ? (
           <>

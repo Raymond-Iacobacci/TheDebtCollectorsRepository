@@ -10,14 +10,14 @@ import IconButton from '@mui/material/IconButton';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { usePathname } from 'src/routes/hooks';
-
-import { fDateTime } from 'src/utils/format-time';
+import { fDate } from 'src/utils/format-time';
 
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
 import { newComment, getComments } from '../hooks/request-specifics'
+
 
 // ----------------------------------------------------------------------
 
@@ -148,7 +148,7 @@ RequestComments.propTypes = {
 // ----------------------------------------------------------------------
 
 function CommentItem({ item }) {
-  const { user, comment, datePosted } = item;
+  const { user, comment, date } = item;
 
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
@@ -163,7 +163,7 @@ function CommentItem({ item }) {
       </Box>
 
       <Typography variant="caption" sx={{ pr: 1, flexShrink: 0, color: 'text.secondary' }}>
-        {fDateTime(datePosted)}
+        {fDate(date)}
       </Typography>
     </Stack>
   );
@@ -173,6 +173,6 @@ CommentItem.propTypes = {
   item: PropTypes.shape({
     user: PropTypes.string,
     comment: PropTypes.string,
-    datePosted: PropTypes.string,
+    date: PropTypes.string,
   }),
 };

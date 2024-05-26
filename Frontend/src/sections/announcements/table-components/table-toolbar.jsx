@@ -11,7 +11,7 @@ import Iconify from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
-export default function PaymentTableToolbar({ numSelected, filterName, onFilterName }) {
+export default function RequestTableToolbar({ numSelected, filterName, onFilterName }) {
   return (
     <Toolbar
       sx={{
@@ -33,7 +33,7 @@ export default function PaymentTableToolbar({ numSelected, filterName, onFilterN
         <OutlinedInput
           value={filterName}
           onChange={onFilterName}
-          placeholder="Search tenant..."
+          placeholder="Search expenses..."
           startAdornment={
             <InputAdornment position="start">
               <Iconify
@@ -62,7 +62,7 @@ export default function PaymentTableToolbar({ numSelected, filterName, onFilterN
   );
 }
 
-PaymentTableToolbar.propTypes = {
+RequestTableToolbar.propTypes = {
   numSelected: PropTypes.number,
   filterName: PropTypes.string,
   onFilterName: PropTypes.func,
