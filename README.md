@@ -2,8 +2,8 @@
 This documentation provides a step-by-step guide to setting up a Google Cloud Project on the Google Cloud Console, integrating Cloud SQL, and setting up OAuth 2.0.
 
 ## Prerequisites
-- A Google account (Gmail or G Suite account).
-- Billing information (if you plan to use paid features).
+- A Google account
+- Billing information 
 
 ## Step-by-Step Instructions
 
