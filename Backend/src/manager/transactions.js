@@ -1,10 +1,14 @@
+const express = require('express');
+const transactionsRouter = express.Router();
+const { executeQuery } = require('./utils');
 
+transactionsRouter.use(express.json());
 
 const charge = 'Charge';
 const payment = 'Payment';
 const credit = 'Credit';
 
-managerRouter.post("/create-credit", async(req, res) =>{
+transactionsRouter.post("/create-credit", async(req, res) =>{
   try {  
     const tenantID = req.body.tenantID;
     const description = req.body.description;
@@ -43,7 +47,7 @@ async function updatePayment(amount){
   }
 }
 
-managerRouter.post("/create-payment", async (req, res) => {
+transactionsRouter.post("/create-payment", async (req, res) => {
   try {
       const tenantID = req.body.tenantID;
       const description = req.body.description;
@@ -67,7 +71,7 @@ managerRouter.post("/create-payment", async (req, res) => {
   }
 });
 
-managerRouter.post('/delete-charge', async (req, res) => {
+transactionsRouter.post('/delete-charge', async (req, res) => {
 try {
   const paymentID = req.query['payment-id'];
   const query = `DELETE FROM paymentsLedger where id = ${paymentID};`;
@@ -135,3 +139,5 @@ try {
 
 //   }
 // }
+
+module.exports = transactionsRouter;

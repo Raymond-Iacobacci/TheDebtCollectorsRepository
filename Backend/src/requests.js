@@ -13,48 +13,6 @@ function getDate() {
   return moment().tz("America/Los_Angeles").format("YYYY-MM-DD");
 }
 
-requestsRouter.get('/get-manager-view', async (req, res) => {
-  try {
-    const managerID = '0x' + req.query['manager-id'];
-    const query = `SELECT r.requestID, CONCAT(t.firstname, ' ', t.lastname) AS name, t.address, r.type, r.status, r.date FROM requests 
-    AS r JOIN tenants AS t ON r.tenantID = t.tenantID WHERE r.managerID = ${managerID} ORDER BY r.date;`;
-    const requestResults = await executeQuery(query);
-
-    if (!requestResults) {
-      res.send('No requests for this managerID').end();
-      return;
-    }
-
-    for(let request of requestResults){
-      request.requestID = request.requestID.toString('hex').toUpperCase();
-    }
-
-    res.send(requestResults).end();
-  } catch (error) {
-    res.status(500).json({ error: `ERROR LOADING MANAGER VIEW: ERROR ${error}` }).end();
-  }
-});
-
-requestsRouter.get('/get-tenant-view', async (req, res) => {
-  try {
-    const tenantID = '0x' + req.query['tenant-id'];
-    const requestResults = await executeQuery(`SELECT requestID, description, type, status, date FROM requests WHERE tenantID = ${tenantID};`);
-    
-    if(!requestResults){
-      res.send('no requests for this tenantID');
-      return;
-    }
-
-    for(let request of requestResults){
-        request.requestID = request.requestID.toString('hex').toUpperCase();
-    }
-
-    res.send(requestResults).end();
-  } catch (error) {
-    res.status(500).json({ error: `ERROR LOADING TENANT VIEW: ERROR ${error}` });
-  }
-});
-
 requestsRouter.get('/specifics/header-info', async (req, res) => {
   try {
     const requestID = '0x' + req.query['request-id'];

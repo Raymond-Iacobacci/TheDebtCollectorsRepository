@@ -1,6 +1,6 @@
 const express = require('express');
 const announcementsRouter = express.Router();
-const { executeQuery } = require('./utils');
+const { executeQuery, getDate } = require('./utils');
 
 announcementsRouter.use(express.json());
 

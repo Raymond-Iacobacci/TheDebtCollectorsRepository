@@ -1,4 +1,10 @@
-managerRouter.post("/create-tenant", async (req, res) => {
+const express = require('express');
+const tenantsRouter = express.Router();
+const { executeQuery } = require('./utils');
+
+tenantsRouter.use(express.json());
+
+tenantsRouter.post("/create-tenant", async (req, res) => {
   try {
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
@@ -37,7 +43,7 @@ managerRouter.post("/create-tenant", async (req, res) => {
   }
 });
 
-managerRouter.get("/get-tenants", async (req, res) => {
+tenantsRouter.get("/get-tenants", async (req, res) => {
   try {
     const managerID = req.query["manager-id"];
     const tenantsList = await executeQuery(
@@ -56,3 +62,5 @@ managerRouter.get("/get-tenants", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+module.exports = tenantsRouter;
