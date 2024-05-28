@@ -1,6 +1,6 @@
 const express = require('express');
 const reportRouter = express.Router();
-const { executeQuery } = require('./utils');
+const { executeQuery } = require('../utils');
 
 reportRouter.use(express.json());
 

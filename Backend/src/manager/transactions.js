@@ -1,6 +1,6 @@
 const express = require('express');
 const transactionsRouter = express.Router();
-const { executeQuery } = require('./utils');
+const { executeQuery } = require('../utils');
 
 transactionsRouter.use(express.json());
 

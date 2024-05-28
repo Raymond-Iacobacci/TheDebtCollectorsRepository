@@ -1,6 +1,6 @@
 const express = require('express');
 const transactionsRouter = express.Router();
-const { executeQuery } = require('./utils');
+const { executeQuery, getDate } = require('../utils');
 
 transactionsRouter.use(express.json());
 
@@ -20,11 +20,6 @@ transactionsRouter.get('/get-ledger', async(req, res) =>{
       res.status(500).json({ error: error });
   }
 });
-
-function getDatePayment() {
-  const moment = require("moment-timezone");
-  return moment().tz("America/Los_Angeles").format("YYYY-MM-DD");
-}
 
 async function updatePayment(amount){
   let newCharge = 0;
@@ -48,7 +43,7 @@ transactionsRouter.post('/make-payment', async(req, res)=>{
       const description = req.body.description;
       let amount = req.body.amount;
       amount = Number(amount);
-      const currentDate = getDatePayment();
+      const currentDate = getDate();
 
       const chargeBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${'0x' + tenantID}`);
       const paymentBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${'0x' + tenantID}`);
@@ -71,14 +66,5 @@ transactionsRouter.post('/make-payment', async(req, res)=>{
   }
 });
 
-transactionsRouter.get('/get-payment-history', async(req, res) => {
-  try{
-      tenantID = req.query['tenant-id'];
-      tenantsPayment = await executeQuery(`SELECT type, time, amount FROM paymentsMade where tenantID=${'0x' +tenantID}`);
-      res.send(tenantsPayment);
-  } catch(error){
-      res.status(500).json({error:error.message});
-  }
-});
 
 module.exports = transactionsRouter;
