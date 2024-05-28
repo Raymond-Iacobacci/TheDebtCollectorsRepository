@@ -56,4 +56,4 @@ function getDate() {
   return moment().tz("America/Los_Angeles").format("YYYY-MM-DD");
 }
   
-module.exports = {pool, executeQuery, uuidToString, sendEmail};
+module.exports = {pool, executeQuery, uuidToString, sendEmail, getDate};

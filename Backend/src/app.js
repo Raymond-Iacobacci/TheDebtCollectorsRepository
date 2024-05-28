@@ -8,7 +8,6 @@ const managerRouter = require('./manager')
 const tenantRouter = require('./tenant');
 
 require('dotenv').config({ path: '../.env' });
-const { insertQuery } = require('./utils');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
