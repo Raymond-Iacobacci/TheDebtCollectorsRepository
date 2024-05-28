@@ -1,7 +1,6 @@
 const express = require("express");
 const managerRouter = express.Router();
-const { executeQuery, uuidToString } = require("./db");
-const { sendEmail } = require("./sendEmail");
+const { executeQuery, uuidToString, sendEmail } = require("./utils");
 const charge = 'Charge';
 const payment = 'Payment';
 const credit = 'Credit';

@@ -1,4 +1,5 @@
 const mysql = require('mysql');
+const axios = require('axios');
 require('dotenv').config({ path: '../.env' });
 
 const pool = mysql.createPool({
@@ -35,5 +36,19 @@ const uuidToString = (buffer) => {
   }
   return null;
 }
+
+async function sendEmail(recipient, subject, text) {
+    try {
+        const url = 'https://us-central1-thedebtcollectors.cloudfunctions.net/send-email';
+        const response = await axios.post(url, {
+            recipient: recipient,
+            subject: subject,
+            text: text
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
   
-module.exports = {pool, executeQuery, uuidToString};
+module.exports = {pool, executeQuery, uuidToString, sendEmail};

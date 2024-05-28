@@ -1,6 +1,6 @@
 const express = require('express');
 const dashBoardRouter = express.Router();
-const { executeQuery } = require('./db');
+const { executeQuery } = require('./utils');
 
 dashBoardRouter.use(express.json());
 

@@ -1,5 +1,5 @@
 const express = require('express');
-const { executeQuery } = require('./db');
+const { executeQuery } = require('./utils');
 const tenantRouter = express.Router();
 const charge = "Charge"
 const payment = "Payment"
