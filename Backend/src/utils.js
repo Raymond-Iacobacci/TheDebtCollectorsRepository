@@ -50,5 +50,10 @@ async function sendEmail(recipient, subject, text) {
         throw error;
     }
 }
+
+function getDate() {
+  const moment = require("moment-timezone");
+  return moment().tz("America/Los_Angeles").format("YYYY-MM-DD");
+}
   
 module.exports = {pool, executeQuery, uuidToString, sendEmail};
