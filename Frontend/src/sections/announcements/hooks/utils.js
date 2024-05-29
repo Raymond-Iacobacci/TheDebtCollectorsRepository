@@ -11,6 +11,7 @@ export const visuallyHidden = {
 };
 
 export function emptyRows(page, rowsPerPage, arrayLength) {
+  console.log("Length:",arrayLength);
   return page ? Math.max(0, (1 + page) * rowsPerPage - arrayLength) : 0;
 }
 
@@ -48,7 +49,7 @@ export function applyFilter({ inputData, comparator, filterName }) {
 
   if (filterName) {
     inputData = inputData.filter(
-      (user) => (user.firstName + user.lastName).toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 

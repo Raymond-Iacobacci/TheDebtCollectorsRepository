@@ -10,8 +10,8 @@ const navConfig = (access) => {
   if (access === 'tenant') {
     return [
       {
-        title: 'dashboard',
-        path: '/main',
+        title: 'announcements',
+        path: '/announcements',
         icon: icon('ic_user'),
         access: 'all',
       },
@@ -21,12 +21,7 @@ const navConfig = (access) => {
         icon: icon('ic_blog'),
         access: 'all',
       },
-      // {
-      //   title: 'Make Payments',
-      //   path: '/payments',
-      //   icon: icon('ic_cart'),
-      //   access: 'tenant',
-      // },
+    
       {
         title: 'Payments',
         path: '/payments-history',
@@ -40,6 +35,12 @@ const navConfig = (access) => {
       {
         title: 'dashboard',
         path: '/main',
+        icon: icon('ic_user'),
+        access: 'all',
+      },
+      {
+        title: 'announcements',
+        path: '/announcements',
         icon: icon('ic_user'),
         access: 'all',
       },
@@ -61,12 +62,6 @@ const navConfig = (access) => {
         icon: icon('ic_cart'),
         access: 'manager',
       },
-      // {
-      //   title: 'Pending Payments',
-      //   path: '/all-payments-view',
-      //   icon: icon('ic_cart'),
-      //   access: 'manager',
-      // },
       {
         title: 'Reports',
         path: '/report',

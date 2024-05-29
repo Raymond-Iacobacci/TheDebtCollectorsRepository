@@ -9,40 +9,53 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
+import { useSearchParams } from 'react-router-dom';
 import { useRouter, usePathname } from 'src/routes/hooks';
 
 import { account } from 'src/_mock/account';
 
 // ----------------------------------------------------------------------
 
-const MENU_OPTIONS = [
-  {
-    label: 'Home',
-    icon: 'eva:home-fill',
-  },
-  {
-    label: 'Profile',
-    icon: 'eva:person-fill',
-  },
-  {
-    label: 'Settings',
-    icon: 'eva:settings-2-fill',
-  },
-];
+// const MENU_OPTIONS = [
+//   {
+//     label: 'Home',
+//     icon: 'eva:home-fill',
+//   },
+// {
+//   label: 'Profile',
+//   icon: 'eva:person-fill',
+// },
+// {
+//   label: 'Settings',
+//   icon: 'eva:settings-2-fill',
+// },
+// ];
 
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
-
   const router = useRouter();
   const [open, setOpen] = useState(null);
 
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('session');
+
   const pathname = usePathname();
   const uuid = pathname.split('/')[3];
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
 
   const [logout, setLogout] = useState(false);
+
+  const handleHome = () => {
+    const isManager = pathname.search('/manager');
+    if (isManager !== -1) {
+      router.replace(`/dashboard/manager/${uuid}/main?session=${token}`);
+    } else {
+      router.replace(`/dashboard/tenant/${uuid}/main?session=${token}`);
+    }
+    setOpen(null);
+  };
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -57,17 +70,14 @@ export default function AccountPopover() {
     setOpen(null);
   };
 
-  useEffect( () => {
-    if(logout) {
-      console.log("logout called")
+  useEffect(() => {
+    if (logout) {
+      console.log('logout called');
       const deleteCookie = async () => {
         try {
-          await fetch(
-            `${import.meta.env.VITE_MIDDLEWARE_URL}/users/remove-token?userID=${uuid}`, {
-              method: 'PUT'
-            }
-          )
-          .then((data) => {
+          await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/users/remove-token?userID=${uuid}`, {
+            method: 'PUT',
+          }).then((data) => {
             console.log(data);
             router.replace('/');
             setLogout(false);
@@ -83,20 +93,18 @@ export default function AccountPopover() {
   useEffect(() => {
     const getUserAttributes = async () => {
       try {
-        await fetch(
-          `${import.meta.env.VITE_MIDDLEWARE_URL}/users/get-attributes?userID=${uuid}`
-        )
-        .then(res => res.json())
-        .then((data) => {
-          setName(`${data.firstName} ${data.lastName}`)
-          setEmail(data.email)
-        });
+        await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/users/get-attributes?userID=${uuid}`)
+          .then((res) => res.json())
+          .then((data) => {
+            setName(`${data.firstName} ${data.lastName}`);
+            setEmail(data.email);
+          });
       } catch (error) {
         console.log(`get-attributes API: ${error}`);
       }
     };
     getUserAttributes();
-  })
+  });
 
   return (
     <>
@@ -151,19 +159,23 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        {MENU_OPTIONS.map((option) => (
+        {/* {MENU_OPTIONS.map((option) => (
           <MenuItem key={option.label}>
             {option.label}
           </MenuItem>
-        ))}
+        ))} */}
 
-        <Divider sx={{ borderStyle: 'dashed', m: 0 }} />
+        {/* <Divider sx={{ borderStyle: 'dashed', m: 0 }} /> */}
+
+        <MenuItem key="Home" onClick={handleHome}>
+          Home
+        </MenuItem>
 
         <MenuItem
           disableRipple
           disableTouchRipple
           onClick={handleClose}
-          sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
+          sx={{ typography: 'body2', color: 'error.main' }}
         >
           Logout
         </MenuItem>

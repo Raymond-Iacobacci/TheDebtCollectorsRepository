@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 
 import Box from '@mui/material/Box';
 import TableRow from '@mui/material/TableRow';
+// import Checkbox from '@mui/material/Checkbox';
 import TableHead from '@mui/material/TableHead';
 import TableCell from '@mui/material/TableCell';
 import TableSortLabel from '@mui/material/TableSortLabel';
@@ -10,14 +11,14 @@ import { visuallyHidden } from '../hooks/utils';
 
 // ----------------------------------------------------------------------
 
-export default function PaymentTableHead({
+export default function RequestTableHead({
   order,
   orderBy,
   headLabel,
-  onTenantSort,
+  onRequestSort,
 }) {
   const onSort = (property) => (event) => {
-    onTenantSort(event, property);
+    onRequestSort(event, property);
   };
 
   return (
@@ -29,17 +30,17 @@ export default function PaymentTableHead({
           <TableCell
             key={headCell.id}
             align={headCell.align || 'left'}
-            sortDirection={orderBy === headCell.paymentID ? order : false}
+            sortDirection={orderBy === headCell.id ? order : false}
             sx={{ width: headCell.width, minWidth: headCell.minWidth }}
           >
             <TableSortLabel
               hideSortIcon
-              active={orderBy === headCell.paymentID}
-              direction={orderBy === headCell.name ? order : 'asc'}
-              onClick={onSort(headCell.paymentID)}
+              active={orderBy === headCell.id}
+              direction={orderBy === headCell.id ? order : 'asc'}
+              onClick={onSort(headCell.id)}
             >
               {headCell.label}
-              {orderBy === headCell.paymentID ? (
+              {orderBy === headCell.id ? (
                 <Box sx={{ ...visuallyHidden }}>
                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
                 </Box>
@@ -47,14 +48,15 @@ export default function PaymentTableHead({
             </TableSortLabel>
           </TableCell>
         ))}
+        {/* <TableCell padding="checkbox" /> */}
       </TableRow>
     </TableHead>
   );
 }
 
-PaymentTableHead.propTypes = {
+RequestTableHead.propTypes = {
   order: PropTypes.oneOf(['asc', 'desc']),
   orderBy: PropTypes.string,
   headLabel: PropTypes.array,
-  onTenantSort: PropTypes.func,
+  onRequestSort: PropTypes.func,
 };

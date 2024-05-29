@@ -61,7 +61,7 @@ export default function ReportView() {
         setLoading(true);
         await fetch(
           `${
-            import.meta.env.VITE_MIDDLEWARE_REPORT_URL
+            import.meta.env.VITE_MIDDLEWARE_URL
           }/manager/get-report?manager-id=${uuid}&schedule=${timePeriod}`
         )
           .then((res) => res.json())

@@ -85,6 +85,7 @@ export default function ListTenantView({ managerID }) {
   const [ searchParams ] = useSearchParams();
   const token = searchParams.get("session");
 
+  const [ reload, setReload ] = useState(true);
 
   useEffect(() => {
     const fetchTenants = async () => {
@@ -98,8 +99,11 @@ export default function ListTenantView({ managerID }) {
         console.log(`HeaderInfo API: ${error}`);
       }
     };
-    fetchTenants();
-  }, [managerID]);
+    if( reload ) {
+      fetchTenants();
+      setReload(false);
+    }
+  }, [managerID, reload]);
 
   // const handleDueDateChange = (event) => {
   //     setDueDate(event.target.value);
@@ -162,7 +166,8 @@ export default function ListTenantView({ managerID }) {
         }),
       }
     );
-    handleClose();
+    setReload(true);
+    setOpen(false);
   };
   const handleChangeRowsPerPage = (event) => {
     setPage(0);
