@@ -4,7 +4,7 @@ const { executeQuery, uuidToString, getDate } = require('../utils');
 
 requestsRouter.use(express.json())
 
-requestsRouter.get('/get-manager-view', async (req, res) => {
+requestsRouter.get('/get-view', async (req, res) => {
   try {
     const managerID = '0x' + req.query['manager-id'];
     const query = `SELECT r.requestID, CONCAT(t.firstname, ' ', t.lastname) AS name, t.address, r.type, r.status, r.date FROM requests 

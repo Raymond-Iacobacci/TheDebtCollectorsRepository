@@ -44,19 +44,8 @@ cookiesRouter.put('/login-manager', async (req, res) => {
   await verifyUser('managers', 'managerID', email, token, res);
 });
 
-cookiesRouter.get('/get-attributes', async (req, res) => {
-  const userID = '0x' + req.query['userID'];
-  const userType = await getUserType(userID);
-  if(userType === null){
-    res.status(404).send({ err: "User not found." });
-    return;
-  }
-  const user = await executeQuery(`SELECT firstName, lastName, email FROM ${userType}s WHERE ${userType}ID = ${userID};`);
-  res.send(user[0]);
-});
-
-cookiesRouter.get('/verify-token', async (req, res) => {
-  const userID = '0x' + req.query['userID'];
+cookiesRouter.get('/verify-cookie', async (req, res) => {
+  const userID = '0x' + req.query['user-id'];
   const frontendToken = req.query['token'];
 
   const userType = await getUserType(userID);
@@ -75,8 +64,8 @@ cookiesRouter.get('/verify-token', async (req, res) => {
   }
 });
 
-cookiesRouter.put('/remove-token', async (req, res) => {
-  const userID = '0x' + req.query['userID'];
+cookiesRouter.put('/remove-cookie', async (req, res) => {
+  const userID = '0x' + req.query['user-id'];
   const userType = await getUserType(userID);
 
   if(userType === null){

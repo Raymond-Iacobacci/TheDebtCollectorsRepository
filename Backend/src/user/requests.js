@@ -4,7 +4,7 @@ const { executeQuery, uuidToString, getDate } = require('../utils');
 
 requestsRouter.use(express.json());
 
-requestsRouter.get('/specifics/header-info', async (req, res) => {
+requestsRouter.get('/get-request-info', async (req, res) => {
   try {
     const requestID = '0x' + req.query['request-id'];
     const query = `SELECT r.type, CONCAT(t.firstname, ' ', t.lastname) AS tenant, t.address, r.description, r.status FROM requests 
@@ -22,7 +22,7 @@ requestsRouter.get('/specifics/header-info', async (req, res) => {
   }
 });
 
-requestsRouter.get('/specifics/comments', async (req, res) => {
+requestsRouter.get('/get-comments', async (req, res) => {
   try {
     const requestID = '0x' + req.query['request-id'];
     const commentResults = await executeQuery(`SELECT commentID, userID, comment, date FROM comments WHERE requestID = ${requestID} ORDER BY date;`);
@@ -52,7 +52,7 @@ requestsRouter.get('/specifics/comments', async (req, res) => {
   }
 });
 
-requestsRouter.post('/specifics/new-comment', async (req, res) => {
+requestsRouter.post('/add-comment', async (req, res) => {
   try {
     const requestID = Buffer.from(req.query['request-id'], 'hex');
     const userID = Buffer.from(req.body.userID, 'hex');
@@ -67,7 +67,7 @@ requestsRouter.post('/specifics/new-comment', async (req, res) => {
   }
 });
 
-requestsRouter.put('/specifics/change-status', async (req, res) => {
+requestsRouter.put('/change-status', async (req, res) => {
   try {
     const requestID = '0x' + req.query['request-id'];
     const newStatusString = req.body.status;
@@ -78,7 +78,7 @@ requestsRouter.put('/specifics/change-status', async (req, res) => {
   }
 });
 
-requestsRouter.get('/specifics/attachments', async (req, res) => { 
+requestsRouter.get('/get-attachments', async (req, res) => { 
   try {
     const requestID = '0x' + req.query['request-id'];
     const attachments = await executeQuery(`SELECT title, description, date, attachment FROM attachments where requestID = ${requestID} ORDER BY date;`);

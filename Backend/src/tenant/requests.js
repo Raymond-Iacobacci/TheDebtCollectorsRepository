@@ -8,7 +8,7 @@ requestsRouter.use(express.json());
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-requestsRouter.get('/get-tenant-view', async (req, res) => {
+requestsRouter.get('/get-view', async (req, res) => {
   try {
     const tenantID = '0x' + req.query['tenant-id'];
     const requestResults = await executeQuery(`SELECT requestID, description, type, status, date FROM requests WHERE tenantID = ${tenantID};`);

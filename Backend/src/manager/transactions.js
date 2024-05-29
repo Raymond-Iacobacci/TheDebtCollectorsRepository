@@ -47,7 +47,7 @@ async function updatePayment(amount){
   }
 }
 
-transactionsRouter.post("/create-payment", async (req, res) => {
+transactionsRouter.post("/create-charge", async (req, res) => {
   try {
       const tenantID = req.body.tenantID;
       const description = req.body.description;

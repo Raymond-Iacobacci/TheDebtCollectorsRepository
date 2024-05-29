@@ -22,7 +22,7 @@ function getPaymentsQuery(managerID, description, startDate, endDate) {
   return `
     SELECT SUM(amount) AS amount
     FROM (
-      SELECT type, description, amount, date
+      SELECT type, description, amount, date, paidAmount
       FROM paymentsLedger p
       INNER JOIN (
         SELECT tenantID
@@ -30,7 +30,7 @@ function getPaymentsQuery(managerID, description, startDate, endDate) {
         WHERE managerID = ${managerID}
       ) AS t ON t.tenantID = p.tenantID
     ) AS final
-    WHERE final.type = 'Payment' AND final.description = '${description}' AND final.date >= '${formattedStartDate}' AND final.date <= '${formattedEndDate}';`;
+    WHERE final.type = 'Charge' AND final.description = '${description}' AND final.paidAmount = 0 AND final.date >= '${formattedStartDate}' AND final.date <= '${formattedEndDate}';`;
 }
 
 function getCreditsQuery(managerID, startDate, endDate) {
