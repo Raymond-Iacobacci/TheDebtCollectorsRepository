@@ -4,6 +4,11 @@ const { executeQuery } = require('../utils');
 
 reportRouter.use(express.json());
 
+/* 
+   Description: Given a managerID and schedule type, return the report data 
+   input: manager-id, schedule
+   output: array of json objects (report)
+*/
 reportRouter.get("/get-report", async (req, res) => {
   try {
     const managerID = "0x" + req.query["manager-id"];
@@ -15,7 +20,8 @@ reportRouter.get("/get-report", async (req, res) => {
   }
 });
 
-function getPaymentsQuery(managerID, description, startDate, endDate) {
+/* Given a managerID, description, and start/end dates, generate a query to get the income in the database satisfying these conditions */
+function getIncomeQuery(managerID, description, startDate, endDate) {
   const formattedStartDate = startDate.toISOString().slice(0, 10);
   const formattedEndDate = endDate.toISOString().slice(0, 10);
 
@@ -33,6 +39,7 @@ function getPaymentsQuery(managerID, description, startDate, endDate) {
     WHERE final.type = 'Charge' AND final.description = '${description}' AND final.paidAmount = 0 AND final.date >= '${formattedStartDate}' AND final.date <= '${formattedEndDate}';`;
 }
 
+/* Given a managerID and start/end dates, generate a query to get the credits in the database satisfying these conditions */
 function getCreditsQuery(managerID, startDate, endDate) {
   const formattedStartDate = startDate.toISOString().slice(0, 10);
   const formattedEndDate = endDate.toISOString().slice(0, 10);
@@ -51,6 +58,7 @@ function getCreditsQuery(managerID, startDate, endDate) {
     WHERE final.type = 'Credit' AND final.date >= '${formattedStartDate}' AND final.date <= '${formattedEndDate}';`;
 }
 
+/* Given a managerID, type, and start/end dates, generate a query to get the expenses in the database satisfying these conditions */
 function getExpensesQuery(managerID, type, startDate, endDate) {
   return `
     SELECT SUM(amount) AS amount
@@ -59,12 +67,13 @@ function getExpensesQuery(managerID, type, startDate, endDate) {
     AND managerID = ${managerID} AND date >= '${startDate.toISOString()}' AND date <= '${endDate.toISOString()}';`;
 }
 
+/* Given a managerID and time period, return a report of income, expenses, and credits */
 async function performQueries(managerID, startDate, endDate){
   const reportDataObject = {} 
   
-  const totalPaidRent = await executeQuery(getPaymentsQuery(managerID, 'Rent', startDate, endDate));
-  const totalPaidUtilities = await executeQuery(getPaymentsQuery(managerID, 'Utilities', startDate, endDate));
-  const totalPaidOther = await executeQuery(getPaymentsQuery(managerID, 'Other', startDate, endDate));
+  const totalPaidRent = await executeQuery(getIncomeQuery(managerID, 'Rent', startDate, endDate));
+  const totalPaidUtilities = await executeQuery(getIncomeQuery(managerID, 'Utilities', startDate, endDate));
+  const totalPaidOther = await executeQuery(getIncomeQuery(managerID, 'Other', startDate, endDate));
 
   reportDataObject.income_rent = totalPaidRent[0].amount || 0;
   reportDataObject.income_utilities = totalPaidUtilities[0].amount || 0;
@@ -88,6 +97,7 @@ async function performQueries(managerID, startDate, endDate){
   return reportDataObject;
 }
 
+/* Given a managerID and schedule type, return a report of income, expenses, and credits */
 async function generateReportData(managerID, schedule) {
   const reportData = [];
   const today = new Date();

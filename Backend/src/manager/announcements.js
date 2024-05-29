@@ -4,6 +4,11 @@ const { executeQuery, getDate } = require('../utils');
 
 announcementsRouter.use(express.json());
 
+/* 
+   Description: Given a managerID, return all announcements made by the manager from the database
+   input: manager-id
+   output: array of json objects (announcements)
+*/
 announcementsRouter.get('/get-announcements', async (req, res) => {
   try {
     const managerID = '0x' + req.query['manager-id'];
@@ -15,6 +20,11 @@ announcementsRouter.get('/get-announcements', async (req, res) => {
   }
 });
 
+/* 
+   Description: Given a managerID, post an announcement to the SQL database
+   input: manager-id
+   output: status code
+*/
 announcementsRouter.post('/make-announcement', async (req, res) => {
   try {
     const managerID = Buffer.from(req.query['manager-id'], 'hex')
