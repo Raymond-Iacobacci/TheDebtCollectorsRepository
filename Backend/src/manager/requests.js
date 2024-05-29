@@ -6,8 +6,8 @@ requestsRouter.use(express.json())
 
 /* 
   Description: Given a managerID, return all the requests from tenants under this managerID
-  input: manager-id
-  output: array of json objects (requests)
+  input: manager-id (binary16)
+  output: array of requests [{requestID (binary16), name (string), address (string), type (string), status (string), date (date)}]
 */
 requestsRouter.get('/get-view', async (req, res) => {
   try {

@@ -6,8 +6,9 @@ expensesRouter.use(express.json());
 
 /* 
    Description: Given a managerID, return all the expenses of the manager in the database
-   input: manager-id
-   output: array of json objects (expenses)
+   input: manager-id (binary16)
+   output: array of expenses [{expenseID (int), managerID (binary16), amound(float), type (string), description (string)
+                               date (date), requestID (binary16)}]
 */
 expensesRouter.get('/get-expenses', async (req, res) => {
   try {

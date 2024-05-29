@@ -6,8 +6,8 @@ announcementsRouter.use(express.json());
 
 /* 
    Description: Given a managerID, return all announcements made by the manager from the database
-   input: manager-id
-   output: array of json objects (announcements)
+   input: manager-id (binary16)
+   output: array of announcements [{title (string), description (string), managerID (binary16), date (date)}]
 */
 announcementsRouter.get('/get-announcements', async (req, res) => {
   try {
@@ -22,7 +22,7 @@ announcementsRouter.get('/get-announcements', async (req, res) => {
 
 /* 
    Description: Given a managerID, post an announcement to the SQL database
-   input: manager-id
+   input: manager-id (binary16)
    output: status code
 */
 announcementsRouter.post('/make-announcement', async (req, res) => {

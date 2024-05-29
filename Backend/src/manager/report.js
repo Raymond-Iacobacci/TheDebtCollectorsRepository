@@ -6,8 +6,9 @@ reportRouter.use(express.json());
 
 /* 
    Description: Given a managerID and schedule type, return the report data 
-   input: manager-id, schedule
-   output: array of json objects (report)
+   input: manager-id (binary16), schedule (string)
+   output: array of report objects [{income_rent, income_utilities, income_other, expenses_other, expenses_maintenence,
+                                    expenses_wages, expenses_mortgage, expenses_utilities}] (floats)
 */
 reportRouter.get("/get-report", async (req, res) => {
   try {
