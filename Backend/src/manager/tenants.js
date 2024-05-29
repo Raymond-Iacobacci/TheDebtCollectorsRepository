@@ -4,6 +4,11 @@ const { executeQuery } = require('../utils');
 
 tenantsRouter.use(express.json());
 
+/* 
+  Description: Inserts a tenant into the database and sends an email confirmation
+  input: firstName, lastName, email, address, rent, manager-id
+  output: status code 
+*/
 tenantsRouter.post("/create-tenant", async (req, res) => {
   try {
     const firstName = req.body.firstName;
@@ -12,25 +17,23 @@ tenantsRouter.post("/create-tenant", async (req, res) => {
     const address = req.body.address;
     const monthlyRent = req.body.monthlyRent;
     const monthlyUtilites = req.body.monthlyUtilities;
-    const managerId = req.query["manager-id"];
-    const managerResult = await executeQuery(
-      `SELECT firstName,lastName FROM managers where managerID = ${"0x" + managerId
-      };`
-    );
-    const query =
-      "INSERT INTO tenants (firstName, lastName, email, address, managerID, rents, utilities) VALUES (?, ?, ?, ?, ?, ?, ?);";
+    const managerID = req.query["manager-id"];
+    const managerResult = await executeQuery(`SELECT firstName,lastName FROM managers where managerID = ${"0x" + managerID};`);
+    const query = "INSERT INTO tenants (firstName, lastName, email, address, managerID, rents, utilities) VALUES (?, ?, ?, ?, ?, ?, ?);";
     const values = [
       firstName,
       lastName,
       email,
       address,
-      Buffer.from(managerId, "hex"),
+      Buffer.from(managerID, "hex"),
       monthlyRent,
       monthlyUtilites,
     ];
     await executeQuery(query, values);
 
-    const message = `Hello ${firstName} ${lastName}, you have been added as a tenant to the DebtCollectors Property Management Suite. You can login here: https://frontend-kxfzqfz2rq-uc.a.run.app`
+    const message = `Hello ${firstName} ${lastName}, you have been added as a tenant to the DebtCollectors
+    Property Management Suite. You can login here: https://frontend-kxfzqfz2rq-uc.a.run.app`;
+
     sendEmail(email, 'Welcome to the DebtCollectors Property Management Suite', message)
       .then(data => {
         res.send('Email sent successfully:');
@@ -38,11 +41,17 @@ tenantsRouter.post("/create-tenant", async (req, res) => {
       .catch(error => {
         res.send('Error sending email:');
       });
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
+/* 
+  Description: Given a manager-id, return all the tenants under the manager
+  input: manager-id
+  output: array of json objects (firstName, lastName, email, address, tenantID)
+*/
 tenantsRouter.get("/get-tenants", async (req, res) => {
   try {
     const managerID = req.query["manager-id"];

@@ -8,6 +8,11 @@ requestsRouter.use(express.json());
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+/* 
+  Description: Given a manager-id, return all the tenants under the manager
+  input: manager-id
+  output: array of json objects requests
+*/
 requestsRouter.get('/get-view', async (req, res) => {
   try {
     const tenantID = '0x' + req.query['tenant-id'];
@@ -28,6 +33,11 @@ requestsRouter.get('/get-view', async (req, res) => {
   }
 });
 
+/* 
+  Description: Given a tenant-id, description, type, and status post a new request to a manager
+  input: tenant-id
+  output: requestID of the new request in the database
+*/
 requestsRouter.post('/new-request', upload.single('attachment'), async (req, res) => {
   try {
     const tenantID = req.query['tenant-id'];

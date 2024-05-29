@@ -4,6 +4,11 @@ const { executeQuery, uuidToString, getDate } = require('../utils');
 
 requestsRouter.use(express.json());
 
+/* 
+  Description: Given a request, return the request details 
+  input: request-id
+  output: type, firstName, lastName, address, description, status of the request
+*/
 requestsRouter.get('/get-request-info', async (req, res) => {
   try {
     const requestID = '0x' + req.query['request-id'];
@@ -22,6 +27,11 @@ requestsRouter.get('/get-request-info', async (req, res) => {
   }
 });
 
+/* 
+  Description: Given a request, return the comments of the request
+  input: request-id
+  output: array of comments
+*/
 requestsRouter.get('/get-comments', async (req, res) => {
   try {
     const requestID = '0x' + req.query['request-id'];
@@ -52,6 +62,11 @@ requestsRouter.get('/get-comments', async (req, res) => {
   }
 });
 
+/* 
+  Description: Given a request-id and user-id, post a comment on the request
+  input: request-id, user-id
+  output: status code
+*/
 requestsRouter.post('/add-comment', async (req, res) => {
   try {
     const requestID = Buffer.from(req.query['request-id'], 'hex');

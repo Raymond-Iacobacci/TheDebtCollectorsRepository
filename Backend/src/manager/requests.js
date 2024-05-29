@@ -4,6 +4,11 @@ const { executeQuery, uuidToString, getDate } = require('../utils');
 
 requestsRouter.use(express.json())
 
+/* 
+  Description: Given a managerID, return all the requests from tenants under this managerID
+  input: manager-id
+  output: array of json objects (requests)
+*/
 requestsRouter.get('/get-view', async (req, res) => {
   try {
     const managerID = '0x' + req.query['manager-id'];

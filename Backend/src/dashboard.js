@@ -8,6 +8,11 @@ const charge = 'Charge';
 const payment = 'Payment';
 const credit = 'Credit';
 
+/* 
+  Description: Given a manager-id, return the number of tenants under the manager
+  input: manager-id
+  output: the number of tenants under the manager
+*/
 dashBoardRouter.get('/get-number-of-tenants', async (req, res) => {
   try{
     const managerID = '0x' + req.query['manager-id'];
@@ -19,6 +24,11 @@ dashBoardRouter.get('/get-number-of-tenants', async (req, res) => {
   }
 });
 
+/* 
+  Description: Given a manager-id, return the number of unresolved requests
+  input: manager-id
+  output: the number of unresolved requests
+*/
 dashBoardRouter.get('/get-number-of-unresolved-requests', async (req, res) => {
   try{
     const managerID = '0x' + req.query['manager-id'];
@@ -30,6 +40,11 @@ dashBoardRouter.get('/get-number-of-unresolved-requests', async (req, res) => {
   }
 });
 
+/* 
+  Description: Given a manager-id, return the number of rent payments paid this month
+  input: manager-id
+  output: number of rent payments
+*/
 dashBoardRouter.get('/get-number-of-rent-payments', async (req, res) => {
   try{
     const managerID = '0x' + req.query['manager-id'];
@@ -57,6 +72,11 @@ dashBoardRouter.get('/get-number-of-rent-payments', async (req, res) => {
   }
 });
 
+/* 
+  Description: Given a manager-id, return the total balance of all tenants
+  input: manager-id
+  output: the totatl balance of all the tenants
+*/
 dashBoardRouter.get("/get-total-balance", async (req, res) => {
   try {
     const managerID = req.query["manager-id"];
@@ -72,6 +92,11 @@ dashBoardRouter.get("/get-total-balance", async (req, res) => {
   }
 });
 
+/* 
+  Description: Given a manager-id, return a list of the tenants with the top 5 most outstanding balances
+  input: manager-id
+  output: an array of 5 (or less) tenants with their outstanding balances
+*/
 dashBoardRouter.get("/get-outstanding-balances-per-tenant", async (req, res) => {
   try {
     const managerID = req.query["manager-id"];

@@ -4,6 +4,11 @@ const { executeQuery } = require('../utils');
 
 announcementsRouter.use(express.json());
 
+/* 
+  Description: Given a tenant-id return all the announcements under that tenant
+  input: manager-id
+  output: array of attachment objects
+*/
 announcementsRouter.get('/get-announcements', async (req, res) => {
   try {
     const tenantID = '0x' + req.query['tenant-id'];
