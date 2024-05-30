@@ -3,7 +3,7 @@ import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 
 import { usePathname } from 'src/routes/hooks';
 
-import DashboardLayout from 'src/layouts/dashboard';
+import DashboardLayout from 'src/layouts/dashboard/common';
 
 export const IndexPage = lazy(() => import('src/pages/app'));
 export const AnnouncementsPage = lazy(() => import('src/pages/announcements'));
