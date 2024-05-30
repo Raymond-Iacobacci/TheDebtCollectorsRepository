@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
@@ -40,9 +39,10 @@ import { getTenantRequests, getManagerRequests } from '../hooks/request-specific
 
 // ----------------------------------------------------------------------
 
-export default function RequestsView({ access }) {
+export default function RequestsView() {
   const pathname = usePathname();
   const uuid = pathname.split('/')[3];
+  const access = pathname.split('/')[2];
 
   const [page, setPage] = useState(0);
 
@@ -386,7 +386,3 @@ export default function RequestsView({ access }) {
     </Container>
   );
 }
-
-RequestsView.propTypes = {
-  access: PropTypes.string,
-};

@@ -52,7 +52,7 @@ export default function LoginView() {
       const validateProfile = async () => {
         try {
           await fetch(
-            `${import.meta.env.VITE_MIDDLEWARE_URL}/users/login-${loginType.toLowerCase()}?email=${
+            `${import.meta.env.VITE_MIDDLEWARE_URL}/user/cookies/login-${loginType.toLowerCase()}?email=${
               profile.email
             }`,
             {

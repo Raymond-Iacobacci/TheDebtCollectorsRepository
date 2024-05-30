@@ -23,7 +23,7 @@ import Iconify from 'src/components/iconify';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 
-import { useRouter } from 'src/routes/hooks';
+import { useRouter, usePathname } from 'src/routes/hooks';
 import { useSearchParams } from "react-router-dom";
 
 import TableNoData from '../table-components/table-no-data';
@@ -59,7 +59,7 @@ TenantTableRow.propTypes = {
   onClick: PropTypes.func,
 };
 
-export default function ListTenantView({ managerID }) {
+export default function ListTenantView() {
   // const [selectedTenant, setSelectedTenant] = useState(null);
   // const [paymentAmount, setPaymentAmount] = useState('');
 
@@ -86,6 +86,9 @@ export default function ListTenantView({ managerID }) {
   const token = searchParams.get("session");
 
   const [ reload, setReload ] = useState(true);
+
+  const pathname = usePathname();
+  const managerID = pathname.split('/')[3];
 
   useEffect(() => {
     const fetchTenants = async () => {
@@ -348,7 +351,3 @@ export default function ListTenantView({ managerID }) {
     </Container>
   );
 }
-
-ListTenantView.propTypes = {
-  managerID: PropTypes.string,
-};

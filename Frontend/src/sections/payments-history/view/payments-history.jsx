@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types';
-
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
@@ -30,10 +28,11 @@ import PaymentTableHead from '../table-components/table-head';
 import TableEmptyRows from '../table-components/table-empty-rows';
 import { emptyRows, applyFilter, getComparator } from '../hooks/utils';
 
-export default function PaymentsHistoryView({ access }) {
+export default function PaymentsHistoryView() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const uuid = pathname.split('/')[3];
+  const access = pathname.split('/')[2];
   const tenantID = access === 'tenant' ? pathname.split('/')[3] : pathname.split('/')[5];
   const [amount, setAmount] = useState('');
   const [payments, setPayments] = useState([]);
@@ -434,7 +433,3 @@ export default function PaymentsHistoryView({ access }) {
     </Container>
   );
 }
-
-PaymentsHistoryView.propTypes = {
-  access: PropTypes.string,
-};
