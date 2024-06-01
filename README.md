@@ -120,11 +120,11 @@ You will be prompted to enter which server you are deploying to. Enter the serve
 
 ## Integrating SendGrid into your application
 1. Sign Up or Login to your SendGrid account.
-2. Click on the "Settings" option in the sidebar.
-3. Under the "Settings" menu, click on "API Keys".
-4. Click the "Create API Key" button.
+2. Click on the **Settings** option in the sidebar.
+3. Under the **Settings** menu, click on **API Keys**.
+4. Click the **Create API Key** button.
 5. Provide a name for your API key.
 6. Set thje desired permissions
-7. Click the "Create & View" button.
+7. Click the **Create & View** button.
 8. Copy the generated API key. 
 9. Paste this API key in the SENDGRID_API_KEY field in the Backend/.env file.
