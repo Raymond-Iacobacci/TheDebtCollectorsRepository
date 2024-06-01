@@ -1,5 +1,5 @@
 # Google Cloud Documentation
-This documentation provides a step-by-step guide to setting up a Google Cloud Project on the Google Cloud Console, integrating Cloud SQL into your project, and deploying Docker containers to Cloud Run.
+This documentation provides a step-by-step guide to setting up the project on the Google Cloud Console, integrating Cloud SQL into your project, deploying Docker containers to Cloud Run, and integrating SendGrid into the application.
 
 ## Setting up Google Cloud Project
 
@@ -117,3 +117,14 @@ You will always have a seperate Cloud Run container for the Frontend and Backend
 7. Enter the command: gcloud run deploy [CONTAINER] --image=gcr.io/PROJECT-ID]/[IMAGE]\
 *Note*: Replace [CONTAINER] with the desired container name (Ex: Backend). Make sure PROJECT-ID and IMAGE are consistent with the previous steps.\
 You will be prompted to enter which server you are deploying to. Enter the server associated with your project.  Your container should be deployed on [Cloud Run](https://console.cloud.google.com/run).
+
+## Integrating SendGrid into your application
+1. Sign up/ Login to your SendGrid account.\
+2. Click on the "Settings" option in the sidebar.
+3. Under the "Settings" menu, click on "API Keys".
+4. Click the "Create API Key" button.
+5. Provide a name for your API key.
+6. Set thje desired permissions
+7. Click the "Create & View" button.
+8. Copy the generated API key. 
+9. Paste this API key in the SENDGRID_API_KEY field in the Backend/.env file.
