@@ -117,24 +117,3 @@ You will always have a seperate Cloud Run container for the Frontend and Backend
 7. Enter the command: gcloud run deploy [CONTAINER] --image=gcr.io/PROJECT-ID]/[IMAGE]\
 *Note*: Replace [CONTAINER] with the desired container name (Ex: Backend). Make sure PROJECT-ID and IMAGE are consistent with the previous steps.\
 You will be prompted to enter which server you are deploying to. Enter the server associated with your project.  Your container should be deployed on [Cloud Run](https://console.cloud.google.com/run).
-
-## Developing/Testing code locally
-- Backend:
-  1. Enter the command: cd Backend
-  2. Enter the command: npm install\
-     This command will install the dependencies listed in the node_modules.
-  4. Enter the command: npm start\
-     You should now have a localhost started on port 8080\
-**WARNING**: Make sure the DB_HOST field in the Backend/.env file is set to the databases's public IP address. Also make sure your current IP address is listed as an authorized network for the database. If either of these conditions are not met, your application will not connect to the database.
-
-- Frontend:
-  1. Enter the command: cd Frontend
-  2. Enter the command: yarn install\
-     This command will install the dependencies listed in the node_modules.
-  4. Enter the command: yarn dev\
-     You should now have a localhost started on port 3030\
-**WARNING**: Make sure the VITE_MIDDLEWARE_URL field listed in the Frontend/.env folder is set to the correct Backend URL. This can either be a Cloud Run container or http://localhost:8080 if you are testing the Backend locally.
-     
-
-
-
