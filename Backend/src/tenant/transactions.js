@@ -8,6 +8,9 @@ const charge = 'Charge';
 const payment = 'Payment';
 const credit = 'Credit';
 
+/*
+  Iterates through all the pending charges and covers the charge amount based on the payment amount. 
+*/
 async function updatePayment(amount){
   let newCharge = 0;
   let subtractAmount = 0;
@@ -24,6 +27,11 @@ async function updatePayment(amount){
   } while (amount != 0);
 }
 
+/* 
+  Description: Tenant will make a payment.
+  input: tenantID, description, amount
+  output: current date 
+*/
 transactionsRouter.post('/make-payment', async(req, res)=>{
   try{
       const tenantID = req.query['tenant-id'];

@@ -8,6 +8,11 @@ const charge = 'Charge';
 const payment = 'Payment';
 const credit = 'Credit';
 
+/* 
+  Description: Manger will issue credit to a specific tenant.
+  input: tenantID, description, amount
+  output: status code 
+*/
 transactionsRouter.post("/create-credit", async(req, res) =>{
   try {  
     const tenantID = req.body.tenantID;
@@ -30,7 +35,9 @@ transactionsRouter.post("/create-credit", async(req, res) =>{
       res.status(500).json({ error: error });
     }
   });  
-
+/*
+  Iterates through all the pending charges and covers the charge amount based on the payment amount. 
+*/
 async function updatePayment(amount){
   let newCharge = 0;
   let subtractAmount = 0;
@@ -47,6 +54,11 @@ async function updatePayment(amount){
   }
 }
 
+/* 
+  Description: Manger will issue a charge to a specific tenant.
+  input: tenantID, description, amount
+  output: current date 
+*/
 transactionsRouter.post("/create-charge", async (req, res) => {
   try {
       const tenantID = req.body.tenantID;
@@ -70,7 +82,11 @@ transactionsRouter.post("/create-charge", async (req, res) => {
       res.status(500).json({ error: error.message });
   }
 });
-
+/* 
+  Description: Manger will delete a charge for a specific tenant.
+  input: payment id
+  output: status code 
+*/
 transactionsRouter.post('/delete-charge', async (req, res) => {
 try {
   const paymentID = req.query['payment-id'];
