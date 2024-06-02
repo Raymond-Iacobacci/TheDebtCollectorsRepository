@@ -1,5 +1,5 @@
 # Google Cloud Documentation
-This documentation provides a step-by-step guide to setting up a Google Cloud Project on the Google Cloud Console, integrating Cloud SQL into your project, and deploying Docker containers to Cloud Run.
+This documentation provides a step-by-step guide to setting up the project on the Google Cloud Console, integrating Cloud SQL into your project, deploying Docker containers to Cloud Run, and integrating SendGrid into the application.
 
 ## Setting up Google Cloud Project
 
@@ -118,23 +118,13 @@ You will always have a seperate Cloud Run container for the Frontend and Backend
 *Note*: Replace [CONTAINER] with the desired container name (Ex: Backend). Make sure PROJECT-ID and IMAGE are consistent with the previous steps.\
 You will be prompted to enter which server you are deploying to. Enter the server associated with your project.  Your container should be deployed on [Cloud Run](https://console.cloud.google.com/run).
 
-## Developing/Testing code locally
-- Backend:
-  1. Enter the command: cd Backend
-  2. Enter the command: npm install\
-     This command will install the dependencies listed in the node_modules.
-  4. Enter the command: npm start\
-     You should now have a localhost started on port 8080\
-**WARNING**: Make sure the DB_HOST field in the Backend/.env file is set to the databases's public IP address. Also make sure your current IP address is listed as an authorized network for the database. If either of these conditions are not met, your application will not connect to the database.
-
-- Frontend:
-  1. Enter the command: cd Frontend
-  2. Enter the command: yarn install\
-     This command will install the dependencies listed in the node_modules.
-  4. Enter the command: yarn dev\
-     You should now have a localhost started on port 3030\
-**WARNING**: Make sure the VITE_MIDDLEWARE_URL field listed in the Frontend/.env folder is set to the correct Backend URL. This can either be a Cloud Run container or http://localhost:8080 if you are testing the Backend locally.
-     
-
-
-
+## Integrating SendGrid into your application
+1. Sign Up or Login to your SendGrid account.
+2. Click on the **Settings** option in the sidebar.
+3. Under the **Settings** menu, click on **API Keys**.
+4. Click the **Create API Key** button.
+5. Provide a name for your API key.
+6. Set thje desired permissions
+7. Click the **Create & View** button.
+8. Copy the generated API key. 
+9. Paste this API key in the SENDGRID_API_KEY field in the Backend/.env file.
