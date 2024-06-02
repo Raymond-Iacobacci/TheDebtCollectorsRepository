@@ -1,6 +1,6 @@
 const express = require('express');
 const profileInfoRouter = express.Router();
-const { executeQuery} = require('../utils');
+const { executeQuery, getUserType} = require('../utils');
 
 profileInfoRouter.use(express.json());
 

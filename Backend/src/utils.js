@@ -55,5 +55,17 @@ function getDate() {
   const moment = require("moment-timezone");
   return moment().tz("America/Los_Angeles").format("YYYY-MM-DD");
 }
+
+async function getUserType(userID) {
+  const tenantResults = await executeQuery(`SELECT tenantID FROM tenants WHERE tenantID = ${userID};`);
+  if (tenantResults.length > 0) {
+      return 'tenant';
+  }
+  const managerResults = await executeQuery(`SELECT managerID FROM managers WHERE managerID = ${userID};`);
+  if (managerResults.length > 0) {
+      return 'manager';
+  }
+  return null; 
+}
   
-module.exports = {pool, executeQuery, uuidToString, sendEmail, getDate};
+module.exports = {pool, executeQuery, uuidToString, sendEmail, getDate, getUserType};

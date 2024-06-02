@@ -1,22 +1,10 @@
 const express = require('express');
-const {executeQuery} = require('../utils');
+const {executeQuery, getUserType} = require('../utils');
 
 const cookiesRouter = express.Router();
 
 cookiesRouter.use(express.json());
 cookiesRouter.use(express.urlencoded({ extended: true }));
-
-async function getUserType(userID) {
-  const tenantResults = await executeQuery(`SELECT tenantID FROM tenants WHERE tenantID = ${userID};`);
-  if (tenantResults.length > 0) {
-      return 'tenant';
-  }
-  const managerResults = await executeQuery(`SELECT managerID FROM managers WHERE managerID = ${userID};`);
-  if (managerResults.length > 0) {
-      return 'manager';
-  }
-  return null; 
-}
 
 async function verifyUser(tableName, userID, email, token, res) {
   try {
