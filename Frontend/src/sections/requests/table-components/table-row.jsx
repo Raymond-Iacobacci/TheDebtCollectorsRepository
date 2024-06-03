@@ -17,6 +17,8 @@ import { fDate } from 'src/utils/format-time';
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 
+import { deleteRequest } from '../hooks/request-specifics'
+
 // ----------------------------------------------------------------------
 
 export default function UserTableRow({
@@ -67,11 +69,12 @@ export default function UserTableRow({
   };
 
   const handleConfirmDelete = async () => {
-    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/requests/delete-request?request-id=${id}`, {
-      method: 'POST',
-    });
+    await deleteRequest(id).then((data) => {
+      if( data.ok ) {
+        deleteRow();
+      }
+    })
     setDeletePopover(null);
-    deleteRow();
   };
 
   return (

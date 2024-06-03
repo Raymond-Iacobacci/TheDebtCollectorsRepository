@@ -21,8 +21,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import CircularProgress from '@mui/material/CircularProgress';
 
-// import { requests } from 'src/_mock/request';
-
 import { usePathname } from 'src/routes/hooks';
 
 import Label from 'src/components/label';
@@ -114,6 +112,7 @@ export default function RequestsView() {
     inputData: requests,
     comparator: getComparator(order, orderBy),
     filterName,
+    role: access,
   });
 
   const notFound = !dataFiltered.length && !!filterName;
@@ -157,7 +156,7 @@ export default function RequestsView() {
     formData.append('type', requestType);
     formData.append('description', description);
     console.log(`This is the formData: ${formData}`);
-    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/requests/new?tenant-id=${uuid}`, {
+    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/requests/new-request?tenant-id=${uuid}`, {
       method: 'POST',
       body: formData, // Convert data to JSON string
     }).then((data) => {
@@ -223,6 +222,19 @@ export default function RequestsView() {
       />
     );
   };
+
+  const requestTypes = [
+    "Leakage",
+    "Electrical",
+    "Kitchen",
+    "Plumbing",
+    "Pest Control",
+    "Mold",
+    "Appliances",
+    "Water",
+    "Trash",
+    "Other"
+  ];
 
   return (
     <Container>
@@ -341,12 +353,7 @@ export default function RequestsView() {
                 label="Request Type"
                 onChange={handleChange}
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value="Leakage">Leakage</MenuItem>
-                <MenuItem value="Electrical">Electrical</MenuItem>
-                <MenuItem value="Kitchen">Kitchen</MenuItem>
+                {requestTypes.map((value) => <MenuItem value={value}>{value}</MenuItem>)}
               </Select>
             </FormControl>
           </Grid>

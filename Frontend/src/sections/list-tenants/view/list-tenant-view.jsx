@@ -93,7 +93,7 @@ export default function ListTenantView() {
   useEffect(() => {
     const fetchTenants = async () => {
       try {
-        fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/get-tenants?manager-id=${managerID}`)
+        fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/tenants/get-tenants?manager-id=${managerID}`)
           .then((res) => res.json())
           .then((data) => {
             setTenants(data);
@@ -153,7 +153,7 @@ export default function ListTenantView() {
 
   const createTenant = async () => {
     await fetch(
-      `${import.meta.env.VITE_MIDDLEWARE_URL}/manager/create-tenant?manager-id=${managerID}`,
+      `${import.meta.env.VITE_MIDDLEWARE_URL}/manager/tenants/create-tenant?manager-id=${managerID}`,
       {
         method: 'POST',
         headers: {
@@ -169,6 +169,11 @@ export default function ListTenantView() {
         }),
       }
     );
+    setFirstName('');
+    setLastName('');
+    setEmail('');
+    setAddress('');
+    setRent('');
     setReload(true);
     setOpen(false);
   };

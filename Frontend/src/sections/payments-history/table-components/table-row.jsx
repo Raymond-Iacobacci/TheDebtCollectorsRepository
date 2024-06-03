@@ -34,7 +34,7 @@ export default function PaymentTableRow({ id, type, time, amount, description, b
     setDeletePopover(null);
   };
   const handleConfirmDelete = async () => {
-    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/delete-charge?payment-id=${id}`, {
+    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/transactions/delete-charge?payment-id=${id}`, {
       method: 'POST',
     });
     setDeletePopover(null);

@@ -4,16 +4,15 @@ import { useState, useEffect, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { usePathname } from 'src/routes/hooks';
 import { fDate } from 'src/utils/format-time';
 
 import Label from 'src/components/label';
-import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
 import { newComment, getComments } from '../hooks/request-specifics'
@@ -130,9 +129,13 @@ export default function RequestComments({ id }) {
                   setCommentField(event.target.value);
                 }}
               />
-              <IconButton onClick={handleAddComment} size="large">
-                <Iconify icon="eva:plus-circle-outline" />
-              </IconButton>
+              <Button
+              onClick={handleAddComment}
+              variant="contained"
+              color="primary"
+            >
+              Send
+            </Button>
             </Stack>
           </>
         )}

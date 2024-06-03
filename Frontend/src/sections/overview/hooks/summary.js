@@ -46,7 +46,7 @@ export async function getListOfOutstandingTenants(uuid) {
 
 export async function getListofUnresolvedRequests(uuid) {
   return fetch(
-    `${import.meta.env.VITE_MIDDLEWARE_URL}/requests//get-manager-view?manager-id=${uuid}`
+    `${import.meta.env.VITE_MIDDLEWARE_URL}/manager/requests/get-view?manager-id=${uuid}`
   )
     .then((res) => res.json())
     .then((data) => data);

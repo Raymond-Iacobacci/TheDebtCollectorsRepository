@@ -75,7 +75,7 @@ export default function AccountPopover() {
       console.log('logout called');
       const deleteCookie = async () => {
         try {
-          await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/users/remove-token?userID=${uuid}`, {
+          await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/user/cookies/remove-cookie?user-id=${uuid}`, {
             method: 'PUT',
           }).then((data) => {
             console.log(data);
@@ -93,7 +93,7 @@ export default function AccountPopover() {
   useEffect(() => {
     const getUserAttributes = async () => {
       try {
-        await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/users/get-attributes?userID=${uuid}`)
+        await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/user/profile-info/get-attributes?user-id=${uuid}`)
           .then((res) => res.json())
           .then((data) => {
             setName(`${data.firstName} ${data.lastName}`);

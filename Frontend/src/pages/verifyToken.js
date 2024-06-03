@@ -9,7 +9,6 @@ export async function verifyToken(uuid, token) {
       return true;
     });
   } catch (error) {
-    console.log(`verifyToken API: ${error}`);
     return false;
   }
   return false;

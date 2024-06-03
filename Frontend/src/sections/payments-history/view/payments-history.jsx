@@ -58,7 +58,7 @@ export default function PaymentsHistoryView() {
     const fetchPayments = async () => {
       try {
         // type, time, amount, balance, description
-        fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/get-ledger?tenant-id=${tenantID}`)
+        fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/user/transactions/get-ledger?tenant-id=${tenantID}`)
           .then((res) => res.json())
           .then((data) => {
             setPayments(data);
@@ -73,7 +73,7 @@ export default function PaymentsHistoryView() {
     }
     const fetchName = async () => {
       try {
-        fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/users/get-attributes?userID=${tenantID}`)
+        fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/user/profile-info/get-attributes?user-id=${tenantID}`)
         .then((res) => res.json())
         .then((data) => {
           setFirstName(data.firstName);
@@ -147,7 +147,7 @@ export default function PaymentsHistoryView() {
   };
   // todo: change API
   const handleSubmit = async () => {
-    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/make-payment?tenant-id=${uuid}`, {
+    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/transactions/make-payment?tenant-id=${uuid}`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -208,7 +208,7 @@ export default function PaymentsHistoryView() {
   };
 
   const handlePaymentSubmit = async () => {
-    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/create-payment`, {
+    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/transactions/create-charge`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -227,7 +227,7 @@ export default function PaymentsHistoryView() {
   };
 
   const handleCreditSubmit = async () => {
-    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/create-credit`, {
+    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/transactions/create-credit`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
