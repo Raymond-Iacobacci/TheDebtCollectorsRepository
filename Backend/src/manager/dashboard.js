@@ -1,8 +1,8 @@
 const express = require('express');
-const dashBoardRouter = express.Router();
-const { executeQuery } = require('./utils');
+const dashboardRouter = express.Router();
+const { executeQuery } = require('../utils');
 
-dashBoardRouter.use(express.json());
+dashboardRouter.use(express.json());
 
 const charge = 'Charge';
 const payment = 'Payment';
@@ -13,7 +13,7 @@ const credit = 'Credit';
   input: manager-id
   output: the number of tenants under the manager
 */
-dashBoardRouter.get('/get-number-of-tenants', async (req, res) => {
+dashboardRouter.get('/get-number-of-tenants', async (req, res) => {
   try{
     const managerID = '0x' + req.query['manager-id'];
     const query = `SELECT COUNT(*) AS numberOfTenants FROM tenants WHERE managerID = ${managerID};`;
@@ -29,7 +29,7 @@ dashBoardRouter.get('/get-number-of-tenants', async (req, res) => {
   input: manager-id
   output: the number of unresolved requests
 */
-dashBoardRouter.get('/get-number-of-unresolved-requests', async (req, res) => {
+dashboardRouter.get('/get-number-of-unresolved-requests', async (req, res) => {
   try{
     const managerID = '0x' + req.query['manager-id'];
     const query = `select count(*) AS count from requests where managerID=${managerID} and status='Unresolved' OR status='Ongoing'`;
@@ -45,7 +45,7 @@ dashBoardRouter.get('/get-number-of-unresolved-requests', async (req, res) => {
   input: manager-id
   output: number of rent payments
 */
-dashBoardRouter.get('/get-number-of-rent-payments', async (req, res) => {
+dashboardRouter.get('/get-number-of-rent-payments', async (req, res) => {
   try{
     const managerID = '0x' + req.query['manager-id'];
     const currentDate = new Date();
@@ -77,7 +77,7 @@ dashBoardRouter.get('/get-number-of-rent-payments', async (req, res) => {
   input: manager-id
   output: the totatl balance of all the tenants
 */
-dashBoardRouter.get("/get-total-balance", async (req, res) => {
+dashboardRouter.get("/get-total-balance", async (req, res) => {
   try {
     const managerID = req.query["manager-id"];
     const chargeBalance = await executeQuery(`select sum(amount) as amount FROM paymentsLedger p1 INNER JOIN tenants t ON t.tenantID=p1.tenantID where managerID=${'0x' + managerID} and type='${charge}'`);
@@ -97,7 +97,7 @@ dashBoardRouter.get("/get-total-balance", async (req, res) => {
   input: manager-id
   output: an array of 5 (or less) tenants with their outstanding balances
 */
-dashBoardRouter.get("/get-outstanding-balances-per-tenant", async (req, res) => {
+dashboardRouter.get("/get-outstanding-balances-per-tenant", async (req, res) => {
   try {
     const managerID = req.query["manager-id"];
     const tenantsList = await executeQuery(
@@ -134,4 +134,4 @@ dashBoardRouter.get("/get-outstanding-balances-per-tenant", async (req, res) => 
   }
 });
 
-module.exports = dashBoardRouter;
+module.exports = dashboardRouter;
