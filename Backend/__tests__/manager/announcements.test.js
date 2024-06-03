@@ -1,6 +1,6 @@
 const request = require('supertest');
 const express = require('express');
-const announcementsRouter = require('../../src/announcements');
+const announcementsRouter = require('../../src/manager/announcements');
 const { executeQuery, getDate } = require('../../src/utils');
 
 jest.mock('../../src/utils', () => ({
