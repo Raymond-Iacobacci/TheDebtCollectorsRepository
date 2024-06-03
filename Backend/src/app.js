@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 
-const dashBoardRouter = require('./dashboard')
 const managerRouter = require('./manager')
 const tenantRouter = require('./tenant');
 const userRouter = require('./user');
@@ -15,7 +14,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/dashboard', dashBoardRouter);
 app.use('/manager', managerRouter);
 app.use('/tenant', tenantRouter);
 app.use('/user', userRouter);
