@@ -62,7 +62,7 @@ export default function ReportView() {
         await fetch(
           `${
             import.meta.env.VITE_MIDDLEWARE_URL
-          }/manager/get-report?manager-id=${uuid}&schedule=${timePeriod}`
+          }/manager/report/get-report?manager-id=${uuid}&schedule=${timePeriod}`
         )
           .then((res) => res.json())
           .then((data) => {
@@ -313,7 +313,6 @@ export default function ReportView() {
             </Typography>
             {renderOverallTotals(expenses, 'Expenses')}
             {renderOverallTotals(paid, 'Income')}
-            {/* {renderOverallTotals(credits, 'Credits')} */}
             <Divider sx={{ borderStyle: 'dashed', marginTop: '12px', marginBottom: '8px' }} />
             {renderNet}
           </Card>

@@ -1,10 +1,8 @@
-// import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
-// import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import CardHeader from '@mui/material/CardHeader';
 
@@ -17,7 +15,7 @@ import Iconify from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
-export default function AnalyticsRequests({ title, subheader, list, ...other }) {
+export default function AppRequests({ title, subheader, list, ...other }) {
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
@@ -26,7 +24,9 @@ export default function AnalyticsRequests({ title, subheader, list, ...other }) 
 
       {list.length !== 0 ? (
         <>
-          {list.map((request) => <TaskItem key={request.tenantID} request={request} />)}
+          {list.map((request) => (
+            <RequestItem key={request.tenantID} request={request} />
+          ))}
         </>
       ) : (
         <Stack
@@ -52,7 +52,7 @@ export default function AnalyticsRequests({ title, subheader, list, ...other }) 
   );
 }
 
-AnalyticsRequests.propTypes = {
+AppRequests.propTypes = {
   list: PropTypes.array,
   subheader: PropTypes.string,
   title: PropTypes.string,
@@ -60,11 +60,12 @@ AnalyticsRequests.propTypes = {
 
 // ----------------------------------------------------------------------
 
-function TaskItem({ request }) {
+function RequestItem({ request }) {
   const pathname = usePathname();
   const router = useRouter();
-  const uuid = pathname.split('/')[3];
   const [searchParams] = useSearchParams();
+  
+  const uuid = pathname.split('/')[3];
   const token = searchParams.get('session');
 
   const handleOpenMenu = (event) => {
@@ -96,6 +97,6 @@ function TaskItem({ request }) {
   );
 }
 
-TaskItem.propTypes = {
-    request: PropTypes.object,
+RequestItem.propTypes = {
+  request: PropTypes.object,
 };

@@ -4,24 +4,19 @@ import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Drawer from '@mui/material/Drawer';
-// import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
 import { alpha } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import ListItemButton from '@mui/material/ListItemButton';
 
-// import { RouterLink } from 'src/routes/components';
 import { useSearchParams } from "react-router-dom";
 import { useRouter, usePathname } from 'src/routes/hooks';
 
 import { useResponsive } from 'src/hooks/use-responsive';
 
-import { account } from 'src/_mock/account';
-
-// import Logo from 'src/components/logo';
 import Scrollbar from 'src/components/scrollbar';
 
-import { NAV } from './config-layout';
+import { NAV } from '../config-layout';
 import navConfig from './config-navigation';
 
 // ----------------------------------------------------------------------
@@ -45,7 +40,7 @@ export default function Nav({ openNav, onCloseNav }) {
     const getUserAttributes = async () => {
       try {
         await fetch(
-          `${import.meta.env.VITE_MIDDLEWARE_URL}/users/get-attributes?userID=${uuid}`
+          `${import.meta.env.VITE_MIDDLEWARE_URL}/user/profile-info/get-attributes?user-id=${uuid}`
         )
         .then(res => res.json())
         .then((data) => {
@@ -84,14 +79,10 @@ export default function Nav({ openNav, onCloseNav }) {
         bgcolor: (theme) => alpha(theme.palette.grey[500], 0.12),
       }}
     >
-      <Avatar src={account.photoURL} alt="photoURL" />
+      <Avatar src='/assets/images/avatars/avatar_23.jpg' alt="photoURL" />
 
       <Box sx={{ ml: 2 }}>
         <Typography variant="subtitle2">{name}</Typography>
-
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {account.role}
-        </Typography>
       </Box>
     </Box>
   );
@@ -136,7 +127,6 @@ export default function Nav({ openNav, onCloseNav }) {
       }}
     >
       
-      {/* <Logo sx={{ mt: 3, ml: 4 }} /> */}
       {renderLogo}
 
       {renderAccount}

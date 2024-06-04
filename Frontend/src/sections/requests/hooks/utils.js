@@ -36,7 +36,7 @@ export function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-export function applyFilter({ inputData, comparator, filterName }) {
+export function applyFilter({ inputData, comparator, filterName, role }) {
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
   stabilizedThis.sort((a, b) => {
@@ -49,7 +49,10 @@ export function applyFilter({ inputData, comparator, filterName }) {
 
   if (filterName) {
     inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (user) => {
+        if(role === 'manager') return user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1;
+        return user.type.toLowerCase().indexOf(filterName.toLowerCase()) !== -1;
+      }
     );
   }
 

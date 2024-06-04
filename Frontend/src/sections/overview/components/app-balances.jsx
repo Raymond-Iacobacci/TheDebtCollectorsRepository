@@ -1,10 +1,8 @@
-// import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
-// import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import CardHeader from '@mui/material/CardHeader';
 
@@ -17,7 +15,7 @@ import Iconify from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
-export default function AnalyticsTasks({ title, subheader, list, ...other }) {
+export default function AppBalances({ title, subheader, list, ...other }) {
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
@@ -26,7 +24,7 @@ export default function AnalyticsTasks({ title, subheader, list, ...other }) {
 
       {list.length !== 0 ? (
         <>
-          {list.map((tenant) => <TaskItem key={tenant.tenantID} tenant={tenant} />)}
+          {list.map((tenant) => <BalanceItem key={tenant.tenantID} tenant={tenant} />)}
         </>
       ) : (
         <Stack
@@ -52,7 +50,7 @@ export default function AnalyticsTasks({ title, subheader, list, ...other }) {
   );
 }
 
-AnalyticsTasks.propTypes = {
+AppBalances.propTypes = {
   list: PropTypes.array,
   subheader: PropTypes.string,
   title: PropTypes.string,
@@ -60,11 +58,12 @@ AnalyticsTasks.propTypes = {
 
 // ----------------------------------------------------------------------
 
-function TaskItem({ tenant }) {
+function BalanceItem({ tenant }) {
   const pathname = usePathname();
   const router = useRouter();
-  const uuid = pathname.split('/')[3];
   const [searchParams] = useSearchParams();
+
+  const uuid = pathname.split('/')[3];
   const token = searchParams.get('session');
 
   const handleOpenMenu = (event) => {
@@ -96,6 +95,6 @@ function TaskItem({ tenant }) {
   );
 }
 
-TaskItem.propTypes = {
+BalanceItem.propTypes = {
   tenant: PropTypes.object,
 };

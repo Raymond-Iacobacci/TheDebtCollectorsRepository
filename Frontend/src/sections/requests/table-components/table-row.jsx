@@ -17,6 +17,8 @@ import { fDate } from 'src/utils/format-time';
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 
+import { deleteRequest } from '../hooks/request-specifics';
+
 // ----------------------------------------------------------------------
 
 export default function UserTableRow({
@@ -56,6 +58,7 @@ export default function UserTableRow({
     }
   };
 
+  // Delete row popover
   const [deletePopover, setDeletePopover] = useState(null);
 
   const handleOpenPopover = (event) => {
@@ -67,12 +70,28 @@ export default function UserTableRow({
   };
 
   const handleConfirmDelete = async () => {
-    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/requests/delete-request?request-id=${id}`, {
-      method: 'POST',
+    await deleteRequest(id).then((data) => {
+      if (data.ok) {
+        deleteRow();
+      }
     });
     setDeletePopover(null);
-    deleteRow();
   };
+
+  const deletePopoverComponent = (
+    <Popover
+      id="delete"
+      open={!!deletePopover}
+      anchorEl={deletePopover}
+      onClose={handleClosePopover}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+    >
+      <MenuItem onClick={handleConfirmDelete} sx={{ pt: 1 }}>
+        <Label color="error">Confirm delete?</Label>
+      </MenuItem>
+    </Popover>
+  );
 
   return (
     <TableRow hover tabIndex={-1} role="checkbox" onClick={handleRowClick}>
@@ -86,35 +105,27 @@ export default function UserTableRow({
         <>
           <TableCell component="th" scope="row" padding="none">
             <Stack direction="row" alignItems="center" spacing={2}>
-              {/* <Avatar alt={name} src={avatarUrl} /> */}
               <Typography variant="subtitle2" noWrap>
                 {name}
               </Typography>
             </Stack>
           </TableCell>
-
           <TableCell id="address">{address}</TableCell>
-
           <TableCell id="type">{type}</TableCell>
-          {/* <TableCell id="status">{type}</TableCell> */}
-
           <TableCell id="date">{fDate(date)}</TableCell>
         </>
       ) : (
         <>
           <TableCell component="th" scope="row" padding="none">
             <Stack direction="row" alignItems="center" spacing={2}>
-              {/* <Avatar alt={type} src={avatarUrl} /> */}
               <Typography variant="subtitle2" noWrap>
                 {type}
               </Typography>
             </Stack>
           </TableCell>
-
           <TableCell id="description" noWrap>
             {description}
           </TableCell>
-
           <TableCell id="date">{fDate(date)}</TableCell>
         </>
       )}
@@ -133,18 +144,7 @@ export default function UserTableRow({
         <IconButton id="delete" onClick={handleOpenPopover}>
           <Iconify id="delete" icon="eva:trash-2-fill" />
         </IconButton>
-        <Popover
-            id="delete"
-            open={!!deletePopover}
-            anchorEl={deletePopover}
-            onClose={handleClosePopover}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-          >
-            <MenuItem onClick={handleConfirmDelete} sx={{ pt: 1 }}>
-              <Label color="error">Confirm delete?</Label>
-            </MenuItem>
-          </Popover>
+        {deletePopoverComponent}
       </TableCell>
     </TableRow>
   );
