@@ -118,7 +118,9 @@ You will always have a seperate Cloud Run container for the Frontend and Backend
 *Note*: Replace [CONTAINER] with the desired container name (Ex: Backend). Make sure PROJECT-ID and IMAGE are consistent with the previous steps.\
 You will be prompted to enter which server you are deploying to. Enter the server associated with your project.  Your container should be deployed on [Cloud Run](https://console.cloud.google.com/run).
 
-## Getting SendGrid API Key
+## Integrating SendGrid into your Application
+
+### Getting SendGrid API Key
 1. Sign Up or Login to your SendGrid account.
 2. Click on the **Settings** option in the sidebar.
 3. Under the **Settings** menu, click on **API Keys**.
@@ -126,4 +128,41 @@ You will be prompted to enter which server you are deploying to. Enter the serve
 5. Provide a name for your API key.
 6. Set thje desired permissions
 7. Click the **Create & View** button.
-8. Copy the generated API key. 
+8. Save the generated API Key. (SendGrid does not store this key, write it down somewhere)
+
+### Setting up Google Cloud Function
+1. On the Google Cloud Console, search for "Cloud Functions"
+2. Select the Cloud Functions page
+3. On the Cloud Functions page, click the Create Function button
+4. Enter your entrypoint name (This function name will appear in your Cloud Run view)
+5. Enter your SendGrid API key in the runtime environment variables configuration
+6. Enter the following code in the index.js (assuming your sendgrid api key is saved as SENDGRID_API_KEY in the runtime environment variables): 
+
+const functions = require('@google-cloud/functions-framework');
+const sgMail = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+functions.http('sendEmail', async (req, res) => {
+    const recipient = req.query.recipient || req.body.recipient;
+    const subject = req.query.subject || req.body.subject || 'Test Email';
+    const text = req.query.text || req.body.text || 'This is a test email sent from SendGrid via Cloud Function!';
+
+    const msg = {
+        to: recipient,
+        from: 'ENTER YOUR EMAIL HERE', 
+        subject,
+        text
+    };
+
+    try {
+        await sgMail.send(msg);
+        res.status(200).send('Email sent successfully!');
+    } catch (error) {
+        res.status(500).send('Error sending email.');
+    }
+});
+
+7. Enter "@sendgrid/mail": "^8.1.1" in the package.json
+8. Deploy the function
+9. Retrieve URL endpoint (You will use this in the sendEmail funciton Backend/utils.js)
