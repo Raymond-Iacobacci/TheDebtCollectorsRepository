@@ -5,9 +5,9 @@ const { executeQuery, getUserType} = require('../utils');
 profileInfoRouter.use(express.json());
 
 /* 
-  Description: Given a user-id, return attributes of the user
-  input: user-id
-  output: return firstName, lastName, email of the user
+  Description: Given a user-id, return firstName, lastName and email
+  input: user-id (binary(16))
+  output: {firstName (string), lastName (string), email (string)}
 */
 profileInfoRouter.get('/get-attributes', async (req, res) => {
   const userID = '0x' + req.query['user-id'];

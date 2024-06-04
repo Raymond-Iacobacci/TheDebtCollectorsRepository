@@ -8,9 +8,7 @@ const charge = 'Charge';
 const payment = 'Payment';
 const credit = 'Credit';
 
-/*
-  Iterates through all the pending charges and covers the charge amount based on the payment amount. 
-*/
+/* Iterates through all the pending charges and covers the charge amount based on the payment amount. */
 async function updatePayment(amount, tenantID){
   let newCharge = 0;
   let subtractAmount = 0;
@@ -124,10 +122,10 @@ transactionsRouter.post("/create-credit", async(req, res) =>{
   }
 });
 
-const timerID = setInterval(checkAndRunTask, 86400000);//86400000
+const interval = 86400000;
+setInterval(checkAndRunTask, interval);
 
 function checkAndRunTask() {
- 
   if (getDate().split("-")[2] === "01") {
       fillRentPayments();
   }
@@ -148,7 +146,6 @@ async function fillRentPayments(){
     }
 }
 
-const interval = 10000;
 setInterval(crawlForLatePayments, interval);
 
 function getAbbrDate() {
@@ -157,8 +154,7 @@ function getAbbrDate() {
 }
 
 async function crawlForLatePayments() {
-  var tenantsWithLatePayments = await selectQuery(`SELECT id, tenantID, description, date FROM paymentsLedger WHERE type = 'Charge' AND idLate is NULL AND paidAmount > 0 AND DATEDIFF('${getAbbrDate()}', date) > -50`); // TODO: change to < 11
-  console.log(tenantsWithLatePayments);
+  let tenantsWithLatePayments = await executeQuery(`SELECT id, tenantID, description, date FROM paymentsLedger WHERE type = 'Charge' AND idLate is NULL AND paidAmount > 0 AND DATEDIFF('${getAbbrDate()}', date) > -50`); // TODO: change to < 11
 
   for (let tenantWithLateCharges of tenantsWithLatePayments) {
 
@@ -173,7 +169,7 @@ async function crawlForLatePayments() {
 
     const query = "INSERT INTO paymentsLedger (type, description, date, amount, tenantID, idLate, balance, paidAmount) VALUES (?,?,?,?,?,?,?,?);";
     const values = ['Charge', `Late: ${tenantWithLateCharges.description}, ${dateFinal}`, getDate(), 10, tenantWithLateCharges.tenantID, tenantWithLateCharges.id, balance, 10];
-    await insertQuery(query, values);
+    await executeQuery(query, values);
 
   }
 }
