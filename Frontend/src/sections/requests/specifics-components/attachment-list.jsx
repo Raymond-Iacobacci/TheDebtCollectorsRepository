@@ -30,7 +30,6 @@ export default function RequestAttachments({ id }) {
           .then(data => {
             console.log(data);
             setAttachmentList(data);
-            // setAttachmentList([]);
         });
         setLoading(false);
       } catch (error) {

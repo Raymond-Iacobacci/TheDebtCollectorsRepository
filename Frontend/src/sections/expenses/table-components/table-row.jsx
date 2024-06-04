@@ -14,7 +14,6 @@ import { fDate } from 'src/utils/format-time';
 import { useRouter, usePathname } from 'src/routes/hooks';
 import { useSearchParams } from 'react-router-dom';
 
-// import { fDate } from 'src/utils/format-time';
 import { fCurrency } from 'src/utils/format-number';
 
 import Label from 'src/components/label';
@@ -23,15 +22,7 @@ import { deleteExpense } from '../hooks/expense-specifics';
 
 // ----------------------------------------------------------------------
 
-export default function UserTableRow({ 
-  id, 
-  type, 
-  amount, 
-  description, 
-  date, 
-  request, 
-  deleteRow 
-}) {
+export default function ExpenseTableRow({ id, type, amount, description, date, request, deleteRow }) {
   const router = useRouter();
   const path = usePathname();
   const [searchParams] = useSearchParams();
@@ -53,7 +44,7 @@ export default function UserTableRow({
 
   const handleConfirmDelete = async () => {
     await deleteExpense(id).then((data) => {
-      if(data.ok) {
+      if (data.ok) {
         deleteRow();
       }
     });
@@ -109,12 +100,12 @@ export default function UserTableRow({
   );
 }
 
-UserTableRow.propTypes = {
+ExpenseTableRow.propTypes = {
   id: PropTypes.any,
   type: PropTypes.any,
   amount: PropTypes.any,
   description: PropTypes.any,
   date: PropTypes.any,
   request: PropTypes.any,
-  deleteRow: PropTypes.any
+  deleteRow: PropTypes.any,
 };

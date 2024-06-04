@@ -65,19 +65,6 @@ export default function AnnouncementsView() {
     }
   }, [uuid, reload, access]);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
-  };
-
-  // const handleDeleteRow = () => {
-  //   setReload(true);
-  // };
-
   // Dialog popup
   const [description, setDescription] = useState('');
   const [title, setTitle] = useState('');
@@ -165,6 +152,7 @@ export default function AnnouncementsView() {
     </Dialog>
   );
 
+  // Table Specifics
   const tableLabels = [
     { id: 'title', label: 'Title' },
     { id: 'description', label: 'Description' },
@@ -173,14 +161,27 @@ export default function AnnouncementsView() {
 
   const tableValues = (row) => (
     <AnnouncementTableRow
-      key={row.expenseID}
-      id={row.expenseID}
+      key={row.announcementID}
+      id={row.announcementID}
       title={row.title}
       description={row.description}
       date={row.date}
-      // deleteRow={handleDeleteRow}
+      deleteRow={handleDeleteRow}
     />
   );
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setPage(0);
+    setRowsPerPage(parseInt(event.target.value, 10));
+  };
+
+  const handleDeleteRow = () => {
+    setReload(true);
+  };
 
   return (
     <Container>

@@ -313,7 +313,6 @@ export default function ReportView() {
             </Typography>
             {renderOverallTotals(expenses, 'Expenses')}
             {renderOverallTotals(paid, 'Income')}
-            {/* {renderOverallTotals(credits, 'Credits')} */}
             <Divider sx={{ borderStyle: 'dashed', marginTop: '12px', marginBottom: '8px' }} />
             {renderNet}
           </Card>

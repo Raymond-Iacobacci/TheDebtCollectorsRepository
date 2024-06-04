@@ -5,9 +5,14 @@ import TableHead from '@mui/material/TableHead';
 import TableCell from '@mui/material/TableCell';
 import TableSortLabel from '@mui/material/TableSortLabel';
 
+import { usePathname } from 'src/routes/hooks';
+
 // ----------------------------------------------------------------------
 
-export default function ExpenseTableHead({ headLabel }) {
+export default function AnnouncementTableHead({ headLabel }) {
+  const pathname = usePathname();
+  const access = pathname.split('/')[2];
+
   return (
     <TableHead>
       <TableRow>
@@ -22,11 +27,16 @@ export default function ExpenseTableHead({ headLabel }) {
             <TableSortLabel hideSortIcon>{headCell.label}</TableSortLabel>
           </TableCell>
         ))}
+        {access !== 'manager' ? (
+        <div />
+      ) : (
+        <TableCell padding="checkbox" />
+      )}
       </TableRow>
     </TableHead>
   );
 }
 
-ExpenseTableHead.propTypes = {
+AnnouncementTableHead.propTypes = {
   headLabel: PropTypes.array,
 };
