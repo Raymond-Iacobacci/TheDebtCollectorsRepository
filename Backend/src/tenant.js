@@ -24,11 +24,11 @@ function getDatePayment() {
     return moment().tz("America/Los_Angeles").format("YYYY-MM-DD");
 }
 
-async function updatePayment(amount){
+async function updatePayment(amount, tenantID){
     let newCharge = 0;
     let subtractAmount = 0;
     do {
-        const oldestCharge = await executeQuery(`SELECT paidAmount AS oldestCharge, id FROM paymentsLedger WHERE type='Charge' AND paidAmount > 0 LIMIT 1`);
+        const oldestCharge = await executeQuery(`SELECT paidAmount AS oldestCharge, id FROM paymentsLedger WHERE type='Charge' AND paidAmount > 0 AND tenantID=${'0x'+tenantID} LIMIT 1 `);
         if (oldestCharge.length === 0) {
             break;
         }
@@ -56,7 +56,7 @@ tenantRouter.post('/make-payment', async(req, res)=>{
         let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0) - Number(creditBalance[0].amount || 0);
         balance =  balance - amount;
 
-        updatePayment(amount);
+        updatePayment(amount, tenantID);
         
         const query = "INSERT INTO paymentsLedger (type, description, date, amount, tenantID, balance) VALUES (?, ?, ?, ?, ?, ?)";
         const values = [payment, description, currentDate, amount, Buffer.from(tenantID, 'hex'), balance];

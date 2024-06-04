@@ -175,31 +175,6 @@ async function generateReportData(managerID, schedule) {
   return reportData;
 }
 
-managerRouter.post("/create-credit", async(req, res) =>{
-try {  
-  const tenantID = req.body.tenantID;
-  const description = req.body.description;
-  const amount = req.body.amount;
-  const currentDate = getDate();
-  
-  const chargeBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${'0x' + tenantID}`);
-  const paymentBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${'0x' + tenantID}`);
-  const creditBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${credit}' AND tenantID=${'0x' + tenantID}`)
-
-  let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0)-Number(creditBalance[0].amount || 0);
-  balance =  balance -Number(amount);
-  updatePayment(amount);
-  const query = "INSERT INTO paymentsLedger (type, description, date, amount, tenantID, balance, paidAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
-  const values = [credit, description, currentDate, amount, Buffer.from(tenantID, 'hex'), balance, 0];
-  await executeQuery(query, values);
-  
-
-  res.send(200);
-  }catch(error){
-    res.status(500).json({ error: error });
-  }
-});
-
 function getDate() {
     const moment = require("moment-timezone");
     return moment().tz("America/Los_Angeles").format("YYYY-MM-DD");
@@ -244,11 +219,11 @@ managerRouter.post("/create-tenant", async (req, res) => {
   }
 });
 
-async function updatePayment(amount){
+async function updatePayment(amount, tenantID){
   let newCharge = 0;
   let subtractAmount = 0;
   while (amount > 0) {
-      const oldestCharge = await executeQuery(`SELECT paidAmount AS oldestCharge, id FROM paymentsLedger WHERE type='Charge' AND paidAmount > 0 LIMIT 1`);
+      const oldestCharge = await executeQuery(`SELECT paidAmount AS oldestCharge, id FROM paymentsLedger WHERE type='Charge' AND paidAmount > 0  AND tenantID=${'0x'+ tenantID} LIMIT 1`);
       if (oldestCharge.length === 0) {
           break;
       }
@@ -260,6 +235,31 @@ async function updatePayment(amount){
   }
 }
 
+async function updateDeletePayment(amount, tenantID){
+  while(amount > 0){
+    const latestCharge = await executeQuery(`select * from paymentsLedger where paidAmount != amount AND tenantID=${'0x' + tenantID} AND type='Charge' ORDER BY id desc LIMIT 1`);
+
+    if(latestCharge.length === 0){
+      break;
+    }
+
+    let paidAmount = Math.min(latestCharge[0].amount - latestCharge[0].paidAmount, amount);
+    amount -= paidAmount;
+    let newCharge = latestCharge[0].paidAmount + paidAmount;
+    await executeQuery(`UPDATE paymentsLedger SET paidAmount=${newCharge} WHERE id=${latestCharge[0].id}`);
+  }
+}
+
+async function getBalance(tenantID){
+  const chargeBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${'0x' + tenantID}`);
+  const paymentBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${'0x' + tenantID}`);
+  const creditBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${credit}' AND tenantID=${'0x' + tenantID}`);
+
+  let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0) - Number(creditBalance[0].amount || 0);
+  console.log(balance);
+  return balance;
+}
+
 managerRouter.post("/create-payment", async (req, res) => {
     try {
         const tenantID = req.body.tenantID;
@@ -267,23 +267,55 @@ managerRouter.post("/create-payment", async (req, res) => {
         const amount = req.body.amount;
         const currentDate = getDate();
         
-        const chargeBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${'0x' + tenantID}`);
-        const paymentBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${'0x' + tenantID}`);
-        const creditBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${credit}' AND tenantID=${'0x' + tenantID}`)
-
-        let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0) - Number(creditBalance[0].amount || 0);
+        let balance = await getBalance(tenantID);
         let temp = balance;
         balance = Number(amount) + balance;
+
         const query = "INSERT INTO paymentsLedger (type, description, date, amount, tenantID, balance, paidAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
         const values = [charge, description, currentDate, amount, Buffer.from(tenantID, 'hex'), balance, amount];
         await executeQuery(query, values);
-        updatePayment(-temp);
+        updatePayment(-temp, tenantID);
         res.send(currentDate);
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
+managerRouter.post("/create-credit", async(req, res) =>{
+  try {  
+    const tenantID = req.body.tenantID;
+    const description = req.body.description;
+    const amount = req.body.amount;
+    const currentDate = getDate();
+    
+    let balance = await getBalance(tenantID);
+    balance =  balance -Number(amount);
+
+    updatePayment(amount, tenantID);
+    const query = "INSERT INTO paymentsLedger (type, description, date, amount, tenantID, balance, paidAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    const values = [credit, description, currentDate, amount, Buffer.from(tenantID, 'hex'), balance, 0];
+    await executeQuery(query, values);
+    
+
+  res.send(200);
+  }catch(error){
+    res.status(500).json({ error: error });
+  }
+});
+managerRouter.post('/delete-payment', async (req, res) =>{
+  try{
+    const amount = req.body.amount;
+    const id = req.body.id;
+    const tenantID = req.query['tenant-id'];
+
+    await executeQuery(`DELETE FROM paymentsLedger WHERE id=${id}`);
+    updateDeletePayment(amount, tenantID);
+    res.sendStatus(200);
+  }catch(error){
+    res.status(500).json({ error: error.message });
+  }
+});
 managerRouter.post('/delete-charge', async (req, res) => {
   try {
     const paymentID = req.query['payment-id'];
