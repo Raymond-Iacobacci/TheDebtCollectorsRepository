@@ -10,6 +10,13 @@ that are needed by all users of the application, regardless if they are a tenant
 ## Working with UUIDs
 The database stores the tenantID, managerID, requestID, commentID, and attachmentID as binary(16) UUIDs. When the middleware recieves a UUID from the frontend in the query or body parameter, the UUID will not have the '0x' attached to the front. When you are performing a SELECT query in the database with the executeQuery() function, you must insert the '0x' at the front of the UUID. When performing an INSERT query with a UUID, you must use Buffer.from(UUID, 'hex') as the data you are inserting. (Note that the UUID should not include the '0x' in this case). 
 
+## Integrating sendEmail functionality into the Backend
+1. See the **Setting Up Google Cloud Functions** section in the main README.md file.
+2. Once you have set up the Google Cloud Function, retrieve the URL endpoint for the function
+3. Go to the Backend/utils.js file
+4. Locate the sendEmail function
+5. Replace the URL variable the URL endpoint for the Google Cloud Function
+
 ## Developing/Testing code locally
 1. From the root directory, enter the command: cd Backend
 2. Enter the command: npm install\
