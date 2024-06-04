@@ -1,6 +1,6 @@
 const express = require('express');
 const transactionsRouter = express.Router();
-const { executeQuery, getBalance } = require('../utils');
+const { executeQuery, getBalance, getDate } = require('../utils');
 
 transactionsRouter.use(express.json());
 
@@ -52,14 +52,14 @@ transactionsRouter.post("/create-charge", async (req, res) => {
     const tenantID = req.body.tenantID;
     const description = req.body.description;
     const amount = req.body.amount;
-    const currentDate = getDate();
-    
+    const currentDate = getDate(); 
     let balance = await getBalance(tenantID);
     let temp = balance;
     balance = Number(amount) + balance;
 
     const query = "INSERT INTO paymentsLedger (type, description, date, amount, tenantID, balance, paidAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
     const values = [charge, description, currentDate, amount, Buffer.from(tenantID, 'hex'), balance, amount];
+
     await executeQuery(query, values);
     updatePayment(-temp, tenantID);
     res.send(currentDate);

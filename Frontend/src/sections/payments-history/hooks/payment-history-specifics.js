@@ -34,7 +34,7 @@ export async function makePayment(uuid, amount_, description_) {
 }
 
 export async function createCharge(uuid, amount_, description_) {
-  return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/tenant/transactions/create-charge`, {
+  return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/transactions/create-charge`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',

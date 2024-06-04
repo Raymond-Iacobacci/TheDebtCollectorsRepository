@@ -69,12 +69,12 @@ async function getUserType(userID) {
 }
 
 async function getBalance(tenantID){
-  const chargeBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${'0x' + tenantID}`);
-  const paymentBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${'0x' + tenantID}`);
-  const creditBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${credit}' AND tenantID=${'0x' + tenantID}`);
+  const chargeBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='Charge' AND tenantID=${'0x' + tenantID}`);
+  const paymentBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='Payment' AND tenantID=${'0x' + tenantID}`);
+  const creditBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='Credit' AND tenantID=${'0x' + tenantID}`);
 
   let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0) - Number(creditBalance[0].amount || 0);
   return balance;
 }
   
-module.exports = {pool, executeQuery, uuidToString, sendEmail, getDate, getUserType};
+module.exports = {pool, executeQuery, uuidToString, sendEmail, getDate, getUserType, getBalance};
