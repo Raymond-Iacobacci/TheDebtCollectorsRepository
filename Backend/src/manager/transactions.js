@@ -1,6 +1,6 @@
 const express = require('express');
 const transactionsRouter = express.Router();
-const { executeQuery, getBalance, getDate } = require('../utils');
+const { executeQuery, getBalance, getDate, uuidToString } = require('../utils');
 
 transactionsRouter.use(express.json());
 
@@ -124,62 +124,58 @@ transactionsRouter.post("/create-credit", async(req, res) =>{
   }
 });
 
-// const intervalMinutes = 0.25;
-// const interval = intervalMinutes * 60000;
+const timerID = setInterval(checkAndRunTask, 86400000);//86400000
 
-// const timerID = setInterval(fillRentPayments, interval);
+function checkAndRunTask() {
+ 
+  if (getDate().split("-")[2] === "01") {
+      fillRentPayments();
+  }
+}
 
-// async function fillRentPayments(){
-//     const tenantPayments = await executeQuery(`SELECT * FROM tenants where rents IS NOT NULL`);
-//     for (const payment of tenantPayments) {
-//         const { rents, type, tenantID } = payment;
-//         const date = getDate();
+async function fillRentPayments(){
+    const tenantPayments = await executeQuery(`SELECT * FROM tenants where rents IS NOT NULL`);
+    for (const payment of tenantPayments) {
+        const { rents, type, tenantID } = payment;
+        const date = getDate();
 
-//         const chargeBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${uuidToString(tenantID)}`);
-//         const paymentBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${uuidToString(tenantID)}`);
-//         const creditBalance = await executeQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${credit}' AND tenantID=${uuidToString(tenantID)}`);
-
-//         let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0) - Number(creditBalance[0].amount || 0);
-//         balance =  balance - payment;
-
-//         updatePayment(payment);
+        let balance = await getBalance(tenantID.toString('hex').toUpperCase());
+        balance =  balance + rents;
         
-//         const query = "INSERT INTO paymentsLedger (type, description, date, amount, tenantID, balance) VALUES (?, ?, ?, ?, ?, ?)";
-//         const values = ['Rent', "Rent payment", date, rents, tenantID, balance];
-//         await executeQuery(query, values);
-//     }
-// }
+        const query = "INSERT INTO paymentsLedger (type, description, date, amount, tenantID, balance, paidAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        const values = ['Charge', "Rent", date, rents, tenantID, balance, rents];
+        await executeQuery(query, values);
+    }
+}
 
-// NOTE: late fees logic
-// const interval = 10000;
-// setInterval(crawlForLatePayments, interval);
+const interval = 10000;
+setInterval(crawlForLatePayments, interval);
 
-// function getAbbrDate() {
-//   const date = new Date();
-//   return date.toISOString().split('T')[0];
-// }
+function getAbbrDate() {
+  const date = new Date();
+  return date.toISOString().split('T')[0];
+}
 
-// async function crawlForLatePayments() {
-//   var tenantsWithLatePayments = await selectQuery(`SELECT id, tenantID, description, date FROM paymentsLedger WHERE type = 'Charge' AND idLate is NULL AND paidAmount > 0 AND DATEDIFF('${getAbbrDate()}', date) > -50`); // TODO: change to < 11
-//   console.log(tenantsWithLatePayments);
+async function crawlForLatePayments() {
+  var tenantsWithLatePayments = await selectQuery(`SELECT id, tenantID, description, date FROM paymentsLedger WHERE type = 'Charge' AND idLate is NULL AND paidAmount > 0 AND DATEDIFF('${getAbbrDate()}', date) > -50`); // TODO: change to < 11
+  console.log(tenantsWithLatePayments);
 
-//   for (let tenantWithLateCharges of tenantsWithLatePayments) {
+  for (let tenantWithLateCharges of tenantsWithLatePayments) {
 
-//     const chargeBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${charge}' AND tenantID=${uuidToString(tenantWithLateCharges.tenantID)}`);
-//     const paymentBalance = await selectQuery(`SELECT sum(amount) as amount from paymentsLedger where type='${payment}' AND tenantID=${uuidToString(tenantWithLateCharges.tenantID)}`);
-//     let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0);
-//     balance = 10 + balance;
+
+    let balance = await getBalance(tenantWithLateCharges.tenantID.toString('hex').toUpperCase());
+    balance = 10 + balance;
     
-//     const date = tenantWithLateCharges.date
-//     const parts = date.toISOString().split('T');
-//     const datePart = parts[0];
-//     const dateFinal = `${datePart.split('-')[1]}/${datePart.split('-')[2]}/${datePart.split('-')[0]}`;
+    const date = tenantWithLateCharges.date
+    const parts = date.toISOString().split('T');
+    const datePart = parts[0];
+    const dateFinal = `${datePart.split('-')[1]}/${datePart.split('-')[2]}/${datePart.split('-')[0]}`;
 
-//     const query = "INSERT INTO paymentsLedger (type, description, date, amount, tenantID, idLate, balance, paidAmount) VALUES (?,?,?,?,?,?,?,?);";
-//     const values = ['Charge', `Late: ${tenantWithLateCharges.description}, ${dateFinal}`, getDatePayment(), 10, tenantWithLateCharges.tenantID, tenantWithLateCharges.id, balance, 10];
-//     await insertQuery(query, values);
+    const query = "INSERT INTO paymentsLedger (type, description, date, amount, tenantID, idLate, balance, paidAmount) VALUES (?,?,?,?,?,?,?,?);";
+    const values = ['Charge', `Late: ${tenantWithLateCharges.description}, ${dateFinal}`, getDate(), 10, tenantWithLateCharges.tenantID, tenantWithLateCharges.id, balance, 10];
+    await insertQuery(query, values);
 
-//   }
-// }
+  }
+}
 
 module.exports = transactionsRouter;
