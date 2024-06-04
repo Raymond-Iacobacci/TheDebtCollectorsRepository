@@ -118,7 +118,7 @@ You will always have a seperate Cloud Run container for the Frontend and Backend
 *Note*: Replace [CONTAINER] with the desired container name (Ex: Backend). Make sure PROJECT-ID and IMAGE are consistent with the previous steps.\
 You will be prompted to enter which server you are deploying to. Enter the server associated with your project.  Your container should be deployed on [Cloud Run](https://console.cloud.google.com/run).
 
-## Integrating SendGrid into your application
+## Getting SendGrid API Key
 1. Sign Up or Login to your SendGrid account.
 2. Click on the **Settings** option in the sidebar.
 3. Under the **Settings** menu, click on **API Keys**.
@@ -127,4 +127,3 @@ You will be prompted to enter which server you are deploying to. Enter the serve
 6. Set thje desired permissions
 7. Click the **Create & View** button.
 8. Copy the generated API key. 
-9. Paste this API key in the SENDGRID_API_KEY field in the Backend/.env file.
