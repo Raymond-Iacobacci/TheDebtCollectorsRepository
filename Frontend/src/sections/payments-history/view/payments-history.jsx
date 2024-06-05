@@ -78,7 +78,7 @@ export default function PaymentsHistoryView() {
     };
 
     fetchName();
-    fetchPayments();
+    
     if (reload) {
       fetchPayments();
       setReload(false);
