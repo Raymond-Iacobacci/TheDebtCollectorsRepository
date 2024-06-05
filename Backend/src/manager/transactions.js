@@ -110,7 +110,7 @@ transactionsRouter.post("/create-credit", async(req, res) =>{
     }
   });  
 
-  transactionsRouter.post('/delete-payment', async (req, res) =>{
+transactionsRouter.post('/delete-payment', async (req, res) =>{
   try{
     const amount = req.body.amount;
     const id = req.body.id;
