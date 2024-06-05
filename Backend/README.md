@@ -13,20 +13,42 @@ that are needed by all users of the application, regardless if they are a tenant
 
 ## Requests
 Tenants can post new requests with an additional attachment and description. This inserts a new entry into the requests table in the database
-with a new requestID (primary key, binary(16)). This entry contains the tenantID and managerID (binary(16)) associated with the request, along with an 'Unresolved' status. The description, type, and date are stored in the request as well. The information for posting a request can be found in t
+with a new requestID (primary key, binary(16)). This entry contains the tenantID and managerID (binary(16)) associated with the request, along with an 'Unresolved' status. The description, type, and date are stored in the request as well. The route for posting a new request can be found in tenant/requests.js. 
 
 ### Comments
-Any 
+Any person associated with the request (the manager or tenant) should be able to comment on the request. When a comment is added, a new entry is inserted into the comments table of the database. The comments table has the following attributes: commentID (primary key, binary(16)), requestID (binary(16)), date (date), comment (string), and userID (binary(16)). The userID is the UUID of the manager or the tenant. The routes for posting and retrieving comments is found in user/requests.js.
 
+### Attachments
+Each request currently has an optional attachment associated with it when posting the request. When the new request is made with an attachment, an entry is inserted into the attachments table in the database. The attachments table has the following attributes: attachmentID (primary key, binary(16)), title (string), description (string), attachment (blob), requestID (binary(16)), date (date). The attachment itself is stored as a BLOB in the database. When the attachments are retrieved from the middleware, they are converted into base64 and sent to the frontend. The API for inserting the attachment is found in the new-request route in tenant/requests.js, and the get-attachments route can be found in user/requests.js.
+
+## Expenses
+The manager can add and track expenses associated with their property. Currently there are 5 different types of expenses: Maintenence Requests, Utilities, Wages, Mortgage Interest, Other. When a manager adds an expense, a new entry is inserted into the expenses table. These are the following attributes of the expenses table: expenseID (primary key, int), managerID (binary(16)), amount (float), type (string), description (string), date (date), requestID (binary(16)). The requestID is always null UNLESS the expense is associated with a particular request. In that case, the requestID of the request must be put here. The details of these routes can be found in manager/expenses.js.
 
 ## Transactions
 ### Payments Table
-The table contains 9 fields : id, date, description, amount, balance, idLate, tenantID, type, paidAmount. The the id is primary key for each entry. The balance is the current balance of the ledger at that entry. The idLate field is only used for late charges. tenantID specifies which tenant the transactio belongs to. The paidAmount field is only used for charges and is initialized to the amount value upon charge creation. The type is specifies wether it is a credit, charge, or payment. 
+The table contains 9 fields : id, date, description, amount, balance, idLate, tenantID, type, paidAmount.
 
-### Creating Charge.
-The manager can create charges based on monthly requirements
+id - Primary key.
+date - Time of transaction.
+description - Describes the transaction.
+amount - Amount transacted.
+Balance - The total balance from the first entry to the current entry.
+idLate - If and only if there is a late charge then idLate is initialized and refers to the charge which is overdue.
+tenantID - The id of the tenant the transactions are carried out for. 
+type - Either 'Charge', 'Credit', or 'Payment'.
+paidAmount - Initialized only for charges and refers to the amount of charge that is paid out. 
 
+### Creating Charge
+The manager can create charges relating to rents, maintenance, utilities and other necessities. Calling the create charge method will insert a charge into the paymentsLedger table. Then it will call the updatePayments function that will check if there are any previous credit that can be used to pay out this charge. 
 
+### Creating Payment
+The tenant can make a payment to cover charges or store credit for future charges. Calling the make payment route will first call the updatePayment function which will cover the appropriate number of charges and then insert the payment into the paymentsLedger table.
+
+### Creating Credit
+The manager can assign credit to a tenant. This functions similarly to making payments. 
+
+### updatePayment function
+The updatePayment function loops through from the oldest charge to the latest charge and finds the charges where the paidAmount field is not zero, indicating the charge is not paid out. It goes through such charges and covers them with the accrued credits. 
 
 ## Working with UUIDs
 The database stores the tenantID, managerID, requestID, commentID, and attachmentID as binary(16) UUIDs. When the middleware recieves a UUID from the frontend in the query or body parameter, the UUID will not have the '0x' attached to the front. When you are performing a SELECT query in the database with the executeQuery() function, you must insert the '0x' at the front of the UUID. When performing an INSERT query with a UUID, you must use Buffer.from(UUID, 'hex') as the data you are inserting. (Note that the UUID should not include the '0x' in this case). 
