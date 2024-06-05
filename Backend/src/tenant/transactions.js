@@ -38,7 +38,7 @@ transactionsRouter.post('/make-payment', async(req, res)=>{
     const description = req.body.description;
     let amount = req.body.amount;
     amount = Number(amount);
-    const currentDate = getDatePayment();
+    const currentDate = getDate();
 
     let balance = await getBalance(tenantID);
     balance =  balance - amount;

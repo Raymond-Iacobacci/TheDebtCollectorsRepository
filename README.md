@@ -138,6 +138,7 @@ You will be prompted to enter which server you are deploying to. Enter the serve
 5. Enter your SendGrid API key in the runtime environment variables configuration
 6. Enter the following code in the index.js (assuming your sendgrid api key is saved as SENDGRID_API_KEY in the runtime environment variables): 
 
+```
 const functions = require('@google-cloud/functions-framework');
 const sgMail = require('@sendgrid/mail');
 
@@ -162,6 +163,7 @@ functions.http('sendEmail', async (req, res) => {
         res.status(500).send('Error sending email.');
     }
 });
+```
 
 7. Enter "@sendgrid/mail": "^8.1.1" in the package.json
 8. Deploy the function

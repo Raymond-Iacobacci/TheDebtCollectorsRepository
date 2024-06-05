@@ -78,7 +78,7 @@ export default function PaymentsHistoryView() {
     };
 
     fetchName();
-
+    
     if (reload) {
       fetchPayments();
       setReload(false);
@@ -119,7 +119,7 @@ export default function PaymentsHistoryView() {
     { id: 'trash', label: '' },
   ];
 
-  const tableValues = (row) => {
+  const tableValues = (row) => (
     <PaymentTableRow
       id={row.id}
       key={row.paymentsID}
@@ -131,8 +131,8 @@ export default function PaymentsHistoryView() {
       description={row.description}
       access={access}
       deleteRow={handleDeleteRow}
-    />;
-  };
+    />
+  );
 
   // General Dialog Popup Vars
   const [paymentPopup, setPaymentPopup] = useState(false);
