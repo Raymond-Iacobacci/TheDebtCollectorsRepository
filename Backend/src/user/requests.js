@@ -82,17 +82,27 @@ requestsRouter.post('/add-comment', async (req, res) => {
   }
 });
 
+/* 
+  Description: Given a request-id, change the status of the request
+  input: request-id
+  output: status code
+*/
 requestsRouter.put('/change-status', async (req, res) => {
   try {
     const requestID = '0x' + req.query['request-id'];
-    const newStatusString = req.body.status;
-    const results = await executeQuery(`UPDATE requests SET status = '${newStatusString}' WHERE requestID = ${requestID};`);
-    res.send(results);
+    const newStatus = req.body.status;
+    await executeQuery(`UPDATE requests SET status = '${newStatus}' WHERE requestID = ${requestID};`);
+    res.send(200);
   } catch (error) {
     res.status(500).json({ error: 'Error updating status'});
   }
 });
 
+/*
+  Description: Given a request-id, return all the attachments uploaded to the request
+  input: request-id (binary(16))
+  output: [blob]
+*/
 requestsRouter.get('/get-attachments', async (req, res) => { 
   try {
     const requestID = '0x' + req.query['request-id'];
@@ -106,6 +116,11 @@ requestsRouter.get('/get-attachments', async (req, res) => {
   }
 });
 
+/*
+  Description: Delete a request given its request-id
+  input: request-id (binary(16))
+  output: status code
+*/
 requestsRouter.post('/delete-request', async (req, res) => { 
   try {
     const requestID = '0x' + req.query['request-id'];

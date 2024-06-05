@@ -37,7 +37,7 @@ function getIncomeQuery(managerID, description, startDate, endDate) {
         WHERE managerID = ${managerID}
       ) AS t ON t.tenantID = p.tenantID
     ) AS final
-    WHERE final.type = 'Charge' AND final.description = '${description}' AND final.paidAmount = 0 AND final.date >= '${formattedStartDate}' AND final.date <= '${formattedEndDate}';`;
+    WHERE (final.type = 'Charge' AND final.description = '${description}' AND final.paidAmount = 0 OR idLate IS NOT NULL) AND final.date >= '${formattedStartDate}' AND final.date <= '${formattedEndDate}';`;
 }
 
 /* Given a managerID and start/end dates, generate a query to get the credits in the database satisfying these conditions */
@@ -118,8 +118,8 @@ async function generateReportData(managerID, schedule) {
       reportData.push(reportDataObject);
     }
   } else if(schedule === "yearly"){
-      const yearStartDate = new Date(today.getFullYear(), 0, 1); // January 1st
-      const yearEndDate = new Date(today.getFullYear(), 11, 31); // December 31st
+      const yearStartDate = new Date(today.getFullYear(), 0, 1); 
+      const yearEndDate = new Date(today.getFullYear(), 11, 31); 
       const reportDataObject = await performQueries(managerID, yearStartDate, yearEndDate);
       reportData.push(reportDataObject);
   }

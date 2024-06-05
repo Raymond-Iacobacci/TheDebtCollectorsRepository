@@ -10,8 +10,8 @@ const credit = 'Credit';
 
 /* 
   Description: Given a manager-id, return the number of tenants under the manager
-  input: manager-id
-  output: the number of tenants under the manager
+  input: manager-id (binary(16))
+  output: the number of tenants under the manager (int)
 */
 dashboardRouter.get('/get-number-of-tenants', async (req, res) => {
   try{
@@ -26,8 +26,8 @@ dashboardRouter.get('/get-number-of-tenants', async (req, res) => {
 
 /* 
   Description: Given a manager-id, return the number of unresolved requests
-  input: manager-id
-  output: the number of unresolved requests
+  input: manager-id (binary(16))
+  output: the number of unresolved requests (int)
 */
 dashboardRouter.get('/get-number-of-unresolved-requests', async (req, res) => {
   try{
@@ -42,8 +42,8 @@ dashboardRouter.get('/get-number-of-unresolved-requests', async (req, res) => {
 
 /* 
   Description: Given a manager-id, return the number of rent payments paid this month
-  input: manager-id
-  output: number of rent payments
+  input: manager-id (binary(16))
+  output: number of rent payments (int)
 */
 dashboardRouter.get('/get-number-of-rent-payments', async (req, res) => {
   try{
@@ -74,8 +74,8 @@ dashboardRouter.get('/get-number-of-rent-payments', async (req, res) => {
 
 /* 
   Description: Given a manager-id, return the total balance of all tenants
-  input: manager-id
-  output: the totatl balance of all the tenants
+  input: manager-id (binary(16))
+  output: the totatl balance of all the tenants (float)
 */
 dashboardRouter.get("/get-total-balance", async (req, res) => {
   try {
@@ -94,7 +94,7 @@ dashboardRouter.get("/get-total-balance", async (req, res) => {
 
 /* 
   Description: Given a manager-id, return a list of the tenants with the top 5 most outstanding balances
-  input: manager-id
+  input: manager-id (binary(16))
   output: an array of 5 (or less) tenants with their outstanding balances
 */
 dashboardRouter.get("/get-outstanding-balances-per-tenant", async (req, res) => {
