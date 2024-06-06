@@ -3,23 +3,23 @@
 // import TableCell from '@mui/material/TableCell';
 // import Box from '@mui/material/Box';
 // import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+// import { useState } from 'react';
 // @author Claude
-import Popover from '@mui/material/Popover';
+// import Popover from '@mui/material/Popover';
 import PropTypes from 'prop-types';
 import TableRow from '@mui/material/TableRow';
-import MenuItem from '@mui/material/MenuItem';
+// import MenuItem from '@mui/material/MenuItem';
 import TableCell from '@mui/material/TableCell'; // Import TableCell
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
-import IconButton from '@mui/material/IconButton';
+// import IconButton from '@mui/material/IconButton';
 
 import { fDate } from 'src/utils/format-time';
-import Label from 'src/components/label';
-import Iconify from 'src/components/iconify';
+// import Label from 'src/components/label';
+// import Iconify from 'src/components/iconify';
 
-import { deleteCharge, deletePayment } from '../hooks/payment-history-specifics';
+// import { deleteCharge, deletePayment } from '../hooks/payment-history-specifics';
 
 // ----------------------------------------------------------------------
 
@@ -28,22 +28,22 @@ export default function PaymentTableRow({ uuid, id, type, time, amount, descript
   // const parts = time.split('T');
   // const datePart = parts[0];
   // const timeFinal = `${datePart.split('-')[1]}/${datePart.split('-')[2]}/${datePart.split('-')[0]}`;
-  const [deletePopover, setDeletePopover] = useState(null);
-  const handleOpenPopover = (event) => {
-    setDeletePopover(event.currentTarget);
-  };
-  const handleClosePopover = () => {
-    setDeletePopover(null);
-  };
-  const handleConfirmDelete = async () => {
-    if( type === 'Charge' ) {
-      await deleteCharge(id);
-    } else {
-      await deletePayment(uuid, amount, id);
-    }
-    setDeletePopover(null);
-    deleteRow();
-  };
+  // const [deletePopover, setDeletePopover] = useState(null);
+  // const handleOpenPopover = (event) => {
+  //   setDeletePopover(event.currentTarget);
+  // };
+  // const handleClosePopover = () => {
+  //   setDeletePopover(null);
+  // };
+  // const handleConfirmDelete = async () => {
+  //   if( type === 'Charge' ) {
+  //     await deleteCharge(id);
+  //   } else {
+  //     await deletePayment(uuid, amount, id);
+  //   }
+  //   setDeletePopover(null);
+  //   deleteRow();
+  // };
 
   return (
     <TableRow
@@ -66,7 +66,7 @@ export default function PaymentTableRow({ uuid, id, type, time, amount, descript
 
 
       {/* {(type === 'Charge' || type === 'Payment') && access === 'manager' ? ( */}
-      {(type === 'Payment' && access === 'manager') ? ( 
+      {/* {(type === 'Payment' && access === 'manager') ? ( 
         <TableCell align="left" padding="none" id="delete">
           <IconButton id="delete" onClick={handleOpenPopover}>
             <Iconify id="delete" icon="eva:trash-2-fill" />
@@ -86,7 +86,7 @@ export default function PaymentTableRow({ uuid, id, type, time, amount, descript
         </TableCell>
       ) : (
         <TableCell />
-      )}
+      )} */}
 
 
     </TableRow>

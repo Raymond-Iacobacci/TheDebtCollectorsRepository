@@ -116,7 +116,7 @@ export default function PaymentsHistoryView() {
     { id: 'time', label: 'Date' },
     { id: 'amount', label: 'Amount' },
     { id: 'balance', label: 'Balance' },
-    { id: 'trash', label: '' },
+    // { id: 'trash', label: '' },
   ];
 
   const tableValues = (row) => (
