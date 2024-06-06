@@ -12,7 +12,7 @@ that are needed by all users of the application, regardless if they are a tenant
 *utils.js* file contains helper functions that are used in multiple files. The most notable functions from here are getDate() and executeQuery() which are used signficantly throughout the application. 
 
 ## Requests
-Tenants can post new requests with an additional attachment and description. This inserts a new entry into the *requests* table in the database. The request table has the following features:
+Tenants can post new requests with an additional attachment and description. This inserts a new entry into the *requests* table in the database. The *requests* table has the following features:
 - requestID - (primary key) automatically generated UUID of request
 - description - extra information about request
 - tenantID - UUID of tenant
@@ -34,7 +34,7 @@ Any person associated with the request (the manager or tenant) should be able to
 The routes for posting and retrieving comments is found in *user/requests.js*.
 
 ### Attachments
-Each request currently has an optional attachment associated with it when posting the request. When the new request is made with an attachment, an entry is inserted into the attachments table in the database. The attachments table has the following attributes: 
+Each request currently has an optional attachment associated with it when posting the request. When the new request is made with an attachment, an entry is inserted into the *attachments* table in the database. *attachments* has the following attributes: 
 - attachmentID - (primary key) automatically generated UUID of attachment
 - title - attachment title (same as request)
 - description - attachment description (same as request)
@@ -45,7 +45,7 @@ Each request currently has an optional attachment associated with it when postin
 The attachment itself is stored as a BLOB in the database. When the attachments are retrieved from the middleware, they are converted into base64 format and sent to the frontend. The API for inserting the attachment is found in the new-request route in tenant/requests.js, and the get-attachments route can be found in user/requests.js.
 
 ## Expenses
-The manager can add and track expenses associated with their property. Currently there are 5 different types of expenses: Maintenence Requests, Utilities, Wages, Mortgage Interest, Other. When a manager adds an expense, a new entry is inserted into the expenses table. These are the following attributes of the expenses table: 
+The manager can add and track expenses associated with their property. Currently there are 5 different types of expenses: Maintenence Requests, Utilities, Wages, Mortgage Interest, Other. When a manager adds an expense, a new entry is inserted into the *expenses* table. These are the following attributes of *expenses*: 
 - expenseID - (primary key) automatically generated int
 - managerID - UUID of manager
 - amount - cost of expense 
@@ -55,6 +55,27 @@ The manager can add and track expenses associated with their property. Currently
 - requestID - The requestID is always null UNLESS the expense is associated with a particular request. In that case, the requestID must be referenced here.
 
 The details of these routes can be found in manager/expenses.js.
+
+## Reports
+The manager has a *reports* tab in left-hand side of the view. The report is split up into three different categories: 
+- Income (payments from tenants)
+  - Rent
+  - Utilities
+  - Other
+- Expenses (costs of the manager)
+  - Maintenence requests
+  - Mortgage Interest
+  - Utilities
+  - Wages
+  - Other
+- Credits (credits that manager gives to tenants)
+
+The report has three types of schedules that can be displayed:
+- Monthly (Jan, Feb, Mar, ... Dec)
+- Quarterly (Jan - Mar, Apr - Jun, Jul - Sep, Oct - Dec)
+- Yearly (Year to date)
+
+The SQL queries and functions to generate this report can be found in *manager/report.js*. 
 
 ## Transactions
 ### Payments Table
