@@ -4,7 +4,7 @@ const dashBoardRouter = require('../src/dashboard');
 const app = express();
 app.use('/dashboard', dashBoardRouter);
 
-const { executeQuery } = require('../src/utils');
+const { executeQuery } = require('../../src/utils');
 jest.mock('../src/utils', () => ({
   executeQuery: jest.fn(),
 }));
