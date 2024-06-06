@@ -108,10 +108,10 @@ export default function LoginView() {
             justifyContent="center"
             sx={{ height: 1 }}
           >
-            <Button variant="contained" color="inherit" onClick={handleManagerLogin}>
+            <Button data-testid="manager-login" variant="contained" color="inherit" onClick={handleManagerLogin}>
               Manager login
             </Button>
-            <Button variant="contained" color="inherit" onClick={handleTenantLogin}>
+            <Button data-testid="tenant-login" variant="contained" color="inherit" onClick={handleTenantLogin}>
               Tenant login
             </Button>
           </Stack>

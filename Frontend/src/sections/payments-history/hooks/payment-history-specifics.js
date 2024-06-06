@@ -33,6 +33,23 @@ export async function makePayment(uuid, amount_, description_) {
   );
 }
 
+export async function deletePayment(uuid, amount_, paymentID_) {
+  return fetch(
+    `${import.meta.env.VITE_MIDDLEWARE_URL}/manager/transactions/delete-payment?tenant-id=${uuid}`,
+    {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: amount_,
+        id: paymentID_,
+      }),
+    }
+  );
+}
+
 export async function createCharge(uuid, amount_, description_) {
   return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/transactions/create-charge`, {
     method: 'POST',
@@ -48,17 +65,26 @@ export async function createCharge(uuid, amount_, description_) {
   });
 }
 
+export async function deleteCharge(id) {
+  return fetch(
+    `${import.meta.env.VITE_MIDDLEWARE_URL}/manager/transactions/delete-charge?payment-id=${id}`,
+    {
+      method: 'POST',
+    }
+  );
+}
+
 export async function createCredit(uuid, amount_, description_) {
-    return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/transactions/create-credit`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          tenantID: uuid,
-          description: description_,
-          amount: amount_,
-        }),
-      });
+  return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/transactions/create-credit`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      tenantID: uuid,
+      description: description_,
+      amount: amount_,
+    }),
+  });
 }

@@ -42,7 +42,7 @@ export default function PaymentsHistoryView() {
   const router = useRouter();
   const pathname = usePathname();
   const access = pathname.split('/')[2];
-  const uuid = pathname.split('/')[3];
+  // const uuid = pathname.split('/')[3];
   const tenantID = access === 'tenant' ? pathname.split('/')[3] : pathname.split('/')[5];
 
   const [payments, setPayments] = useState([]);
@@ -123,7 +123,7 @@ export default function PaymentsHistoryView() {
     <PaymentTableRow
       id={row.id}
       key={row.paymentsID}
-      tenantID={uuid}
+      uuid={tenantID}
       type={row.type}
       time={row.date}
       amount={row.amount}

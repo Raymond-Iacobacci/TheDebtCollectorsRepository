@@ -105,6 +105,7 @@ export default function AppView() {
       <Grid container spacing={3}>
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
+            data-testid="numTenantsWidget"
             title="Number of Tenants"
             total={numTenants.length !== 0 ? numTenants.numberOfTenants : 0}
             color="info"
@@ -113,6 +114,7 @@ export default function AppView() {
         </Grid>
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
+            data-testid="numPaymentsWidget"
             title="Rent Payments"
             total={numPayments.length !== 0 ? numPayments.count : 0}
             color="success"
@@ -122,6 +124,7 @@ export default function AppView() {
 
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
+            data-testid="numRequestsWidget"
             title="Unresolved Requests"
             total={numRequests.length !== 0 ? numRequests.count : 0}
             color="warning"
@@ -131,6 +134,7 @@ export default function AppView() {
 
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
+            data-testid="numBalanceWidget"
             title="Total Balances"
             total={totalOutstanding.length !== 0 ? totalOutstanding.balance : 0}
             color="error"
@@ -139,11 +143,12 @@ export default function AppView() {
         </Grid>
 
         <Grid xs={12} md={6} lg={6}>
-          <AppBalances title="Outstanding Balances" list={outstandingTenants} />
+          <AppBalances data-testid="outstandingTenantsList" title="Outstanding Balances" list={outstandingTenants} />
         </Grid>
 
         <Grid xs={12} md={6} lg={6}>
           <AppRequests
+            data-testid="unresolvedRequestsList"
             title="Unresolved Requests"
             list={unresolvedReqs}
           />

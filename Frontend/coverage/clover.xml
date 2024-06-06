@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1717654303339" clover="3.2.0">
+  <project timestamp="1717654303339" name="All files">
+    <metrics statements="90" coveredstatements="77" conditionals="16" coveredconditionals="11" methods="38" coveredmethods="31" elements="144" coveredelements="119" complexity="0" loc="90" ncloc="90" packages="4" files="10" classes="10"/>
+    <package name="components.iconify">
+      <metrics statements="3" coveredstatements="3" conditionals="1" coveredconditionals="1" methods="1" coveredmethods="1"/>
+      <file name="iconify.jsx" path="C:\Users\tgdzi\Desktop\Code\TheDebtCollectorsRepository\Frontend\src\components\iconify\iconify.jsx">
+        <metrics statements="3" coveredstatements="3" conditionals="1" coveredconditionals="1" methods="1" coveredmethods="1"/>
+        <line num="9" count="1" type="cond" truecount="1" falsecount="0"/>
+        <line num="10" count="2" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+      </file>
+      <file name="index.js" path="C:\Users\tgdzi\Desktop\Code\TheDebtCollectorsRepository\Frontend\src\components\iconify\index.js">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+    </package>
+    <package name="routes.hooks">
+      <metrics statements="11" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="9" coveredmethods="4"/>
+      <file name="index.js" path="C:\Users\tgdzi\Desktop\Code\TheDebtCollectorsRepository\Frontend\src\routes\hooks\index.js">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+      <file name="use-pathname.js" path="C:\Users\tgdzi\Desktop\Code\TheDebtCollectorsRepository\Frontend\src\routes\hooks\use-pathname.js">
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <line num="7" count="7" type="stmt"/>
+        <line num="9" count="6" type="stmt"/>
+      </file>
+      <file name="use-router.js" path="C:\Users\tgdzi\Desktop\Code\TheDebtCollectorsRepository\Frontend\src\routes\hooks\use-router.js">
+        <metrics statements="9" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="7" coveredmethods="2"/>
+        <line num="7" count="2" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
+        <line num="20" count="2" type="stmt"/>
+      </file>
+    </package>
+    <package name="sections.overview.components">
+      <metrics statements="30" coveredstatements="28" conditionals="7" coveredconditionals="6" methods="13" coveredmethods="11"/>
+      <file name="app-balances.jsx" path="C:\Users\tgdzi\Desktop\Code\TheDebtCollectorsRepository\Frontend\src\sections\overview\components\app-balances.jsx">
+        <metrics statements="14" coveredstatements="13" conditionals="2" coveredconditionals="2" methods="6" coveredmethods="5"/>
+        <line num="19" count="4" type="stmt"/>
+        <line num="27" count="1" type="stmt"/>
+        <line num="40" count="3" type="stmt"/>
+        <line num="53" count="1" type="stmt"/>
+        <line num="62" count="1" type="stmt"/>
+        <line num="63" count="1" type="stmt"/>
+        <line num="64" count="1" type="stmt"/>
+        <line num="66" count="1" type="stmt"/>
+        <line num="67" count="1" type="stmt"/>
+        <line num="69" count="1" type="stmt"/>
+        <line num="70" count="0" type="stmt"/>
+        <line num="73" count="1" type="stmt"/>
+        <line num="84" count="1" type="stmt"/>
+        <line num="98" count="1" type="stmt"/>
+      </file>
+      <file name="app-requests.jsx" path="C:\Users\tgdzi\Desktop\Code\TheDebtCollectorsRepository\Frontend\src\sections\overview\components\app-requests.jsx">
+        <metrics statements="14" coveredstatements="13" conditionals="2" coveredconditionals="2" methods="6" coveredmethods="5"/>
+        <line num="19" count="4" type="stmt"/>
+        <line num="28" count="1" type="stmt"/>
+        <line num="42" count="3" type="stmt"/>
+        <line num="55" count="1" type="stmt"/>
+        <line num="64" count="1" type="stmt"/>
+        <line num="65" count="1" type="stmt"/>
+        <line num="66" count="1" type="stmt"/>
+        <line num="68" count="1" type="stmt"/>
+        <line num="69" count="1" type="stmt"/>
+        <line num="71" count="1" type="stmt"/>
+        <line num="72" count="0" type="stmt"/>
+        <line num="75" count="1" type="stmt"/>
+        <line num="86" count="1" type="stmt"/>
+        <line num="100" count="1" type="stmt"/>
+      </file>
+      <file name="app-widget-summary.jsx" path="C:\Users\tgdzi\Desktop\Code\TheDebtCollectorsRepository\Frontend\src\sections\overview\components\app-widget-summary.jsx">
+        <metrics statements="2" coveredstatements="2" conditionals="3" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="11" count="16" type="stmt"/>
+        <line num="37" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="sections.overview.view">
+      <metrics statements="46" coveredstatements="40" conditionals="8" coveredconditionals="4" methods="15" coveredmethods="15"/>
+      <file name="app-view.jsx" path="C:\Users\tgdzi\Desktop\Code\TheDebtCollectorsRepository\Frontend\src\sections\overview\view\app-view.jsx">
+        <metrics statements="46" coveredstatements="40" conditionals="8" coveredconditionals="4" methods="15" coveredmethods="15"/>
+        <line num="25" count="5" type="stmt"/>
+        <line num="26" count="4" type="stmt"/>
+        <line num="28" count="4" type="stmt"/>
+        <line num="29" count="4" type="stmt"/>
+        <line num="30" count="4" type="stmt"/>
+        <line num="31" count="4" type="stmt"/>
+        <line num="32" count="4" type="stmt"/>
+        <line num="33" count="4" type="stmt"/>
+        <line num="35" count="4" type="stmt"/>
+        <line num="36" count="3" type="stmt"/>
+        <line num="37" count="3" type="stmt"/>
+        <line num="38" count="3" type="stmt"/>
+        <line num="39" count="3" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="45" count="3" type="stmt"/>
+        <line num="46" count="3" type="stmt"/>
+        <line num="47" count="3" type="stmt"/>
+        <line num="48" count="3" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="54" count="3" type="stmt"/>
+        <line num="55" count="3" type="stmt"/>
+        <line num="56" count="3" type="stmt"/>
+        <line num="57" count="3" type="stmt"/>
+        <line num="60" count="0" type="stmt"/>
+        <line num="63" count="3" type="stmt"/>
+        <line num="64" count="3" type="stmt"/>
+        <line num="65" count="3" type="stmt"/>
+        <line num="66" count="3" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="72" count="3" type="stmt"/>
+        <line num="73" count="3" type="stmt"/>
+        <line num="74" count="3" type="stmt"/>
+        <line num="75" count="3" type="stmt"/>
+        <line num="78" count="0" type="stmt"/>
+        <line num="81" count="3" type="stmt"/>
+        <line num="82" count="3" type="stmt"/>
+        <line num="83" count="3" type="stmt"/>
+        <line num="84" count="6" type="stmt"/>
+        <line num="87" count="0" type="stmt"/>
+        <line num="91" count="3" type="stmt"/>
+        <line num="92" count="3" type="stmt"/>
+        <line num="93" count="3" type="stmt"/>
+        <line num="94" count="3" type="stmt"/>
+        <line num="95" count="3" type="stmt"/>
+        <line num="96" count="3" type="stmt"/>
+        <line num="99" count="4" type="stmt"/>
+      </file>
+      <file name="index.js" path="C:\Users\tgdzi\Desktop\Code\TheDebtCollectorsRepository\Frontend\src\sections\overview\view\index.js">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+    </package>
+  </project>
+</coverage>
