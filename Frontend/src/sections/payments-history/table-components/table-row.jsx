@@ -65,7 +65,8 @@ export default function PaymentTableRow({ uuid, id, type, time, amount, descript
       <TableCell>{balance}</TableCell>
 
 
-      {(type === 'Charge' || type === 'Payment') && access === 'manager' ? (
+      {/* {(type === 'Charge' || type === 'Payment') && access === 'manager' ? ( */}
+      {(type === 'Payment' && access === 'manager') ? ( 
         <TableCell align="left" padding="none" id="delete">
           <IconButton id="delete" onClick={handleOpenPopover}>
             <Iconify id="delete" icon="eva:trash-2-fill" />
