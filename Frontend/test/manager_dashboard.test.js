@@ -50,7 +50,6 @@ describe('Dashboard Page', () => {
     expect(numRequests).toBeInTheDocument();
     expect(numBalance).toBeInTheDocument();
 
-    // Wait for async data to be set
     await waitFor(() => {
       expect(numTenants).toHaveTextContent('10');
       expect(numPayments).toHaveTextContent('15');

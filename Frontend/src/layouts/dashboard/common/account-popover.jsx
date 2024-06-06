@@ -53,7 +53,6 @@ export default function AccountPopover() {
 
   useEffect(() => {
     if (logout) {
-      console.log('logout called');
       const deleteCookie = async () => {
         try {
           await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/user/cookies/remove-cookie?user-id=${uuid}`, {

@@ -52,7 +52,6 @@ export default function UserTableRow({
     }
 
     const selection = window.getSelection();
-    console.log(event.target);
     if (selection.type !== 'Range') {
       router.push(`${id}?session=${token}`);
     }

@@ -66,7 +66,6 @@ export default function ReportView() {
         )
           .then((res) => res.json())
           .then((data) => {
-            console.log(data)
             let finalPaid = [];
             let finalExpenses = [];
             let finalCredits = []; 

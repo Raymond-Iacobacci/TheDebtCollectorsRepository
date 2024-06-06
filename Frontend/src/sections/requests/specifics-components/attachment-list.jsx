@@ -28,7 +28,6 @@ export default function RequestAttachments({ id }) {
         setLoading(true);
         await getAttachments(id)
           .then(data => {
-            console.log(data);
             setAttachmentList(data);
         });
         setLoading(false);

@@ -11,7 +11,6 @@ export const visuallyHidden = {
 };
 
 export function emptyRows(page, rowsPerPage, arrayLength) {
-  console.log("Length:",arrayLength);
   return page ? Math.max(0, (1 + page) * rowsPerPage - arrayLength) : 0;
 }
 
