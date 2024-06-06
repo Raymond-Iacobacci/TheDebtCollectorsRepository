@@ -22,7 +22,7 @@ const executeQuery = (query, values = []) => {
         connection.release();
         if (queryErr) {
           reject(queryErr);
-          return;
+          return queryErr;
         }
         resolve(results);
       });

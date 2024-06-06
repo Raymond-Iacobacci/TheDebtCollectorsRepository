@@ -21,7 +21,7 @@ export async function addAnnouncement(manager, title_, description_) {
 }
 
 export async function deleteAnnouncement(id) {
-  return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}//manager/announcements/delete-announcement?announcement-id=${id}`, {
+  return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/announcements/delete-announcement?announcement-id=${id}`, {
     method: 'POST',
   });
 }

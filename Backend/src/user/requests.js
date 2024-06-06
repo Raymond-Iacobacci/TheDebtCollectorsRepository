@@ -127,6 +127,10 @@ requestsRouter.post('/delete-request', async (req, res) => {
     await executeQuery(`DELETE FROM attachments where requestID = ${requestID}`);
     await executeQuery(`DELETE FROM comments where requestID = ${requestID}`);
     await executeQuery(`DELETE FROM requests where requestID = ${requestID}`);
+    const expenseResults = await executeQuery(`SELECT expenseID from expenses where requestID = ${requestID}`);
+    for(const expenseID of expenseResults){
+      await executeQuery(`UPDATE expenses SET requestID = NULL where expenseID = ${expenseID.expenseID}`);
+    }
     res.send(200);
   } catch (error) {
     res.status(500).json({ error: 'Error deleting request' });

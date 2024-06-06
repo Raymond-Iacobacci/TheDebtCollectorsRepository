@@ -1,7 +1,7 @@
 const express = require('express');
 const requestsRouter = express.Router();
 const multer = require('multer');
-const { executeQuery, uuidToString, getDate } = require('../utils');
+const { executeQuery, getDate } = require('../utils');
 
 requestsRouter.use(express.json());
 

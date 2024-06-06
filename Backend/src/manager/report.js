@@ -15,6 +15,7 @@ reportRouter.get("/get-report", async (req, res) => {
     const managerID = "0x" + req.query["manager-id"];
     const schedule = req.query["schedule"];
     const reportData = await generateReportData(managerID, schedule);
+    console.log('done');
     res.json(reportData);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -29,7 +30,7 @@ function getIncomeQuery(managerID, description, startDate, endDate) {
   return `
     SELECT SUM(amount) AS amount
     FROM (
-      SELECT type, description, amount, date, paidAmount
+      SELECT type, description, amount, date, paidAmount, idLate
       FROM paymentsLedger p
       INNER JOIN (
         SELECT tenantID
@@ -37,7 +38,7 @@ function getIncomeQuery(managerID, description, startDate, endDate) {
         WHERE managerID = ${managerID}
       ) AS t ON t.tenantID = p.tenantID
     ) AS final
-    WHERE (final.type = 'Charge' AND final.description = '${description}' AND final.paidAmount = 0 OR idLate IS NOT NULL) AND final.date >= '${formattedStartDate}' AND final.date <= '${formattedEndDate}';`;
+    WHERE (final.type = 'Charge' AND final.description = '${description}' AND final.paidAmount = 0 OR final.idLate IS NOT NULL) AND final.date >= '${formattedStartDate}' AND final.date <= '${formattedEndDate}';`;
 }
 
 /* Given a managerID and start/end dates, generate a query to get the credits in the database satisfying these conditions */
