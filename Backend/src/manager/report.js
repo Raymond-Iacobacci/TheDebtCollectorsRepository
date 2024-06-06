@@ -15,7 +15,6 @@ reportRouter.get("/get-report", async (req, res) => {
     const managerID = "0x" + req.query["manager-id"];
     const schedule = req.query["schedule"];
     const reportData = await generateReportData(managerID, schedule);
-    console.log('done');
     res.json(reportData);
   } catch (error) {
     res.status(500).json({ error: error.message });
