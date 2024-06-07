@@ -74,13 +74,18 @@ transactionsRouter.post("/create-charge", async (req, res) => {
 transactionsRouter.post('/delete-charge', async (req, res) => {
 try {
   const paymentID = req.query['payment-id'];
+  const charge = await executeQuery(`SELECT amount, paidAmount, date, tenantID from paymentsLedger where id=${paymentID}`);
   const query = `DELETE FROM paymentsLedger where id = ${paymentID};`;
   await executeQuery(query);
+
+  updatePayment(charge[0].amount-charge[0].paidAmount,charge[0].tenantID.toString('hex').toUpperCase() );
+
   res.sendStatus(200);
 } catch (error) {
   res.status(500).json({ error: error.message });
 }
 });
+
 
 /* 
   Description: Manger will issue credit to a specific tenant.
@@ -92,11 +97,12 @@ transactionsRouter.post("/create-credit", async(req, res) =>{
     const tenantID = req.body.tenantID;
     const description = req.body.description;
     const amount = req.body.amount;
+
     const currentDate = getDate();
     
     let balance = await getBalance(tenantID);
     balance =  balance -Number(amount);
-
+  
     updatePayment(amount, tenantID);
     const query = "INSERT INTO paymentsLedger (type, description, date, amount, tenantID, balance, paidAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
     const values = [credit, description, currentDate, amount, Buffer.from(tenantID, 'hex'), balance, 0];
@@ -154,7 +160,7 @@ function getAbbrDate() {
 }
 
 async function crawlForLatePayments() {
-  let tenantsWithLatePayments = await executeQuery(`SELECT id, tenantID, description, date FROM paymentsLedger WHERE type = 'Charge' AND idLate is NULL AND paidAmount > 0 AND DATEDIFF('${getAbbrDate()}', date) > -50`); // TODO: change to < 11
+  let tenantsWithLatePayments = await executeQuery(`SELECT id, tenantID, description, date FROM paymentsLedger WHERE type = 'Charge' AND idLate is NULL AND paidAmount > 0 AND DATEDIFF('${getAbbrDate()}', date) < 11>`); // TODO: change to < 11
 
   for (let tenantWithLateCharges of tenantsWithLatePayments) {
 
