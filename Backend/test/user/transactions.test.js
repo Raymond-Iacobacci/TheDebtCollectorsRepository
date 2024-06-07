@@ -19,40 +19,40 @@ describe('Transactions API routes', () => {
     jest.clearAllMocks();
   });
 
-  // describe('GET /transactions/get-ledger', () => {
-  //   test('should return the ledger for the tenant', async () => {
-  //     const mockLedger = [
-  //       { id: 1, type: 'Charge', date: '2024-06-01', amount: 500, description: 'Rent', balance: 500 },
-  //       { id: 2, type: 'Payment', date: '2024-06-05', amount: 500, description: 'Payment', balance: 0 }
-  //     ];
+  describe('GET /transactions/get-ledger', () => {
+    test('should return the ledger for the tenant', async () => {
+      const mockLedger = [
+        { id: 1, type: 'Charge', date: '2024-06-01', amount: 500, description: 'Rent', balance: 500 },
+        { id: 2, type: 'Payment', date: '2024-06-05', amount: 500, description: 'Payment', balance: 0 }
+      ];
 
-  //     executeQuery.mockImplementation((query) => {
-  //       if (query.includes("SELECT id, type, date, amount, description, balance FROM paymentsLedger WHERE tenantID=" + mockTenantIDHex)) {
-  //         return mockLedger;
-  //       }
-  //       if (query.includes("sum(amount) as amount from paymentsLedger where type='Charge'")) {
-  //         return [{ amount: 500 }];
-  //       }
-  //       if (query.includes("sum(amount) as amount from paymentsLedger where type='Payment'")) {
-  //         return [{ amount: 500 }];
-  //       }
-  //       if (query.includes("sum(amount) as amount from paymentsLedger where type='Credit'")) {
-  //         return [{ amount: 0 }];
-  //       }
-  //       return [];
-  //     });
+      executeQuery.mockImplementation((query) => {
+        if (query.includes("SELECT id, type, date, amount, description, balance FROM paymentsLedger WHERE tenantID=" + mockTenantIDHex)) {
+          return mockLedger;
+        }
+        if (query.includes("sum(amount) as amount from paymentsLedger where type='Charge'")) {
+          return [{ amount: 500 }];
+        }
+        if (query.includes("sum(amount) as amount from paymentsLedger where type='Payment'")) {
+          return [{ amount: 500 }];
+        }
+        if (query.includes("sum(amount) as amount from paymentsLedger where type='Credit'")) {
+          return [{ amount: 0 }];
+        }
+        return [];
+      });
 
-  //     const response = await request(app)
-  //       .get('/transactions/get-ledger')
-  //       .query({ 'tenant-id': mockTenantID });
+      const response = await request(app)
+        .get('/transactions/get-ledger')
+        .query({ 'tenant-id': mockTenantID });
 
-  //     expect(response.body).toEqual(mockLedger);
-  //     expect(executeQuery).toHaveBeenNthCalledWith(1, expect.stringContaining("SELECT id, type, date, amount, description, balance FROM paymentsLedger WHERE tenantID=" + mockTenantIDHex));
-  //     expect(executeQuery).toHaveBeenNthCalledWith(2, expect.stringContaining("SELECT sum(amount) as amount from paymentsLedger where type='Charge' AND tenantID=" + mockTenantIDHex));
-  //     expect(executeQuery).toHaveBeenNthCalledWith(3, expect.stringContaining("SELECT sum(amount) as amount from paymentsLedger where type='Payment' AND tenantID=" + mockTenantIDHex));
-  //     expect(executeQuery).toHaveBeenNthCalledWith(4, expect.stringContaining("SELECT sum(amount) as amount from paymentsLedger where type='Credit' AND tenantID=" + mockTenantIDHex));
-  //   });
-  // });
+      expect(response.body).toEqual(mockLedger);
+      expect(executeQuery).toHaveBeenNthCalledWith(1, expect.stringContaining("SELECT id, type, date, amount, description, balance FROM paymentsLedger WHERE tenantID=" + mockTenantIDHex));
+      expect(executeQuery).toHaveBeenNthCalledWith(2, expect.stringContaining("SELECT sum(amount) as amount from paymentsLedger where type='Charge' AND tenantID=" + mockTenantIDHex));
+      expect(executeQuery).toHaveBeenNthCalledWith(3, expect.stringContaining("SELECT sum(amount) as amount from paymentsLedger where type='Payment' AND tenantID=" + mockTenantIDHex));
+      expect(executeQuery).toHaveBeenNthCalledWith(4, expect.stringContaining("SELECT sum(amount) as amount from paymentsLedger where type='Credit' AND tenantID=" + mockTenantIDHex));
+    });
+  });
 
   describe('updateBalance function', () => {
     test('should update balances correctly', async () => {
