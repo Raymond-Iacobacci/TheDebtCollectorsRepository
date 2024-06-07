@@ -7,6 +7,13 @@
     "start": "nodemon src/app.js",
     "test" : "jest"
   },
+  "jest": {
+    "coverageReporters": ["text"],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "src/utils.js"
+    ]
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
