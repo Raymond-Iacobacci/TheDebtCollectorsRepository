@@ -1,6 +1,6 @@
 const express = require('express');
 const announcementsRouter = require('./announcements');
-const transactionsRouter = require('./transactions');
+const {transactionsRouter} = require('./transactions');
 const requestsRouter = require('./requests');
 
 const tenantRouter = express.Router();

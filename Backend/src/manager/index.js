@@ -3,7 +3,7 @@ const reportRouter = require('./report');
 const expensesRouter = require('./expenses');
 const announcementsRouter = require('./announcements');
 const tenantsRouter = require('./tenants');
-const transactionsRouter = require('./transactions');
+const {transactionsRouter}= require('./transactions');
 const requestsRouter = require('./requests');
 const dashboardRouter = require('./dashboard')
 

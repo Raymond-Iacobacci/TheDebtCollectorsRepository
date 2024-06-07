@@ -2,7 +2,7 @@ const express = require('express');
 const requestsRouter = require('./requests');
 const cookiesRouter = require('./cookies');
 const profileInfoRouter = require('./profileInfo');
-const transactionsRouter = require('./transactions')
+const {transactionsRouter}= require('./transactions')
 
 const userRouter = express.Router();
 
