@@ -17,7 +17,7 @@ describe('Expenses API routes', () => {
   });
 
   test('GET /expenses/get-expenses should return all expenses for the manager', async () => {
-    const managerId = 'abc123'; // Change this to the manager ID you want to test with
+    const managerId = 'abc123'; 
     const mockExpenses = [
       { expenseID: 1, managerID: 'abc123', amount: 100, type: 'Food', description: 'Groceries', date: '2024-06-02', requestID: null },
       { expenseID: 2, managerID: 'abc123', amount: 50, type: 'Transportation', description: 'Taxi fare', date: '2024-06-01', requestID: 'def456' }
@@ -29,14 +29,14 @@ describe('Expenses API routes', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual(mockExpenses.map(expense => ({
       ...expense,
-      managerID: expense.managerID, // Assuming frontend expects lowercase hex string
+      managerID: expense.managerID, 
       requestID: expense.requestID ? expense.requestID: null
     })));
     expect(executeQuery).toHaveBeenCalledWith(`SELECT expenseID, managerID, amount, type, description, date, requestID FROM expenses where managerID = 0x${managerId};`);
   });
 
   test('POST /expenses/add-expense should add a new expense', async () => {
-    const managerId = 'abc123'; // Change this to the manager ID you want to test with
+    const managerId = 'abc123';
     const newExpense = {
       amount: 75,
       type: 'Miscellaneous',
@@ -56,7 +56,7 @@ describe('Expenses API routes', () => {
   });
 
   test('POST /expenses/delete-expense should delete an expense', async () => {
-    const expenseId = 123; // Change this to the expense ID you want to test with
+    const expenseId = 123; 
 
     const response = await request(app).post(`/expenses/delete-expense?expense-id=${expenseId}`);
     
