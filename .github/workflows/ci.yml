@@ -20,10 +20,10 @@ jobs:
 
     - name: Dependency installs
       run: |
-        cd backend
+        cd Backend
         npm install
 
     - name: Run Jest Tests
       run: |
-        cd backend
+        cd Backend
         npm run test
