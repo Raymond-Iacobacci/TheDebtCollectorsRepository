@@ -5,6 +5,8 @@ import { BrowserRouter } from 'react-router-dom';
 
 import { AppView } from 'src/sections/overview/view';
 
+// ----------------------------------------------------------------------
+
 jest.mock('src/sections/overview/hooks/summary', () => ({
   getNumberTenants: jest.fn(() => Promise.resolve({ numberOfTenants: 10 })),
   getNumberRequests: jest.fn(() => Promise.resolve({ count: 5 })),
