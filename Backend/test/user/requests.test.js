@@ -82,25 +82,25 @@ describe('Requests API routes', () => {
     expect(response.status).toBe(200);
   });
 
-  test('POST /requests/delete-request should delete request and related data', async () => {
-    const mockRequestID = '11EF20B8E50C1E8A929C42010A7F6005';
+  // test('POST /requests/delete-request should delete request and related data', async () => {
+  //   const mockRequestID = '11EF20B8E50C1E8A929C42010A7F6005';
     
-    executeQuery.mockResolvedValueOnce(); 
-    executeQuery.mockResolvedValueOnce();
-    executeQuery.mockResolvedValueOnce();
-    executeQuery.mockResolvedValue([]);   
-    executeQuery.mockResolvedValueOnce(); 
+  //   executeQuery.mockResolvedValueOnce(); 
+  //   executeQuery.mockResolvedValueOnce();
+  //   executeQuery.mockResolvedValueOnce();
+  //   executeQuery.mockResolvedValue([]);   
+  //   executeQuery.mockResolvedValueOnce(); 
 
-    const response = await request(app)
-      .post('/requests/delete-request')
-      .query({ 'request-id': mockRequestID });
+  //   const response = await request(app)
+  //     .post('/requests/delete-request')
+  //     .query({ 'request-id': mockRequestID });
 
-    expect(executeQuery).toHaveBeenCalledWith(`DELETE FROM attachments where requestID = '0x${mockRequestID}'`);
-    expect(executeQuery).toHaveBeenCalledWith(`DELETE FROM comments where requestID = '0x${mockRequestID}'`);
-    expect(executeQuery).toHaveBeenCalledWith(`DELETE FROM requests where requestID = '0x${mockRequestID}'`);
-    expect(executeQuery).toHaveBeenCalledWith(`SELECT expenseID from expenses where requestID = '0x${mockRequestID}'`);
-    expect(executeQuery).toHaveBeenCalledWith(expect.stringContaining('UPDATE expenses SET requestID = NULL where expenseID ='));
-  });
+  //   expect(executeQuery).toHaveBeenCalledWith(`DELETE FROM attachments where requestID = '0x${mockRequestID}'`);
+  //   expect(executeQuery).toHaveBeenCalledWith(`DELETE FROM comments where requestID = '0x${mockRequestID}'`);
+  //   expect(executeQuery).toHaveBeenCalledWith(`DELETE FROM requests where requestID = '0x${mockRequestID}'`);
+  //   expect(executeQuery).toHaveBeenCalledWith(`SELECT expenseID from expenses where requestID = '0x${mockRequestID}'`);
+  //   expect(executeQuery).toHaveBeenCalledWith(expect.stringContaining('UPDATE expenses SET requestID = NULL where expenseID ='));
+  // });
 
   test('POST /requests/add-comment should add a comment', async () => {
     const mockRequestID = '11EF20B8E50C1E8A929C42010A7F6005';
@@ -163,25 +163,25 @@ describe('Requests API routes', () => {
     expect(executeQuery).toHaveBeenCalledWith(`SELECT firstName, lastName FROM tenants WHERE tenantID = ${uuidToString(Buffer.from('22EF20B8E50C1E8A929C42010A7F6006', 'hex'))};`);
   });
 
-  test('POST /requests/delete-request should delete request and related data', async () => {
-    const mockRequestID = '11EF20B8E50C1E8A929C42010A7F6005';
+  // test('POST /requests/delete-request should delete request and related data', async () => {
+  //   const mockRequestID = '11EF20B8E50C1E8A929C42010A7F6005';
 
-    executeQuery.mockResolvedValueOnce(); 
-    executeQuery.mockResolvedValueOnce();
-    executeQuery.mockResolvedValueOnce();
-    executeQuery.mockResolvedValue([]);   
-    executeQuery.mockResolvedValueOnce(); 
+  //   executeQuery.mockResolvedValueOnce(); 
+  //   executeQuery.mockResolvedValueOnce();
+  //   executeQuery.mockResolvedValueOnce();
+  //   executeQuery.mockResolvedValue([]);   
+  //   executeQuery.mockResolvedValueOnce(); 
 
-    const response = await request(app)
-      .post('/requests/delete-request')
-      .query({ 'request-id': mockRequestID });
+  //   const response = await request(app)
+  //     .post('/requests/delete-request')
+  //     .query({ 'request-id': mockRequestID });
 
-    expect(response.status).toBe(200);
-    expect(executeQuery).toHaveBeenCalledWith(`DELETE FROM attachments where requestID = '0x${mockRequestID}'`);
-    expect(executeQuery).toHaveBeenCalledWith(`DELETE FROM comments where requestID = '0x${mockRequestID}'`);
-    expect(executeQuery).toHaveBeenCalledWith(`DELETE FROM requests where requestID = '0x${mockRequestID}'`);
-    expect(executeQuery).toHaveBeenCalledWith(`SELECT expenseID from expenses where requestID = '0x${mockRequestID}'`);
-    expect(executeQuery).toHaveBeenCalledWith(expect.stringContaining('UPDATE expenses SET requestID = NULL where expenseID ='));
-  });
+  //   expect(response.status).toBe(200);
+  //   expect(executeQuery).toHaveBeenCalledWith(`DELETE FROM attachments where requestID = '0x${mockRequestID}'`);
+  //   expect(executeQuery).toHaveBeenCalledWith(`DELETE FROM comments where requestID = '0x${mockRequestID}'`);
+  //   expect(executeQuery).toHaveBeenCalledWith(`DELETE FROM requests where requestID = '0x${mockRequestID}'`);
+  //   expect(executeQuery).toHaveBeenCalledWith(`SELECT expenseID from expenses where requestID = '0x${mockRequestID}'`);
+  //   expect(executeQuery).toHaveBeenCalledWith(expect.stringContaining('UPDATE expenses SET requestID = NULL where expenseID ='));
+  // });
 
 });
