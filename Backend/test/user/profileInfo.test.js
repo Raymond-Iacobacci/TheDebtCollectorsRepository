@@ -29,4 +29,11 @@ describe('Profile Info API routes', () => {
     expect(response.body).toEqual(mockUser);
   });
 
+  test('GET /profile-info/get-attributes should handle user not found', async () => {
+    const userId = 'abc123';
+    getUserType.mockResolvedValueOnce(null);
+    const response = await request(app).get(`/profile-info/get-attributes?user-id=${userId}`);
+    expect(response.statusCode).toBe(404);
+    expect(response.body).toEqual({ err: 'User not found.' });
+  });
 });
