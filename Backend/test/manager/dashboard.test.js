@@ -87,16 +87,15 @@ describe('Dashboard API routes', () => {
       {
         firstName: 'Jane',
         lastName: 'Smith',
-        balance: 350, // 600 - 150 - 100
+        balance: 350, 
       },
       {
         firstName: 'John',
         lastName: 'Doe',
-        balance: 250, // 500 - 200 - 50
+        balance: 250,
       }
     ];
 
-    // Check if the response body matches the expected balances
     console.log(response.body)
     response.body.forEach((item, index) => {
       expect(item.firstName).toBe(expectedBalances[index].firstName);

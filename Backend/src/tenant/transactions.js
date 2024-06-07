@@ -55,4 +55,4 @@ transactionsRouter.post('/make-payment', async(req, res)=>{
   }
 });
 
-module.exports = transactionsRouter;
+module.exports = {transactionsRouter, updatePayment};

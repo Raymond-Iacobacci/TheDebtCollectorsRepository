@@ -3,7 +3,6 @@ const express = require('express');
 const reportRouter = require('../../src/manager/report');
 const { executeQuery } = require('../../src/utils');
 
-// Mock the executeQuery function
 jest.mock('../../src/utils', () => ({
   executeQuery: jest.fn()
 }));
@@ -29,7 +28,7 @@ describe('GET /reports/get-report', () => {
       .query({ 'manager-id': '1', schedule: 'monthly' });
 
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(12); // 12 months
+    expect(response.body.length).toBe(12); 
     response.body.forEach((report) => {
       expect(report).toHaveProperty('income_rent', 100);
       expect(report).toHaveProperty('income_utilities', 100);

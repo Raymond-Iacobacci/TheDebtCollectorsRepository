@@ -86,7 +86,6 @@ try {
 }
 });
 
-
 /* 
   Description: Manger will issue credit to a specific tenant.
   input: tenantID, description, amount
@@ -114,6 +113,11 @@ transactionsRouter.post("/create-credit", async(req, res) =>{
     }
   });  
 
+/* 
+  Description: Deletes a payment.
+  input: id, tenantID, amount
+  output: status code 
+*/
 transactionsRouter.post('/delete-payment', async (req, res) =>{
   try{
     const amount = req.body.amount;
@@ -176,8 +180,7 @@ async function crawlForLatePayments() {
     const query = "INSERT INTO paymentsLedger (type, description, date, amount, tenantID, idLate, balance, paidAmount) VALUES (?,?,?,?,?,?,?,?);";
     const values = ['Charge', `Late: ${tenantWithLateCharges.description}, ${dateFinal}`, getDate(), 10, tenantWithLateCharges.tenantID, tenantWithLateCharges.id, balance, 10];
     await executeQuery(query, values);
-
   }
 }
 
-module.exports = transactionsRouter;
+module.exports = {transactionsRouter, crawlForLatePayments, fillRentPayments, getAbbrDate};

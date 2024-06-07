@@ -103,6 +103,12 @@ The manager can assign credit to a tenant. This functions similarly to making pa
 ### updatePayment function
 The *updatePayment* function loops from the oldest charge to the latest charge and finds the charges where the *paidAmount* field is not zero, indicating the charge is not paid out. It goes through such charges and covers them with the accrued credits. 
 
+### Late fees
+If a fee is not paid within 10 days of its issue date then late fees are charged. The *crawlForLatePayments* function finds all overdue charges and issues a $10 charge for each overdue charge.
+
+### Automatic Rent Payments.
+*fillRentPayments* automatically charges the tenant a specified rent at the beginning of each month. 
+
 ## Working with UUIDs
 The database stores the tenantID, managerID, requestID, commentID, and attachmentID as binary(16) UUIDs. When the middleware recieves a UUID from the frontend in the query or body parameter, the UUID will not have the '0x' attached to the front. When you are performing a SELECT query in the database with the executeQuery() function, you must insert the '0x' at the front of the UUID. When performing an INSERT query with a UUID, you must use Buffer.from(UUID, 'hex') as the data you are inserting. (Note that the UUID should not include the '0x' in this case). 
 
@@ -121,6 +127,14 @@ This command will install the dependencies listed in the package.json and popula
 You should now have a localhost started on port 8080. You can now test API calls using postman or other services.
 
 **WARNING**: When testing code locally, ensure the DB_HOST field in the Backend/.env file is set to the databases's public IP address. Also make sure your current IP address is listed as an authorized network for the Cloud SQL database. If either of these conditions are not met, your application will not connect to the database.
+
+## Adding Managers and Tenants 
+To add a manager to the application, you must manually insert a new manager into the database. This is done by design so users create manager accounts on the website. To insert a manager into the database: 
+
+1. Enter the debtcollectors database
+2. Enter the query: INSERT INTO managers (email, firstName, lastName) values ('manager@gmail.com', 'manager', '1');
+
+Note that tenants can only be added by managers through the *Create Tenant* button. 
 
 ## Unit Testing with Jest
 All of the tests are located in the *test* folder. To find the coverage of all the tests in the Backend directory: 

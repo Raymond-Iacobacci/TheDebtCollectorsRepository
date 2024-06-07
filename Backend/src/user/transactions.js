@@ -12,6 +12,7 @@ async function getPrevBalance(tenantID, id){
   let balance = Number(chargeBalance[0].amount || 0)-Number(paymentBalance[0].amount || 0) - Number(creditBalance[0].amount || 0);
   return balance;
 }
+
 async function updateBalance(tenantID){
   currLedger = await executeQuery(`SELECT id, type, date, amount, description, balance FROM paymentsLedger WHERE tenantID=${'0x' + tenantID}`);
   for(let entry of currLedger){
@@ -19,6 +20,7 @@ async function updateBalance(tenantID){
     await executeQuery(`Update paymentsLedger set balance=${balance} where id=${entry.id}`);
   }
 }
+
 /* 
   Description: Given a tenant, return all the transactions for the tenant
   input: tenant-id
@@ -35,4 +37,4 @@ transactionsRouter.get('/get-ledger', async(req, res) =>{
   }
 });
 
-module.exports = transactionsRouter;
+module.exports = {transactionsRouter, updateBalance, getPrevBalance};

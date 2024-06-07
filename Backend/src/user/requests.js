@@ -15,7 +15,6 @@ requestsRouter.get('/get-request-info', async (req, res) => {
     const query = `SELECT r.type, CONCAT(t.firstname, ' ', t.lastname) AS tenant, t.address, r.description, r.status FROM requests 
     AS r JOIN tenants AS t ON r.tenantID = t.tenantID WHERE r.requestID = ${requestID};`
     const requestInfo = await executeQuery(query);
-
     if (!requestInfo) {
       res.status(404).json({ error: 'requestID not found in requests table' });
       return;

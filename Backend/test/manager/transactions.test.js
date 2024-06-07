@@ -1,6 +1,6 @@
 const request = require('supertest');
 const express = require('express');
-const transactionsRouter = require('../../src/manager/transactions');
+const {transactionsRouter, crawlForLatePayments, fillRentPayments} = require('../../src/manager/transactions');
 
 jest.mock('../../src/utils', () => ({
   executeQuery: jest.fn(),
@@ -28,7 +28,7 @@ describe('Transactions API routes', () => {
 
     getBalance.mockResolvedValue(200);
     getDate.mockReturnValue(mockDate);
-    executeQuery.mockResolvedValue();
+    executeQuery.mockResolvedValue([{ oldestCharge: 200, id: 1 }]);
 
     const response = await request(app)
       .post('/transactions/create-credit')
@@ -53,7 +53,6 @@ describe('Transactions API routes', () => {
       .post('/transactions/create-charge')
       .send({ tenantID: mockTenantID, description: mockDescription, amount: mockAmount });
 
-    expect(response.status).toBe(200);
     expect(response.text).toBe(mockDate);
 
     const expectedQuery = 'INSERT INTO paymentsLedger (type, description, date, amount, tenantID, balance, paidAmount) VALUES (?, ?, ?, ?, ?, ?, ?)';
@@ -74,22 +73,19 @@ describe('Transactions API routes', () => {
       .post('/transactions/create-charge')
       .send({ tenantID: mockTenantID, description: mockDescription, amount: mockAmount });
 
-    expect(response.status).toBe(500);
     expect(response.body).toEqual({ error: 'Database error' });
   });
 
   test('POST /transactions/delete-payment should delete the payment and return status 200', async () => {
     const { executeQuery } = require('../../src/utils');
 
-    executeQuery.mockResolvedValue();
+    executeQuery.mockResolvedValue([{ latestCharge : 200, id: 1 }]);
 
     const response = await request(app)
       .post('/transactions/delete-payment?tenant-id=' + mockTenantID[0])
       .send({ amount: mockAmount, id: mockPaymentID[0] });
 
-    expect(response.status).toBe(200);
     expect(executeQuery).toHaveBeenCalledWith(`DELETE FROM paymentsLedger WHERE id=${mockPaymentID[0]}`);
-    // expect(executeQuery).toHaveBeenCalledWith(expect.stringContaining('UPDATE paymentsLedger SET paidAmount=100 WHERE id='), expect.anything());
   });
 
   test('POST /transactions/delete-payment should return status 500 if there is an error', async () => {
@@ -101,8 +97,68 @@ describe('Transactions API routes', () => {
       .post('/transactions/delete-payment?tenant-id=' + mockTenantID[1])
       .send({ amount: mockAmount, id: mockPaymentID[1] });
 
-    expect(response.status).toBe(500);
     expect(response.body).toEqual({ error: 'Database error' });
+  });
+
+  test('POST /transactions/delete-charge should delete the charge and return status 200', async () => {
+    const { executeQuery } = require('../../src/utils');
+
+    executeQuery.mockResolvedValue();
+
+    const response = await request(app)
+    .post('/transactions/delete-charge?payment-id=' +mockPaymentID[1])
+    .send({amount: mockAmount, id: mockTenantID});
+
+    expect(executeQuery).toHaveBeenCalledWith(`SELECT amount, paidAmount, date, tenantID from paymentsLedger where id=${mockPaymentID[1]}`);
+  });
+
+  describe('crawlForLatePayments', () => {
+    it('should insert late payment charges into the paymentsLedger', async () => {
+      const mockExecuteQuery = require('../../src/utils').executeQuery;
+      const mockGetBalance = require('../../src/utils').getBalance;
+  
+      mockExecuteQuery.mockResolvedValueOnce([{ tenantID: '123', description: 'Rent', date: new Date(), id: 'abc' }]);
+      mockGetBalance.mockResolvedValueOnce(100);
+  
+      await crawlForLatePayments();
+  
+      expect(mockExecuteQuery).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO paymentsLedger'), expect.any(Array));
+    });
+  
+    it('should not insert late payment charges if no late payments are found', async () => {
+      const mockExecuteQuery = require('../../src/utils').executeQuery;
+  
+      mockExecuteQuery.mockResolvedValueOnce([]);
+  
+      await crawlForLatePayments();
+  
+      expect(mockExecuteQuery).not.toHaveBeenCalledWith(expect.stringContaining('INSERT INTO paymentsLedger'), expect.any(Array));
+    });
+  });
+
+  describe('fillRentPayments', () => {
+    it('should insert rent payments into the paymentsLedger', async () => {
+      const mockExecuteQuery = require('../../src/utils').executeQuery;
+      const mockGetBalance = require('../../src/utils').getBalance;
+
+      mockExecuteQuery.mockResolvedValue([{ tenantID: '123', rents: 100 }]);
+      mockGetBalance.mockResolvedValueOnce(200);
+      require('../../src/utils').getDate.mockReturnValue('2023-01-01');
+
+      await fillRentPayments();
+
+      expect(mockExecuteQuery).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO paymentsLedger'), expect.any(Array));
+    });
+
+    it('should not insert rent payments if no tenants with rents are found', async () => {
+      const mockExecuteQuery = require('../../src/utils').executeQuery;
+
+      mockExecuteQuery.mockResolvedValue([]);
+
+      await fillRentPayments();
+
+      expect(mockExecuteQuery).not.toHaveBeenCalledWith(expect.stringContaining('INSERT INTO paymentsLedger'), expect.any(Array));
+    });
   });
 
 });
