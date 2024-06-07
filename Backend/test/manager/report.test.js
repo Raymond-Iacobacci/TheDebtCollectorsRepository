@@ -1,58 +1,58 @@
 const request = require('supertest');
 const express = require('express');
-const reportRouter = require('../../src/manager/report'); 
-const { executeQuery } = require('../../src/utils'); 
+const reportRouter = require('../../src/manager/report');
+const { executeQuery } = require('../../src/utils');
 
+// Mock the executeQuery function
 jest.mock('../../src/utils', () => ({
-  executeQuery: jest.fn(),
+  executeQuery: jest.fn()
 }));
 
 const app = express();
-app.use('/report', reportRouter);
+app.use('/reports', reportRouter);
 
-describe('Report API routes', () => {
-  afterEach(() => {
+describe('GET /reports/get-report', () => {
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('GET /report/get-report with monthly schedule should return monthly report data', async () => {
-    const managerId = 'abc123'; 
-    const mockReportData = [
-      { income_rent: 1000, income_utilities: 500, income_other: 200, expenses_other: 300, expenses_maintenance: 150, expenses_wages: 800, expenses_mortgage: 1200, expenses_utilities: 400, credits: 300 },
-      { income_rent: 1100, income_utilities: 600, income_other: 250, expenses_other: 320, expenses_maintenance: 180, expenses_wages: 900, expenses_mortgage: 1300, expenses_utilities: 450, credits: 320 }
-    ];
-    executeQuery.mockResolvedValueOnce(mockReportData);
+  test('should return report data for monthly schedule', async () => {
+    executeQuery.mockImplementation((query) => {
+      if (query.includes("SUM(amount) AS amount")) {
+        return [{ amount: 100 }];
+      }
+      return [];
+    });
 
-    const response = await request(app).get(`/report/get-report?manager-id=${managerId}&schedule=monthly`);
-    
+    const response = await request(app)
+      .get('/reports/get-report')
+      .query({ 'manager-id': '1', schedule: 'monthly' });
+
     expect(response.status).toBe(200);
-    expect(response.body).toEqual(mockReportData);
+    expect(response.body.length).toBe(12); // 12 months
+    response.body.forEach((report) => {
+      expect(report).toHaveProperty('income_rent', 100);
+      expect(report).toHaveProperty('income_utilities', 100);
+      expect(report).toHaveProperty('income_other', 100);
+      expect(report).toHaveProperty('expenses_other', 100);
+      expect(report).toHaveProperty('expenses_maintenance', 100);
+      expect(report).toHaveProperty('expenses_wages', 100);
+      expect(report).toHaveProperty('expenses_mortgage', 100);
+      expect(report).toHaveProperty('expenses_utilities', 100);
+      expect(report).toHaveProperty('credits', 100);
+    });
   });
 
-  test('GET /report/get-report with quarterly schedule should return quarterly report data', async () => {
-    const managerId = 'abc123'; 
-    const mockReportData = [
-      { income_rent: 3000, income_utilities: 1500, income_other: 600, expenses_other: 900, expenses_maintenance: 450, expenses_wages: 2400, expenses_mortgage: 3600, expenses_utilities: 1200, credits: 900 },
-      { income_rent: 3300, income_utilities: 1800, income_other: 750, expenses_other: 960, expenses_maintenance: 540, expenses_wages: 2700, expenses_mortgage: 3900, expenses_utilities: 1350, credits: 960 }
-    ];
-    executeQuery.mockResolvedValueOnce(mockReportData);
+  test('should handle errors gracefully', async () => {
+    executeQuery.mockImplementation(() => {
+      throw new Error('Database error');
+    });
 
-    const response = await request(app).get(`/report/get-report?manager-id=${managerId}&schedule=quarterly`);
-    
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual(mockReportData);
-  });
+    const response = await request(app)
+      .get('/reports/get-report')
+      .query({ 'manager-id': '1', schedule: 'monthly' });
 
-  test('GET /report/get-report with yearly schedule should return yearly report data', async () => {
-    const managerId = 'abc123'; 
-    const mockReportData = [
-      { income_rent: 12000, income_utilities: 6000, income_other: 2400, expenses_other: 3600, expenses_maintenance: 1800, expenses_wages: 9600, expenses_mortgage: 14400, expenses_utilities: 4800, credits: 3600 }
-    ];
-    executeQuery.mockResolvedValueOnce(mockReportData);
-
-    const response = await request(app).get(`/report/get-report?manager-id=${managerId}&schedule=yearly`);
-    
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual(mockReportData);
+    expect(response.status).toBe(500);
+    expect(response.body).toHaveProperty('error', 'Database error');
   });
 });

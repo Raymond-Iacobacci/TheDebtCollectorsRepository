@@ -9,10 +9,6 @@ cookiesRouter.use(express.urlencoded({ extended: true }));
 async function verifyUser(tableName, userID, email, token, res) {
   try {
     const user = await executeQuery(`SELECT ${userID} FROM ${tableName} WHERE email = '${email}';`);
-    if (!user || user.length === 0) {
-      res.status(404).send({ err: "User not found." });
-      return;
-    }
     await executeQuery(`UPDATE ${tableName} SET token = '${token}' WHERE email = '${email}';`);
     res.send({ uuid: user[0][userID].toString('hex').toUpperCase() });
   } catch (error) {
@@ -37,11 +33,6 @@ cookiesRouter.get('/verify-cookie', async (req, res) => {
   const frontendToken = req.query['token'];
 
   const userType = await getUserType(userID);
-  if(userType === null){
-    res.status(404).send({ err: "User not found." });
-    return;
-  }
-
   queryResults = await executeQuery(`SELECT token FROM ${userType}s WHERE ${userType}ID = ${userID};`);
   const backendToken = queryResults[0].token;
 
@@ -55,12 +46,6 @@ cookiesRouter.get('/verify-cookie', async (req, res) => {
 cookiesRouter.put('/remove-cookie', async (req, res) => {
   const userID = '0x' + req.query['user-id'];
   const userType = await getUserType(userID);
-
-  if(userType === null){
-    res.status(404).send({ err: "User not found." });
-    return;
-  }
-
   await executeQuery(`UPDATE ${userType}s SET token = NULL WHERE ${userType}ID = ${userID};`);
   res.sendStatus(200);
 });

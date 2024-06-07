@@ -31,17 +31,16 @@ tenantsRouter.post("/create-tenant", async (req, res) => {
     ];
     await executeQuery(query, values);
 
-    const message = `Hello ${firstName} ${lastName}, you have been added as a tenant to the DebtCollectors
+    const message = `Hello ${firstName} ${lastName}, you have been added as a tenant to TheDebtCollectors
     Property Management Suite. You can login here: https://frontend-kxfzqfz2rq-uc.a.run.app`;
 
-    sendEmail(email, 'Welcome to the DebtCollectors Property Management Suite', message)
+    sendEmail(email, 'Welcome to TheDebtCollectors Property Management Suite', message)
       .then(data => {
-        res.send('Email sent successfully:');
+        res.send(200);
       })
       .catch(error => {
         res.send('Error sending email:');
       });
-
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

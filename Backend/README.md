@@ -121,3 +121,9 @@ This command will install the dependencies listed in the package.json and popula
 You should now have a localhost started on port 8080. You can now test API calls using postman or other services.
 
 **WARNING**: When testing code locally, ensure the DB_HOST field in the Backend/.env file is set to the databases's public IP address. Also make sure your current IP address is listed as an authorized network for the Cloud SQL database. If either of these conditions are not met, your application will not connect to the database.
+
+## Unit Testing with Jest
+All of the tests are located in the *test* folder. To find the coverage of all the tests in the Backend directory: 
+1. Enter: cd Backend
+2. Enter: npx jest --coverage\
+Note: The *utils.js* file is not included in this coverage. 
