@@ -194,23 +194,16 @@ export default function PaymentsHistoryView() {
             }}
             sx={{ flex: 1, borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
           />
-          <FormControl
-            sx={{ flex: 1, marginLeft: 0, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
-          >
-            <InputLabel id="demo-select-small-label">Categories</InputLabel>
-            <Select
-              labelId="demo-select-small-label"
-              id="demo-select-small"
-              value={description}
-              label="Categories"
-              onChange={handleDescriptionChange}
-              SelectProps={{ MenuProps: { sx: { maxHeight: 150 } } }}
-            >
-              <MenuItem value="Rent">Rent</MenuItem>
-              <MenuItem value="Utilities">Utilities</MenuItem>
-              <MenuItem value="Other">Other</MenuItem>
-            </Select>
-          </FormControl>
+          <TextField
+            value={description}
+            label="Memo"
+            variant="outlined"
+            multiline
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
+            sx={{ flex: 1, borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+          />
         </Box>
         <DialogActions sx={{ justifyContent: 'center', mt: 2 }}>
           <Button onClick={handleSubmitPayment} variant="contained">

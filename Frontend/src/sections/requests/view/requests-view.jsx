@@ -218,11 +218,26 @@ export default function RequestsView() {
     >
       <DialogTitle id="alert-dialog-title">Maintenance request</DialogTitle>
       <Grid container>
-        <Grid>
+        <Stack direction="row" sx={{ width: '100%' }}>
+          <Box
+            component="form"
+            sx={{ paddingRight: '15px', '& > :not(style)': { m: 1 } }}
+            noValidate
+            autoComplete="off"
+          >
+            <TextField
+              value={requestType}
+              id="outlined-basic"
+              label="Type"
+              variant="outlined"
+              onChange={handleTypeChange}
+            />
+          </Box>
           <Box
             component="form"
             sx={{
-              '& > :not(style)': { m: 1, width: '100ch' },
+              width: '50%',
+              '& > :not(style)': { m: 1 },
             }}
             noValidate
             autoComplete="off"
@@ -236,27 +251,10 @@ export default function RequestsView() {
               onChange={(e) => {
                 setDescription(e.target.value);
               }}
+              sx={{width: '100%'}}
             />
           </Box>
-        </Grid>
-        <Grid>
-          <Box
-            component="form"
-            sx={{
-              '& > :not(style)': { m: 1, width: '30ch' },
-            }}
-            noValidate
-            autoComplete="off"
-          >
-            <TextField
-              value={requestType}
-              id="outlined-basic"
-              label="Type"
-              variant="outlined"
-              onChange={handleTypeChange}
-            />
-          </Box>
-        </Grid>
+        </Stack>
         <Grid>
           <DialogActions>
             <Grid>

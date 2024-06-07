@@ -48,12 +48,7 @@ export default function ReportView() {
     'December',
   ];
 
-  const quarters = [
-    'Q1',
-    'Q2',
-    'Q3',
-    'Q4'
-  ];
+  const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,7 +63,7 @@ export default function ReportView() {
           .then((data) => {
             let finalPaid = [];
             let finalExpenses = [];
-            let finalCredits = []; 
+            let finalCredits = [];
             for (let i = 0; i < data.length; i += 1) {
               const period = data[i];
               const parsedIncome = {};
@@ -140,21 +135,21 @@ export default function ReportView() {
           {Object.entries(map).map(([key, value]) => (
             <Stack alignItems="center">
               <Grid item xs={1} sx={{ paddingLeft: '20px' }}>
-                  {timePeriod === 'monthly' ? (
-                    <Typography variant="subtitle1">{months[key]}</Typography>
-                  ) : (
-                    <div />
-                  )}
-                  {timePeriod === 'quarterly' ? (
-                    <Typography variant="subtitle1">{quarters[key]}</Typography>
-                  ) : (
-                    <div />
-                  )}
-                  {timePeriod === 'yearly' ? (
-                    <Typography variant="subtitle1">{new Date().getFullYear()}</Typography>
-                  ) : (
-                    <div />
-                  )}
+                {timePeriod === 'monthly' ? (
+                  <Typography variant="subtitle1">{months[key]}</Typography>
+                ) : (
+                  <div />
+                )}
+                {timePeriod === 'quarterly' ? (
+                  <Typography variant="subtitle1">{quarters[key]}</Typography>
+                ) : (
+                  <div />
+                )}
+                {timePeriod === 'yearly' ? (
+                  <Typography variant="subtitle1">{new Date().getFullYear()}</Typography>
+                ) : (
+                  <div />
+                )}
               </Grid>
               {Object.entries(map[key]).map(([k, v]) => (
                 <Grid item xs={1} sx={{ paddingLeft: '20px' }}>
@@ -221,7 +216,8 @@ export default function ReportView() {
           {fCurrency(
             (
               parseInt(calculateOverallTotal(paid), 10) -
-              parseInt(calculateOverallTotal(expenses), 10)
+              parseInt(calculateOverallTotal(expenses), 10) -
+              parseInt(calculateOverallTotal(credits), 10)
             ).toString()
           )}
         </Typography>
@@ -295,15 +291,9 @@ export default function ReportView() {
 
       <Grid container spacing={3}>
         <Grid item xs={12} sm={12} md={8}>
-          <Card sx={{ padding: '16px' }}>
-            {renderData(expenses, 'Expenses')}
-          </Card>
-          <Card sx={{ padding: '16px', marginTop: '25px' }}>
-            {renderData(paid, 'Income')}
-          </Card>
-          <Card sx={{ padding: '16px', marginTop: '25px' }}>
-            {renderData(credits, 'Credits')}
-          </Card>
+          <Card sx={{ padding: '16px' }}>{renderData(expenses, 'Expenses')}</Card>
+          <Card sx={{ padding: '16px', marginTop: '25px' }}>{renderData(paid, 'Income')}</Card>
+          <Card sx={{ padding: '16px', marginTop: '25px' }}>{renderData(credits, 'Credits')}</Card>
         </Grid>
         <Grid item xs={12} sm={12} md={4}>
           <Card sx={{ padding: '16px' }}>
@@ -312,6 +302,7 @@ export default function ReportView() {
             </Typography>
             {renderOverallTotals(expenses, 'Expenses')}
             {renderOverallTotals(paid, 'Income')}
+            {renderOverallTotals(credits, 'Credit')}
             <Divider sx={{ borderStyle: 'dashed', marginTop: '12px', marginBottom: '8px' }} />
             {renderNet}
           </Card>
