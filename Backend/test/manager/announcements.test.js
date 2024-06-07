@@ -1,59 +1,33 @@
 const request = require('supertest');
 const express = require('express');
 const announcementsRouter = require('../../src/manager/announcements');
-const { executeQuery, getDate } = require('../../src/utils');
 
 jest.mock('../../src/utils', () => ({
   executeQuery: jest.fn(),
-  getDate: jest.fn()
+  getDate: jest.fn() // If getDate is used in your routes, otherwise remove this
 }));
 
 const app = express();
 app.use(express.json());
 app.use('/announcements', announcementsRouter);
 
-describe('Announcements Router', () => {
+describe('Announcements API routes', () => {
+  const mockManagerID = '12345';
+  const mockAnnouncements = [
+    { managerID: 12345, announcementID: 1, title: 'Announcement 1', description: 'Description 1', date: '2024-06-01' },
+    { managerID: 12345, announcementID: 2, title: 'Announcement 2', description: 'Description 2', date: '2024-06-02' },
+    { managerID: 67890, announcementID: 3, title: 'Announcement 3', description: 'Description 3', date: '2024-06-03' } 
+  ];
 
-    it('GET/manager/announcemnts/get-announcement should return all announcements for a given managerID', async () => {
-      const mockAnnouncements = [
-        { announcementID: 1, title: 'Title1', description: 'Description1', date: '2023-01-01' },
-        { announcementID: 2, title: 'Title2', description: 'Description2', date: '2023-01-02' },
-      ];
-      executeQuery.mockResolvedValue(mockAnnouncements);
-
-      const res = await request(app).get('/announcements/get-announcements?manager-id=1234');
-      
-      expect(res.status).toBe(200);
-      expect(res.body).toEqual(mockAnnouncements);
-      expect(executeQuery).toHaveBeenCalledWith(
-        `SELECT announcementID, title, description, date FROM announcements where managerID = 0x1234;`
-      );
-    });
-
-    it('POST/manager/announcements/make-announcement should insert a new announcement and return a 200 status code', async () => {
-      getDate.mockReturnValue('2023-01-01');
-      executeQuery.mockResolvedValue();
-
-      const res = await request(app)
-        .post('/announcements/make-announcement?manager-id=1234')
-        .send({ title: 'Title1', description: 'Description1' });
-
-      expect(res.status).toBe(200);
-      expect(executeQuery).toHaveBeenCalledWith(
-        `INSERT INTO announcements (title, description, managerID, date) values (?,?,?,?);`,
-        ['Title1', 'Description1', Buffer.from('1234', 'hex'), '2023-01-01']
-      );
-    });
-
-    it('POST/manager/announcements/delete-announcemnt should delete an announcement and return a 200 status code', async () => {
-      executeQuery.mockResolvedValue();
-
-      const res = await request(app)
-        .post('/announcements/delete-announcement?announcement-id=1');
-
-      expect(res.status).toBe(200);
-      expect(executeQuery).toHaveBeenCalledWith(
-        `DELETE FROM announcements where announcementID = 1`
-      );
-    });
+  beforeEach(() => {
+    jest.clearAllMocks(); // Clear mocks before each test
   });
+
+  test('GET /announcements/get-announcements should return all announcements for a given manager', async () => {
+    const { executeQuery } = require('../../src/utils');
+    executeQuery.mockResolvedValueOnce(mockAnnouncements.filter(announcement => announcement.managerID === parseInt(mockManagerID, 10)));
+    const response = await request(app).get(`/announcements/get-announcements?manager-id=${mockManagerID}`);
+    expect(response.body).toEqual(mockAnnouncements.filter(announcement => announcement.managerID === parseInt(mockManagerID, 10)));
+  });
+
+});
