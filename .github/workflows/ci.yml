@@ -19,7 +19,9 @@ jobs:
       uses: actions/setup-node@v2
 
     - name: Dependency installs
-      run: npm install
+      run: |
+        cd backend
+        npm install
 
     - name: Run Jest Tests
       run: |
