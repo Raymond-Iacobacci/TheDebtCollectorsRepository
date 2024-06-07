@@ -11,7 +11,7 @@ import { visuallyHidden } from '../hooks/utils';
 
 // ----------------------------------------------------------------------
 
-export default function RequestTableHead({
+export default function ExpenseTableHead({
   order,
   orderBy,
   headLabel,
@@ -54,7 +54,7 @@ export default function RequestTableHead({
   );
 }
 
-RequestTableHead.propTypes = {
+ExpenseTableHead.propTypes = {
   order: PropTypes.oneOf(['asc', 'desc']),
   orderBy: PropTypes.string,
   headLabel: PropTypes.array,

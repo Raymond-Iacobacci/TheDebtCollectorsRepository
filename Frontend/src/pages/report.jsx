@@ -6,33 +6,24 @@ import { useSearchParams } from 'react-router-dom';
 
 import { ReportView } from 'src/sections/report';
 
+import { verifyToken } from './verifyToken';
+
 // ----------------------------------------------------------------------
 
 export default function ReportPage() {
-
-  const [ searchParams ] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const token = searchParams.get('session');
   const pathname = usePathname();
   const uuid = pathname.split('/')[3];
   const router = useRouter();
 
+  // Verifying token for user access
   useEffect(() => {
-    const verifyToken = async () => {
-      try {
-        await fetch(
-          `${import.meta.env.VITE_MIDDLEWARE_URL}/users/verify-token?userID=${uuid}&token=${token}`
-        )
-        .then((response) => {
-          if(response.status !== 200) {
-            router.replace('/404');
-          }
-        });
-      } catch (error) {
-        console.log(`verifyToken API: ${error}`);
-      }
-    };
-    verifyToken();
+    if (!verifyToken(uuid, token)) {
+      router.replace('/404');
+    }
   }, [token, uuid, router]);
+
   
   return (
     <>

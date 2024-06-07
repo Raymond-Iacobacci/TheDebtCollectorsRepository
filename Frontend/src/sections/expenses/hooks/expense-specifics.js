@@ -2,20 +2,20 @@
 
 export async function getRequests(uuid) {
   return fetch(
-    `${import.meta.env.VITE_MIDDLEWARE_URL}/requests/get-manager-view?manager-id=${uuid}`
+    `${import.meta.env.VITE_MIDDLEWARE_URL}/manager/requests/get-view?manager-id=${uuid}`
   )
     .then((res) => res.json())
     .then((data) => data);
 }
 
 export async function getExpenses(uuid) {
-  return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/get-expenses?manager-id=${uuid}`)
+  return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/expenses/get-expenses?manager-id=${uuid}`)
     .then((res) => res.json())
     .then((data) => data);
 }
 
 export async function addExpense(manager, amount_, type_, request_, description_) {
-  return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/add-expense?manager-id=${manager}`, {
+  return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/expenses/add-expense?manager-id=${manager}`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -27,5 +27,11 @@ export async function addExpense(manager, amount_, type_, request_, description_
       description: description_,
       requestID: request_
     }),
+  });
+}
+
+export async function deleteExpense(id) {
+  return fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/expenses/delete-expense?expense-id=${id}`, {
+    method: 'POST',
   });
 }

@@ -1,21 +1,15 @@
 import { lazy, Suspense } from 'react';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 
-import { usePathname } from 'src/routes/hooks';
-
-import DashboardLayout from 'src/layouts/dashboard';
+import DashboardLayout from 'src/layouts/dashboard/common';
 
 export const IndexPage = lazy(() => import('src/pages/app'));
 export const AnnouncementsPage = lazy(() => import('src/pages/announcements'));
-// export const BlogPage = lazy(() => import('src/pages/blog'));
 export const RequestPage = lazy(() => import('src/pages/requests'));
 export const RequestDetailsPage = lazy(() => import('src/pages/request-details'));
 export const ListTenant = lazy(() => import('src/pages/list-tenants'));
 export const LoginPage = lazy(() => import('src/pages/login'));
-// export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
-
-// export const LandingPage = lazy(() => import('src/pages/landing'));
 export const PaymentsHistory = lazy(() => import('src/pages/payments-history'));
 export const Expenses = lazy(() => import('src/pages/expenses'));
 export const Report = lazy(() => import('src/pages/report'));
@@ -23,8 +17,6 @@ export const Report = lazy(() => import('src/pages/report'));
 // ----------------------------------------------------------------------
 
 export default function Router() {
-  const pathname = usePathname();
-  const userID = pathname.split('/')[3];
   const routes = useRoutes([
     {
       path: 'dashboard',
@@ -41,9 +33,9 @@ export default function Router() {
           children: [
             { path: 'main', element: <IndexPage /> },
             { path: 'announcements', element: <AnnouncementsPage /> },
-            { path: 'requests', element: <RequestPage access="tenant" /> },
+            { path: 'requests', element: <RequestPage /> },
             { path: 'requests/:requestID', element: <RequestDetailsPage /> },
-            { path: 'payments-history', element: <PaymentsHistory access="tenant" /> },
+            { path: 'payments-history', element: <PaymentsHistory /> },
           ],
         },
         {
@@ -51,12 +43,12 @@ export default function Router() {
           children: [
             { path: 'main', element: <IndexPage /> },
             { path: 'announcements', element: <AnnouncementsPage /> },
-            { path: 'requests', element: <RequestPage access="manager" /> },
+            { path: 'requests', element: <RequestPage /> },
             { path: 'requests/:requestID', element: <RequestDetailsPage /> },
-            { path: 'list-tenants', element: <ListTenant managerID={userID} /> },
-            { path: 'list-tenants/:tenantID', element: <PaymentsHistory access="manager" /> },
-            { path: 'expenses', element: <Expenses access="manager" /> },
-            { path: 'report', element: <Report /> }
+            { path: 'list-tenants', element: <ListTenant /> },
+            { path: 'list-tenants/:tenantID', element: <PaymentsHistory /> },
+            { path: 'expenses', element: <Expenses /> },
+            { path: 'report', element: <Report /> },
           ],
         },
       ],

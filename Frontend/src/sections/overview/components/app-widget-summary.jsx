@@ -5,8 +5,6 @@ import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-// import { fShortenNumber } from 'src/utils/format-number';
-
 // ----------------------------------------------------------------------
 
 export default function AppWidgetSummary({ title, total, icon, color = 'primary', sx, ...other }) {

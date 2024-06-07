@@ -1,26 +1,20 @@
 import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
-// import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
-// import Typography from '@mui/material/Typography';
-// import LoadingButton from '@mui/lab/LoadingButton';
-// import { alpha, useTheme } from '@mui/material/styles';
-
-import { useRouter } from 'src/routes/hooks';
-
-import { bgGradient } from 'src/theme/css';
-
 import Button from '@mui/material/Button';
 
+import { useRouter } from 'src/routes/hooks';
+import { bgGradient } from 'src/theme/css';
+
 import { useGoogleLogin } from '@react-oauth/google';
+
+import { verifyToken, verifyProfile } from './login-specifics';
 
 // ----------------------------------------------------------------------
 
 export default function LoginView() {
-  // const theme = useTheme();
-
   const router = useRouter();
 
   const [newToken, setToken] = useState('');
@@ -29,61 +23,41 @@ export default function LoginView() {
   const [loginType, setLoginType] = useState(null);
 
   useEffect(() => {
+    const validateCredentials = async () => {
+      try {
+        await verifyToken(credentials).then((data) => {
+          setProfile(data);
+          setToken(credentials.access_token);
+          setCredentials([]);
+        });
+      } catch (error) {
+        console.log(`validateCredentials API: ${error}`);
+      }
+    };
+    const validateProfile = async () => {
+      try {
+        await verifyProfile(loginType.toLowerCase(), profile.email, newToken).then((data) => {
+          const { uuid } = data;
+          if (data) {
+            router.push(
+              `/dashboard/${loginType.toLowerCase()}/${uuid}/${
+                loginType === 'Manager' ? 'main' : 'announcements'
+              }?session=${newToken}`
+            );
+          } else {
+            router.replace('/404');
+          }
+          setProfile([]);
+        });
+      } catch (error) {
+        console.log(`validateProfile API: ${error}`);
+      }
+    };
+
     if (credentials.length !== 0) {
-      const validateCredentials = async () => {
-        try {
-          await fetch(
-            `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${credentials.access_token}`
-          )
-            .then((res) => res.json())
-            .then((data) => {
-              console.log(data);
-              setProfile(data);
-              setToken(credentials.access_token);
-              setCredentials([]);
-            });
-        } catch (error) {
-          console.log(`validateProfile API: ${error}`);
-        }
-      };
       validateCredentials();
     }
     if (profile.length !== 0) {
-      const validateProfile = async () => {
-        try {
-          await fetch(
-            `${import.meta.env.VITE_MIDDLEWARE_URL}/users/login-${loginType.toLowerCase()}?email=${
-              profile.email
-            }`,
-            {
-              method: 'PUT',
-              headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                token: newToken,
-              }),
-            }
-          )
-            .then((res) => res.json())
-            .then((data) => {
-              const { uuid } = data;
-              if (uuid) {
-                router.push(
-                  `/dashboard/${loginType.toLowerCase()}/${uuid}/${
-                    loginType === 'Manager' ? 'main' : 'announcements'
-                  }?session=${newToken}`
-                );
-              } else {
-                router.replace('/404');
-              }
-              setProfile([]);
-            });
-        } catch (error) {
-          console.log(`validateProfile API: ${error}`);
-        }
-      };
       validateProfile();
     }
   }, [credentials, profile, router, loginType, newToken]);
@@ -108,7 +82,6 @@ export default function LoginView() {
     <Box
       sx={{
         ...bgGradient({
-          // color: alpha(theme.palette.background.default, 0.9),
           imgUrl: '/assets/background/overlay_4.jpg',
         }),
         height: 1,
@@ -135,10 +108,10 @@ export default function LoginView() {
             justifyContent="center"
             sx={{ height: 1 }}
           >
-            <Button variant="contained" color="inherit" onClick={handleManagerLogin}>
+            <Button data-testid="manager-login" variant="contained" color="inherit" onClick={handleManagerLogin}>
               Manager login
             </Button>
-            <Button variant="contained" color="inherit" onClick={handleTenantLogin}>
+            <Button data-testid="tenant-login" variant="contained" color="inherit" onClick={handleTenantLogin}>
               Tenant login
             </Button>
           </Stack>
