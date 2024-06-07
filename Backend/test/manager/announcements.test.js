@@ -4,7 +4,7 @@ const announcementsRouter = require('../../src/manager/announcements');
 
 jest.mock('../../src/utils', () => ({
   executeQuery: jest.fn(),
-  getDate: jest.fn() // If getDate is used in your routes, otherwise remove this
+  getDate: jest.fn()
 }));
 
 const app = express();
@@ -20,7 +20,7 @@ describe('Announcements API routes', () => {
   ];
 
   beforeEach(() => {
-    jest.clearAllMocks(); // Clear mocks before each test
+    jest.clearAllMocks(); 
   });
 
   test('GET /announcements/get-announcements should return all announcements for a given manager', async () => {
@@ -30,4 +30,35 @@ describe('Announcements API routes', () => {
     expect(response.body).toEqual(mockAnnouncements.filter(announcement => announcement.managerID === parseInt(mockManagerID, 10)));
   });
 
+  test('POST /announcements/make-announcement should add a new announcement', async () => {
+    const { executeQuery, getDate } = require('../../src/utils');
+    const title = 'New Announcement';
+    const description = 'New Announcement Description';
+    const date = '2024-06-04';
+
+    executeQuery.mockResolvedValueOnce();
+    getDate.mockReturnValueOnce(date);
+
+    const response = await request(app)
+      .post(`/announcements/make-announcement?manager-id=${mockManagerID}`)
+      .send({ title, description });
+
+    expect(response.status).toBe(200);
+
+    const query = `INSERT INTO announcements (title, description, managerID, date) values (?,?,?,?);`;
+    const values = [title, description, Buffer.from(mockManagerID, 'hex'), date];
+    expect(executeQuery).toHaveBeenCalledWith(query, values);
+  });
+
+  test('POST /announcements/delete-announcement should delete an announcement', async () => {
+    const announcementIDToDelete = 1;
+    const { executeQuery } = require('../../src/utils');
+
+    executeQuery.mockResolvedValueOnce();
+    const response = await request(app).post(`/announcements/delete-announcement?announcement-id=${announcementIDToDelete}`);
+    expect(response.status).toBe(200);
+
+    const query = `DELETE FROM announcements where announcementID = ${announcementIDToDelete}`;
+    expect(executeQuery).toHaveBeenCalledWith(query);
+  });
 });
