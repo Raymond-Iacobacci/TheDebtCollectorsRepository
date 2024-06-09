@@ -19,9 +19,11 @@ import { fDate } from 'src/utils/format-time';
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
 
+import { deleteCharge, deletePayment } from '../hooks/payment-history-specifics';
+
 // ----------------------------------------------------------------------
 
-export default function PaymentTableRow({ id, type, time, amount, description, balance, access, deleteRow }) {
+export default function PaymentTableRow({ uuid, id, type, time, amount, description, balance, access, deleteRow }) {
   const [firstWord, ...restWords] = type.split(' ');
   // const parts = time.split('T');
   // const datePart = parts[0];
@@ -34,9 +36,11 @@ export default function PaymentTableRow({ id, type, time, amount, description, b
     setDeletePopover(null);
   };
   const handleConfirmDelete = async () => {
-    await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/manager/delete-charge?payment-id=${id}`, {
-      method: 'POST',
-    });
+    if( type === 'Charge' ) {
+      await deleteCharge(id);
+    } else {
+      await deletePayment(uuid, amount, id);
+    }
     setDeletePopover(null);
     deleteRow();
   };
@@ -61,7 +65,7 @@ export default function PaymentTableRow({ id, type, time, amount, description, b
       <TableCell>{balance}</TableCell>
 
 
-      {type === 'Charge' && access === 'manager' ? (
+      {(type === 'Charge' || type === 'Payment') && access === 'manager' ? (
         <TableCell align="left" padding="none" id="delete">
           <IconButton id="delete" onClick={handleOpenPopover}>
             <Iconify id="delete" icon="eva:trash-2-fill" />
@@ -90,6 +94,7 @@ export default function PaymentTableRow({ id, type, time, amount, description, b
 
 
 PaymentTableRow.propTypes = {
+  uuid: PropTypes.any,
   id: PropTypes.any,
   type: PropTypes.any,
   time: PropTypes.any,

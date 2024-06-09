@@ -12,25 +12,6 @@ import IconButton from '@mui/material/IconButton';
 import { useSearchParams } from 'react-router-dom';
 import { useRouter, usePathname } from 'src/routes/hooks';
 
-import { account } from 'src/_mock/account';
-
-// ----------------------------------------------------------------------
-
-// const MENU_OPTIONS = [
-//   {
-//     label: 'Home',
-//     icon: 'eva:home-fill',
-//   },
-// {
-//   label: 'Profile',
-//   icon: 'eva:person-fill',
-// },
-// {
-//   label: 'Settings',
-//   icon: 'eva:settings-2-fill',
-// },
-// ];
-
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
@@ -72,10 +53,9 @@ export default function AccountPopover() {
 
   useEffect(() => {
     if (logout) {
-      console.log('logout called');
       const deleteCookie = async () => {
         try {
-          await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/users/remove-token?userID=${uuid}`, {
+          await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/user/cookies/remove-cookie?user-id=${uuid}`, {
             method: 'PUT',
           }).then((data) => {
             console.log(data);
@@ -93,7 +73,7 @@ export default function AccountPopover() {
   useEffect(() => {
     const getUserAttributes = async () => {
       try {
-        await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/users/get-attributes?userID=${uuid}`)
+        await fetch(`${import.meta.env.VITE_MIDDLEWARE_URL}/user/profile-info/get-attributes?user-id=${uuid}`)
           .then((res) => res.json())
           .then((data) => {
             setName(`${data.firstName} ${data.lastName}`);
@@ -121,7 +101,7 @@ export default function AccountPopover() {
         }}
       >
         <Avatar
-          src={account.photoURL}
+          src='/assets/images/avatars/avatar_23.jpg'
           alt={name}
           sx={{
             width: 36,
@@ -158,14 +138,6 @@ export default function AccountPopover() {
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
-
-        {/* {MENU_OPTIONS.map((option) => (
-          <MenuItem key={option.label}>
-            {option.label}
-          </MenuItem>
-        ))} */}
-
-        {/* <Divider sx={{ borderStyle: 'dashed', m: 0 }} /> */}
 
         <MenuItem key="Home" onClick={handleHome}>
           Home

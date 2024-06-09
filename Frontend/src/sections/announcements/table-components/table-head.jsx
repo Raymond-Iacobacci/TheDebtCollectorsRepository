@@ -1,25 +1,17 @@
 import PropTypes from 'prop-types';
 
-import Box from '@mui/material/Box';
 import TableRow from '@mui/material/TableRow';
-// import Checkbox from '@mui/material/Checkbox';
 import TableHead from '@mui/material/TableHead';
 import TableCell from '@mui/material/TableCell';
 import TableSortLabel from '@mui/material/TableSortLabel';
 
-import { visuallyHidden } from '../hooks/utils';
+import { usePathname } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
 
-export default function RequestTableHead({
-  order,
-  orderBy,
-  headLabel,
-  onRequestSort,
-}) {
-  const onSort = (property) => (event) => {
-    onRequestSort(event, property);
-  };
+export default function AnnouncementTableHead({ headLabel }) {
+  const pathname = usePathname();
+  const access = pathname.split('/')[2];
 
   return (
     <TableHead>
@@ -30,33 +22,21 @@ export default function RequestTableHead({
           <TableCell
             key={headCell.id}
             align={headCell.align || 'left'}
-            sortDirection={orderBy === headCell.id ? order : false}
             sx={{ width: headCell.width, minWidth: headCell.minWidth }}
           >
-            <TableSortLabel
-              hideSortIcon
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={onSort(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box sx={{ ...visuallyHidden }}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </TableSortLabel>
+            <TableSortLabel hideSortIcon>{headCell.label}</TableSortLabel>
           </TableCell>
         ))}
-        {/* <TableCell padding="checkbox" /> */}
+        {access !== 'manager' ? (
+        <div />
+      ) : (
+        <TableCell padding="checkbox" />
+      )}
       </TableRow>
     </TableHead>
   );
 }
 
-RequestTableHead.propTypes = {
-  order: PropTypes.oneOf(['asc', 'desc']),
-  orderBy: PropTypes.string,
+AnnouncementTableHead.propTypes = {
   headLabel: PropTypes.array,
-  onRequestSort: PropTypes.func,
 };

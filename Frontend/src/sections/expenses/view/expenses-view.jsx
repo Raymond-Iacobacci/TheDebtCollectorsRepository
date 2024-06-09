@@ -44,21 +44,16 @@ export default function ExpensesView() {
   const uuid = pathname.split('/')[3];
 
   const [page, setPage] = useState(0);
-
   const [order, setOrder] = useState('asc');
-
   const [orderBy, setOrderBy] = useState('name');
-
   const [filterName, setFilterName] = useState('');
-
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const [loading, setLoading] = useState(true);
   const [expenses, setExpenses] = useState([]);
   const [requests, setRequests] = useState([]);
   const [errorMsg, setError] = useState('');
-
-  const [requestPopup, setRequestPopup] = useState(false);
+  const [popup, setPopup] = useState(false);
 
   const [reload, setReload] = useState(true);
 
@@ -67,7 +62,6 @@ export default function ExpensesView() {
       try {
         setLoading(true);
         await getExpenses(uuid).then((data) => {
-          console.log(data);
           setExpenses(data);
         });
         await getRequests(uuid).then((data) => {
@@ -76,15 +70,15 @@ export default function ExpensesView() {
         setLoading(false);
       } catch (error) {
         setError(error.message);
-        console.log(`Expenses API: ${error}`);
       }
     };
-    if( reload ) {
+    if (reload) {
       fetchData();
       setReload(false);
     }
   }, [uuid, reload]);
 
+  // Table Display
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
     if (id !== '') {
@@ -115,51 +109,9 @@ export default function ExpensesView() {
 
   const notFound = !dataFiltered.length && !!filterName;
 
-  // Dialog popup
-  const [expenseType, setExpenseType] = useState('');
-  const [description, setExpenseDescription] = useState('');
-  const [amount, setExpenseAmount] = useState('');
-  const [expenseRequest, setExpenseRequest] = useState(null);
-  // const [expenseRequestLabel, setExpenseRequestLabel] = useState('');
-
-  const handleOpenRequestPopup = () => {
-    setRequestPopup(true);
-  };
-
-  const handleCloseRequestPopup = () => {
-    setRequestPopup(false);
-  };
-
-  const handleChange = (event) => {
-    setExpenseType(event.target.value);
-  };
-
-  const handleExpenseRequestChange = (event) => {
-    console.log(event.target.value)
-    setExpenseRequest(event.target.value);
-  }
-
-  const handleSubmitRequest = async () => {
-    if (expenseType !== 'Maintenance Request') setExpenseRequest(null);
-    await addExpense(uuid, amount, expenseType, expenseRequest, description).then((data) => {
-      if (data.ok) {
-        console.log('Data posted successfully');
-        setExpenseDescription('');
-        setExpenseType('');
-        setExpenseAmount('');
-        setExpenseRequest(null);
-        setRequestPopup(false);
-        setReload(true);
-      } else {  
-        console.log('Error posting data to backend');
-      }
-    });
-    handleCloseRequestPopup();
-  };
-
   const handleDeleteRow = () => {
     setReload(true);
-  }
+  };
 
   const tableLabels = [
     { id: 'type', label: 'Type' },
@@ -181,6 +133,138 @@ export default function ExpensesView() {
     />
   );
 
+  // Dialog popup
+  const [expenseType, setExpenseType] = useState('');
+  const [description, setExpenseDescription] = useState('');
+  const [amount, setExpenseAmount] = useState('');
+  const [expenseRequest, setExpenseRequest] = useState(null);
+
+  const handleOpenPopup = () => {
+    setPopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setExpenseDescription('');
+    setExpenseType('');
+    setExpenseAmount('');
+    setExpenseRequest(null);
+    setPopup(false);
+  };
+
+  const handleChange = (event) => {
+    setExpenseType(event.target.value);
+  };
+
+  const handleExpenseRequestChange = (event) => {
+    setExpenseRequest(event.target.value);
+  };
+
+  const handleSubmitRequest = async () => {
+    if (expenseType !== 'Maintenance Request') setExpenseRequest(null);
+    await addExpense(uuid, amount, expenseType, expenseRequest, description).then((data) => {
+      if (data.ok) {
+        setExpenseDescription('');
+        setExpenseType('');
+        setExpenseAmount('');
+        setExpenseRequest(null);
+        setPopup(false);
+        setReload(true);
+      }
+    });
+    handleClosePopup();
+  };
+
+  const expenseTypes = ['Maintenance Request', 'Wages', 'Mortgage Interest', 'Utilities', 'Other'];
+
+  const newExpenseDialog = (
+    <Dialog
+      open={popup}
+      onClose={handleClosePopup}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+      fullWidth
+      maxWidth="lg"
+    >
+      <DialogTitle id="alert-dialog-title">Add Expense</DialogTitle>
+      <Grid container>
+        <Grid>
+          <FormControl sx={{ m: 1, minWidth: 150 }} size="medium">
+            <InputLabel id="demo-select-small-label">Expense Type</InputLabel>
+            <Select
+              labelId="demo-select-small-label"
+              id="demo-select-small"
+              value={expenseType}
+              label="Expense Type"
+              onChange={handleChange}
+              SelectProps={{ MenuProps: { sx: { maxHeight: 150 } } }}
+            >
+              {expenseTypes.map((value) => (
+                <MenuItem value={value}>{value}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl sx={{ m: 1 }}>
+            <InputLabel>Amount</InputLabel>
+            <Input
+              onChange={(e) => {
+                setExpenseAmount(e.target.value);
+              }}
+              startAdornment={<InputAdornment position="start">$</InputAdornment>}
+            />
+          </FormControl>
+
+          {expenseType === 'Maintenance Request' ? (
+            <FormControl sx={{ m: 1, minWidth: 150 }} size="medium">
+              <InputLabel id="demo-select-small-label">Request</InputLabel>
+              <Select
+                labelId="demo-select-small-label"
+                id="demo-select-small"
+                value={expenseRequest}
+                label="Expense Type"
+                onChange={handleExpenseRequestChange}
+                SelectProps={{ MenuProps: { sx: { maxHeight: 150 } } }}
+              >
+                {requests.map((req) => (
+                  <MenuItem value={req.requestID}>{`${req.type} for ${req.name}`}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          ) : (
+            <div />
+          )}
+        </Grid>
+        <Grid>
+          <Box
+            component="form"
+            sx={{
+              '& > :not(style)': { m: 1, width: '100ch' },
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            <TextField
+              value={description}
+              id="outlined-basic"
+              label="Description"
+              variant="outlined"
+              multiline
+              onChange={(e) => {
+                setExpenseDescription(e.target.value);
+              }}
+            />
+          </Box>
+        </Grid>
+        <Grid>
+          <DialogActions>
+            <Button onClick={handleSubmitRequest} autoFocus>
+              Submit
+            </Button>
+          </DialogActions>
+        </Grid>
+      </Grid>
+    </Dialog>
+  );
+
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
@@ -189,7 +273,7 @@ export default function ExpensesView() {
           variant="contained"
           color="inherit"
           startIcon={<Iconify icon="eva:plus-fill" />}
-          onClick={handleOpenRequestPopup}
+          onClick={handleOpenPopup}
         >
           New Expense
         </Button>
@@ -253,94 +337,7 @@ export default function ExpensesView() {
         />
       </Card>
 
-      <Dialog
-        open={requestPopup}
-        onClose={handleCloseRequestPopup}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        fullWidth
-        maxWidth="lg"
-      >
-        <DialogTitle id="alert-dialog-title">Add Expense</DialogTitle>
-        <Grid container>
-          <Grid>
-            <FormControl sx={{ m: 1, minWidth: 150 }} size="medium">
-              <InputLabel id="demo-select-small-label">Expense Type</InputLabel>
-              <Select
-                labelId="demo-select-small-label"
-                id="demo-select-small"
-                value={expenseType}
-                label="Expense Type"
-                onChange={handleChange}
-                SelectProps={{ MenuProps: { sx: { maxHeight: 150 } } }}
-              >
-                <MenuItem value="Maintenance Request">Maintenance Request</MenuItem>
-                <MenuItem value="Wages">Wages</MenuItem>
-                <MenuItem value="Mortgage Interest">Mortgage Interest</MenuItem>
-                <MenuItem value="Utilities">Utilities</MenuItem>
-                <MenuItem value="Other">Other</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl sx={{ m: 1 }}>
-              <InputLabel>Amount</InputLabel>
-              <Input
-                onChange={(e) => {
-                  setExpenseAmount(e.target.value);
-                }}
-                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-              />
-            </FormControl>
-
-            {expenseType === 'Maintenance Request' ? (
-              <FormControl sx={{ m: 1, minWidth: 150 }} size="medium">
-                <InputLabel id="demo-select-small-label">Request</InputLabel>
-                <Select
-                  labelId="demo-select-small-label"
-                  id="demo-select-small"
-                  value={expenseRequest}
-                  label="Expense Type"
-                  onChange={handleExpenseRequestChange}
-                  SelectProps={{ MenuProps: { sx: { maxHeight: 150 } } }}
-                >
-                  {requests.map((req) => (
-                    <MenuItem value={req.requestID}>{`${req.type} for ${req.name}`}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            ) : (
-              <div />
-            )}
-          </Grid>
-          <Grid>
-            <Box
-              component="form"
-              sx={{
-                '& > :not(style)': { m: 1, width: '100ch' },
-              }}
-              noValidate
-              autoComplete="off"
-            >
-              <TextField
-                value={description}
-                id="outlined-basic"
-                label="Description"
-                variant="outlined"
-                multiline
-                onChange={(e) => {
-                  setExpenseDescription(e.target.value);
-                }}
-              />
-            </Box>
-          </Grid>
-          <Grid>
-            <DialogActions>
-              <Button onClick={handleSubmitRequest} autoFocus>
-                Submit
-              </Button>
-            </DialogActions>
-          </Grid>
-        </Grid>
-      </Dialog>
+      {newExpenseDialog}
     </Container>
   );
 }
