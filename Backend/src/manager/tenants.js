@@ -1,6 +1,6 @@
 const express = require('express');
 const tenantsRouter = express.Router();
-const { executeQuery } = require('../utils');
+const { executeQuery, uuidToString } = require('../utils');
 
 tenantsRouter.use(express.json());
 
@@ -66,6 +66,30 @@ tenantsRouter.get("/get-tenants", async (req, res) => {
       tenantID: row.tenantID.toString('hex').toUpperCase(),
     }));
     res.send(formattedData);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+tenantsRouter.post("/delete-tenant", async (req, res) => {
+  try {
+    const tenantID = '0x' + req.query["tenant-id"];
+    const requests = await executeQuery(`SELECT requestID from requests where tenantID = ${tenantID};`);
+    if(requests){
+      for(let request of requests){
+        const requestID = uuidToString(request.requestID);
+        await executeQuery(`DELETE FROM attachments where requestID = ${requestID}`);
+        await executeQuery(`DELETE FROM comments where requestID = ${requestID}`);
+        await executeQuery(`DELETE FROM requests where requestID = ${requestID}`);
+        const expenseResults = await executeQuery(`SELECT expenseID from expenses where requestID = ${requestID};`);
+        for(const expenseID of expenseResults){
+          await executeQuery(`UPDATE expenses SET requestID = NULL where expenseID = ${expenseID.expenseID}`);
+        }
+      }
+    }
+    await executeQuery(`DELETE FROM paymentsLedger where tenantID = ${tenantID};`);
+    await executeQuery(`DELETE FROM tenants where tenantID = ${tenantID};`);
+    res.send(200);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
