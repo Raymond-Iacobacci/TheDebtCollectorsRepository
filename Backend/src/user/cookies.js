@@ -6,7 +6,8 @@ const cookiesRouter = express.Router();
 cookiesRouter.use(express.json());
 cookiesRouter.use(express.urlencoded({ extended: true }));
 
-async function verifyUser(tableName, userID, email, token, res) {
+/* Gets userID from database and updates the user's cookie */
+async function addCookie(tableName, userID, email, token, res) {
   try {
     const user = await executeQuery(`SELECT ${userID} FROM ${tableName} WHERE email = '${email}';`);
     await executeQuery(`UPDATE ${tableName} SET token = '${token}' WHERE email = '${email}';`);
@@ -16,18 +17,21 @@ async function verifyUser(tableName, userID, email, token, res) {
   }
 }
 
+/* logs the tenant by adding a cookie for user's session */
 cookiesRouter.put('/login-tenant', async (req, res) => {
   const email = req.query['email'];
   const token = req.body['token'];
-  await verifyUser('tenants', 'tenantID', email, token, res);
+  await addCookie('tenants', 'tenantID', email, token, res);
 });
 
+/* logs the manager by adding a cookie for user's session */
 cookiesRouter.put('/login-manager', async (req, res) => {
   const email = req.query['email'];
   const token = req.body['token'];
-  await verifyUser('managers', 'managerID', email, token, res);
+  await addCookie('managers', 'managerID', email, token, res);
 });
 
+/* given a user and cookie, verify if the cookie is correct */
 cookiesRouter.get('/verify-cookie', async (req, res) => {
   const userID = '0x' + req.query['user-id'];
   const frontendToken = req.query['token'];
@@ -43,6 +47,7 @@ cookiesRouter.get('/verify-cookie', async (req, res) => {
   }
 });
 
+/* given a user, delete the cookie from the database */
 cookiesRouter.put('/remove-cookie', async (req, res) => {
   const userID = '0x' + req.query['user-id'];
   const userType = await getUserType(userID);

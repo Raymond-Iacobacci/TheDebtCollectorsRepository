@@ -32,7 +32,7 @@ dashboardRouter.get('/get-number-of-tenants', async (req, res) => {
 dashboardRouter.get('/get-number-of-unresolved-requests', async (req, res) => {
   try{
     const managerID = '0x' + req.query['manager-id'];
-    const query = `select count(*) AS count from requests where managerID=${managerID} and status='Unresolved' OR status='Ongoing'`;
+    const query = `SELECT COUNT(*) AS count FROM requests WHERE managerID=${managerID} AND (status='Unresolved' OR status='Ongoing');`;
     const results = await executeQuery(query);
     res.send(results[0])
   } catch (error) {
@@ -109,7 +109,7 @@ dashboardRouter.get("/get-outstanding-balances-per-tenant", async (req, res) => 
       tenantID: row.tenantID.toString('hex').toUpperCase(),
     }));
     const balances = [];
-    for (const tenant of formattedData) {         // TODO: check if hitting already-done payments
+    for (const tenant of formattedData) {         
       const tenantID = tenant.tenantID;
       const lastName = tenant.lastName;
       const firstName = tenant.firstName;
