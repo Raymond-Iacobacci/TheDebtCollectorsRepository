@@ -26,8 +26,9 @@ function getIncomeQuery(managerID, description, startDate, endDate) {
   const formattedStartDate = startDate.toISOString().slice(0, 10);
   const formattedEndDate = endDate.toISOString().slice(0, 10);
 
+  //amount amount-paidAmount 
   return `
-    SELECT SUM(amount) AS amount
+    SELECT SUM(amount-paidAmount) AS amount
     FROM (
       SELECT type, description, amount, date, paidAmount, idLate
       FROM paymentsLedger p
@@ -37,7 +38,7 @@ function getIncomeQuery(managerID, description, startDate, endDate) {
         WHERE managerID = ${managerID}
       ) AS t ON t.tenantID = p.tenantID
     ) AS final
-    WHERE (final.type = 'Charge' AND final.description = '${description}' AND final.paidAmount = 0 OR final.idLate IS NOT NULL) AND final.date >= '${formattedStartDate}' AND final.date <= '${formattedEndDate}';`;
+    WHERE (final.type = 'Charge' AND final.description = '${description}' AND final.paidAmount < final.amount OR final.idLate IS NOT NULL) AND final.date >= '${formattedStartDate}' AND final.date <= '${formattedEndDate}';`;
 }
 
 /* Given a managerID and start/end dates, generate a query to get the credits in the database satisfying these conditions */
