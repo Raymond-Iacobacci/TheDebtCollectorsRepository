@@ -37,13 +37,18 @@ cookiesRouter.get('/verify-cookie', async (req, res) => {
   const frontendToken = req.query['token'];
 
   const userType = await getUserType(userID);
+  if(userType === null){
+    console.log('ENTERED HERE ')
+    res.sendStatus(404).send({ err: "No user found" });
+    return;
+  }
   queryResults = await executeQuery(`SELECT token FROM ${userType}s WHERE ${userType}ID = ${userID};`);
   const backendToken = queryResults[0].token;
 
   if (frontendToken === backendToken) {
     res.sendStatus(200);
   } else {
-    res.status(404).send({ err: "Token not verified." });
+    res.sendStatus(404).send({ err: "Token not verified." });
   }
 });
 

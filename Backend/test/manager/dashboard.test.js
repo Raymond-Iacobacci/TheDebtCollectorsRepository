@@ -95,8 +95,6 @@ describe('Dashboard API routes', () => {
         balance: 250,
       }
     ];
-
-    console.log(response.body)
     response.body.forEach((item, index) => {
       expect(item.firstName).toBe(expectedBalances[index].firstName);
       expect(item.lastName).toBe(expectedBalances[index].lastName);
