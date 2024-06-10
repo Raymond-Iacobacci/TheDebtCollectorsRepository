@@ -71,4 +71,5 @@ tenantsRouter.get("/get-tenants", async (req, res) => {
   }
 });
 
+
 module.exports = tenantsRouter;

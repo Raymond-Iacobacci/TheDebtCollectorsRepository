@@ -86,6 +86,19 @@ try {
 }
 });
 
+transactionsRouter.post("/delete-credit", async(req, res) => {
+  try{
+    const amount = req.body.amount;
+    const id = req.body.id;
+    const tenantID = req.query['tenant-id'];
+  
+    await executeQuery(`DELETE FROM paymentsLedger WHERE id=${id}`);
+    updateDeletePayment(amount, tenantID);
+    res.sendStatus(200);
+  }catch(error){
+    res.status(500).json({ error: error.message });
+  }
+});
 /* 
   Description: Manger will issue credit to a specific tenant.
   input: tenantID, description, amount
